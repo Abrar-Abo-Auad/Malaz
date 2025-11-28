@@ -1,6 +1,6 @@
 // file: lib/screens/main_wrapper.dart
 import 'package:flutter/material.dart';
-import '../../../core/config/theme/theme_config.dart';
+import '../../../core/config/theme_config.dart';
 import '../booking/booking_screen.dart';
 import '../chats/chats_screen.dart';
 import '../favorites/favorites_screen.dart';

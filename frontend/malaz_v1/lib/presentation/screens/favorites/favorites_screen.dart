@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/config/theme/theme_config.dart';
+import '../../../core/config/theme_config.dart';
 import '../../../data/source/apartments/apartments_source.dart';
 import '../../global widgets/apartment_card.dart';
 

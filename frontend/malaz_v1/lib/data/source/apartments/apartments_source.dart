@@ -1,4 +1,4 @@
-import '../../models/apartment/apartment_model.dart';
+import '../../../domain/entities/apartment.dart';
 
 final List<Apartment> mockApartments = [
   Apartment(

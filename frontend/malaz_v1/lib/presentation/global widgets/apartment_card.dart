@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/config/theme/theme_config.dart';
-import '../../data/models/apartment/apartment_model.dart';
+import '../../core/config/theme_config.dart';
+import '../../domain/entities/apartment.dart';
 
 /// بطاقة عرض الشقة المستخدمة في القوائم
 class ApartmentCard extends StatelessWidget {

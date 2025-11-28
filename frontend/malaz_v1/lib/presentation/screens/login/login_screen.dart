@@ -1,6 +1,6 @@
 // file: lib/screens/auth/login_screen.dart
 import 'package:flutter/material.dart';
-import '../../../core/config/theme/theme_config.dart';
+import '../../../core/config/theme_config.dart';
 import '../../global widgets/custom_button.dart';
 import '../main wrapper/main_wrapper.dart';
 

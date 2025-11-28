@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:malaz_v1/presentation/screens/login/login_screen.dart';
-import 'core/config/theme/theme_config.dart';
+import 'core/config/theme_config.dart';
 
 
 void main() {

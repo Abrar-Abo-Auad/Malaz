@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/config/theme/theme_config.dart';
+import '../../../core/config/theme_config.dart';
 
 
 // Enum لضمان التعامل الآمن مع الحالات

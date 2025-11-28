@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/config/theme/theme_config.dart';
+import '../../core/config/theme_config.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;

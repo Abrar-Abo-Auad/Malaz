@@ -1,13 +1,13 @@
 // file: lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
-import '../../../core/config/theme/theme_config.dart';
+import '../../../core/config/theme_config.dart';
 import '../../../data/source/apartments/apartments_source.dart';
 import '../../global widgets/apartment_card.dart';
-import '../Drawer/app_drawer.dart';
 import '../details/details_screen.dart';
+import '../side drawer/app_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
-  // 2. نحتاج هذا المفتاح للتحكم في الـ Scaffold وفتح الـ Drawer برمجياً
+  // 2. نحتاج هذا المفتاح للتحكم في الـ Scaffold وفتح الـ side drawer برمجياً
   // لأننا لا نستخدم AppBar قياسي
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
       key: _scaffoldKey, // 3. ربط المفتاح بالـ Scaffold
       backgroundColor: AppColors.background,
 
-      // 4. إضافة الـ Drawer هنا
+      // 4. إضافة الـ side drawer هنا
       drawer: const AppDrawer(),
 
       body: SafeArea(
