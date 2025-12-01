@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,16 +12,23 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('phone')->unique();
+            $table->enum('role', ['ADMIN', 'OWNER', 'RENTER', 'PENDING'])->default('PENDING');
+            $table->date('date_of_birth')->nullable();
+            $table->longText('profile_image')->nullable();
+            $table->longText('identity_card_image');
+            // $table->foreignId('profile_image_id')->default(1)->constrained('images')->references('id')->onDelete(action: 'cascade')->cascadeOnUpdate();
+            // $table->foreignId('identity_card_id')->constrained('images')->references('id')->onDelete('cascade')->cascadeOnUpdate();
+            $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
+            $table->string('phone')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
