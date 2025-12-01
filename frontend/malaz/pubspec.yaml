@@ -58,6 +58,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/key_logo.png
+    - assets/icons/ribbon.png
+    - assets/icons/card_box.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

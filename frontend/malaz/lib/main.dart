@@ -29,7 +29,7 @@ class RentalApp extends StatelessWidget {
       ),
       routes: {'/login': (context) => const LoginScreen()},
       // The initial screen of the app.
-      home: SplashScreen(),
+      home: LoginScreen(),
 
       // Defines the named routes for navigation.
       // This is necessary for `Navigator.pushReplacementNamed(\'/login\')` to work.

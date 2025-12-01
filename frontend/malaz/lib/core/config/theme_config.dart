@@ -10,7 +10,7 @@ class AppColors {
   static const Color primaryLight = Color(0xFFD1FAE5); // emerald-100
 
   // Secondary & Accent Colors
-  static const Color secondary = Color(0xFF0D9488); // teal-600
+  static const Color secondary = Colors.amberAccent; // teal-600
   static const Color accent = Color(0xFF3B82F6); // blue-500
 
   // Neutral Colors
