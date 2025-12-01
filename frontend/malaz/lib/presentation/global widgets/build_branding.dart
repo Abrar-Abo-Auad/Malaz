@@ -6,7 +6,7 @@ class BuildBranding extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 40.0),
+        padding: const EdgeInsets.only(bottom: 20.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

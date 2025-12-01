@@ -40,14 +40,16 @@ class LoginScreen extends StatelessWidget {
                     _buildTextField('Mobile Number', Icons.phone),
                     const SizedBox(height: 16),
                     _buildTextField('Verification Code', Icons.lock_outline),
-        
-                    const SizedBox(height: 100),
+                    _buildVerficationCodeButton(),
+                    const SizedBox(height: 70),
                     CustomButton(
                       text: 'Login',
                       onPressed: () {
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainWrapper()));
                       },
                     ),
+                    const SizedBox(height: 12),
+                    _buildRegisterButton(),
                     SizedBox(height: 40,),
                     BuildBranding()
                   ],
@@ -85,4 +87,30 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildRegisterButton() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Text('Don\'t have an account ? ',style: TextStyle(color: AppColors.textSecondary),),
+      GestureDetector(
+        onTap: (){
+          //Navigator.pushNamed(context, RegisterPage.id);
+        },
+        child: const Text('Register',style: TextStyle(color: AppColors.primary),),
+      ),
+    ],
+  );
+}
+
+Widget _buildVerficationCodeButton() {
+  return Align(
+    alignment: Alignment.centerLeft,
+    child: TextButton.icon(
+      onPressed: () {},
+      icon: const Icon(Icons.send, color: AppColors.primary),
+      label: const Text('Send verification code', style: TextStyle(color: AppColors.primary)),
+    ),
+  );
 }
