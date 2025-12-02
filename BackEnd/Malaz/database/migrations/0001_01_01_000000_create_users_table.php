@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('first_name');
             $table->string('last_name');
             $table->string('phone')->unique();
-            $table->enum('role', ['ADMIN', 'OWNER', 'RENTER', 'PENDING'])->default('PENDING');
+            $table->string('role')->default('PENDING');
             $table->date('date_of_birth')->nullable();
             $table->longText('profile_image')->nullable();
             $table->longText('identity_card_image');
