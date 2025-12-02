@@ -23,11 +23,13 @@ class LoginRequest extends FormRequest
     public function messages()
     {
         return [
-            'phone.required' => 'phone number is required',
-            'phone.regex' => 'wrong format with phone number should be only digit or an "+" as the first char',
-            'phone.unique' => 'phone number is already exists',
-            'password.required' => 'password is required',
-            'password.min' => 'password is too short',
+            'phone.required' => 'Phone number is required.',
+            'phone.regex' => 'Phone number must be in a valid format (9–15 digits, may start with +).',
+            'phone.exists' => 'This phone number does not exist in our records.',
+
+            'password.required' => 'Password is required.',
+            'password.string' => 'Password must be a valid string.',
+            'password.min' => 'Password must be at least 6 characters long.',
         ];
     }
 }

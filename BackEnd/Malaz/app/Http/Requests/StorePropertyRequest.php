@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class storeproperty extends FormRequest
+class StorePropertyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,10 +29,12 @@ class storeproperty extends FormRequest
             'latitude' => 'numeric',
             'longitude' => 'numeric',
             'description' => 'nullable|string|max:1000',
+            'images' => 'nullable|array',
+            'imager.*' => 'string'
         ];
     }
 
-    public function messages(): array
+    public function messages()
     {
         return [
             'price.required' => 'Price is required.',

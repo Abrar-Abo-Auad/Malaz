@@ -3,25 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\EditRequest;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
-    public function info()
-    {
-        return response()->json(
-            [
-                'data' => User::all(),
-                'message' => 'all user',
-                'status' => 1,
-            ]
-        );
-    }
-
     public function sendOtp(Request $request)
     {
         $request->validate([
@@ -39,7 +30,7 @@ class UserController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|regex:/^\+?\d{9,15}$/|unique:users,phone',
+            'phone' => 'required|regex:/^\+?\d{9,15}$/|exists:users,phone',
             'otp' => 'required|integer'
         ]);
 
@@ -63,6 +54,35 @@ class UserController extends Controller
         return response()->json(['message' => 'Phone verified']);
     }
 
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        $validated = $request->validated();
+        $user->update($validated);
+        $user->refresh();
+        return response()->json([
+            'data' => $user,
+            'message' => 'user update completed',
+            'status' => 200,
+        ]);
+    }
+
+    public function request_update(UpdateUserRequest $request)
+    {
+        $user = auth()->user();
+        $editrequest = EditRequest::create([
+            'user_id' => $user->id,
+            'old_data' => $user->toArray(),
+            'new_data' => $request->validated(),
+            'status' => 'PENDING',
+        ]);
+        return response()->json([
+            'data' => $editrequest,
+            'message' => 'Send the edit request , Wait until it is approved by the officials',
+            'status' => 200,
+        ]);
+    }
+
+
     public function register(RegisterRequest $request)
     {
         $user = User::create([
@@ -71,9 +91,10 @@ class UserController extends Controller
             'phone' => $request->phone,
             'password' => bcrypt($request->password),
             'identity_card_image' => $request->identity_card_image,
+            'profile_image' => $request->profile_image,
             'date_of_birth' => $request->date_of_birth,
         ]);
-        $user->fresh();
+        $user->refresh();
         return response()->json(['message' => 'User created Wait until it is approved by the officials', 'data' => $user], 201);
 
     }
@@ -87,7 +108,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 500);
+            return response()->json(['message' => 'User not found'], 423);
         }
 
         if ($user->role === 'PENDING') {
@@ -109,14 +130,14 @@ class UserController extends Controller
     }
 
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $request->user()->currentAccessToken()->delete();
+        auth()->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
     }
 
-    public function me(Request $request)
+    public function me()
     {
-        return response()->json($request->user());
+        return response()->json(auth()->user());
     }
 }

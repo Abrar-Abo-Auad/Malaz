@@ -23,6 +23,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Property::class, 'owner_id', 'id');
     }
+
+    public function edit_requests()
+    {
+        return $this->hasMany(EditRequest::class, 'user_id', 'id');
+    }
     protected $guarded = ['role'];
 
     /**

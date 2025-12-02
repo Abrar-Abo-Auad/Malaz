@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EditRequestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -13,13 +14,16 @@ use App\Http\Controllers\PropertyController;
 Route::prefix('user')->controller(UserController::class)->group(function () {
     Route::post('/sendOtp', 'sendOtp');
     Route::post('/verifyOtp', 'verifyOtp');
-    Route::get('/info', 'info');
     Route::post('/register', 'register');
     Route::post('/login', 'login');
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', 'logout');
+        Route::post('/request_update', 'request_update');
+        Route::get('/logout', 'logout');
         Route::get('/me', 'me');
     });
+
+    Route::post('/update', [PropertyController::class, 'update'])
+        ->middleware(['auth:sanctum', 'role:ADMIN']);
 });
 
 Route::prefix('property')->controller(PropertyController::class)->group(function () {
@@ -31,4 +35,10 @@ Route::prefix('property')->controller(PropertyController::class)->group(function
         Route::patch('/update/{property}', 'update');
         Route::delete('/destroy/{property}', 'destroy');
     });
+});
+
+Route::prefix('admin')->middleware(['auth:sanctum', 'role:ADMIN'])->controller(EditRequestController::class)->group(function () {
+    Route::get('/index', 'index');
+    Route::get('/pendinglist', 'pendinglist');
+    Route::patch('/update/{editRequest}', 'update');
 });

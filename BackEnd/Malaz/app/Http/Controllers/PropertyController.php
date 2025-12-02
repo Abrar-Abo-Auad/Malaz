@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePropertyRequest;
+use App\Http\Requests\UpdatePropertyRequest;
 use Auth;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -15,7 +17,7 @@ class PropertyController extends Controller
     public function my_properties()
     {
         $user = auth()->user();
-        $properties = $user->properties()->get();
+        $properties = $user->properties()->with('images')->get();
         return response()->json(
             [
                 'data' => $properties,
@@ -27,7 +29,7 @@ class PropertyController extends Controller
 
     public function all_properties()
     {
-        $properties = Property::all();
+        $properties = Property::with('images')->get();
         return response()->json(
             [
                 'data' => $properties,
@@ -48,12 +50,17 @@ class PropertyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(storeproperty $request)
+    public function store(StorePropertyRequest $request)
     {
         $user = auth()->user();
         $validated = $request->validated();
         $validated['owner_id'] = $user->id;
         $property = Property::create($validated);
+
+        $property->images()->createMany(
+            collect($validated['images'])->map(fn($image) => ['image' => $image])->toArray()
+        );
+
         return response()->json([
             'data' => $property,
             'message' => 'Property created successfully',
@@ -67,8 +74,9 @@ class PropertyController extends Controller
     {
         return response()->json([
             'data' => $property,
+            'images' => $property->images()->get(),
             'message' => 'Property returned successfully',
-        ], 201);
+        ], 200);
     }
 
     /**
@@ -82,16 +90,20 @@ class PropertyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Property $property)
+    public function update(UpdatePropertyRequest $request, Property $property)
     {
         $this->authorize('update', $property);
-        $validated = $request->validate([
-            'is_rented' => 'boolean',
-            'price' => 'integer|min:0',
-            'description' => 'nullable|string|max:1000',
-        ]);
+        $validated = $request->validated();
         $property->update($validated);
-
+        if (!empty($validated['images'])) {
+            $property->images()->createMany(
+                collect($validated['images'])->map(fn($image) => ['image' => $image])->toArray()
+            );
+        }
+        if (!empty($validated['erase'])) {
+            $property->images()->whereIn('id', $validated['erase'])->delete();
+        }
+        $property->refresh();
         return response()->json([
             'property' => $property,
             'message' => 'update completed',

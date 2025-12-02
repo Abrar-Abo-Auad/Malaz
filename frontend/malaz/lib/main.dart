@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:malaz/core/config/theme_config.dart';
-import 'package:malaz/presentation/screens/login/login_screen.dart';
-import 'package:malaz/presentation/screens/splash%20screen/splash_screen.dart';
+import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 
 // I'm commenting this out as it seems to be causing an error.
 // We can fix this together later if you'd like.

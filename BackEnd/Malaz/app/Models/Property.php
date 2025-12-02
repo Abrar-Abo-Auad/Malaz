@@ -12,8 +12,13 @@ class Property extends Model
 
     public function images()
     {
-        return $this->hasMany(Image::class);
+        return $this->hasMany(Image::class, 'property_id', 'id');
     }
 
-    protected $guarded =[];
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    protected $guarded = [];
 }
