@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,6 +12,15 @@ return new class extends Migration
     {
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('owner_id')->constrained('users')->references('id');
+            $table->boolean('is_rented')->default(false);
+            $table->integer('price')->default(0);
+            $table->string('governorate');
+            $table->string('city');
+            $table->string('address');
+            $table->string('description')->nullable();
+            $table->string('laititude')->nullable();
+            $table->string('longitude')->nullable();
             $table->timestamps();
         });
     }
