@@ -121,9 +121,7 @@ class LoginScreen extends StatelessWidget {
 }
 
 class _buildPinCodeTextField extends StatelessWidget {
-  const _buildPinCodeTextField({
-    super.key,
-  });
+  const _buildPinCodeTextField();
 
   @override
   Widget build(BuildContext context) {
