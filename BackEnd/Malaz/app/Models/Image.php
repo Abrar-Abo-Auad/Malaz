@@ -10,7 +10,7 @@ class Image extends Model
     /** @use HasFactory<\Database\Factories\ImageFactory> */
     use HasFactory;
 
-    public function properties()
+    public function property()
     {
         return $this->belongsTo(Property::class);
     }

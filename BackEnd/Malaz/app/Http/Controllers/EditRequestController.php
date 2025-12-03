@@ -9,7 +9,7 @@ class EditRequestController extends Controller
 {
     public function index()
     {
-        $requests = EditRequest::with('user')->get();
+        $requests = EditRequest::all();
 
         return response()->json([
             'data' => $requests,
@@ -20,7 +20,7 @@ class EditRequestController extends Controller
 
     public function pendinglist()
     {
-        $requests = EditRequest::with('user')->where('status', 'PENDING')->get();
+        $requests = EditRequest::where('status', 'PENDING')->get();
 
         return response()->json([
             'data' => $requests,
@@ -41,8 +41,8 @@ class EditRequestController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        if ($request->status === 'APPROVED') {
-            $editRequest->user->update($editRequest->new_data);
+        if ($request->status == 'APPROVED') {
+            $editRequest->user()->update($editRequest->new_data);
         }
 
         return response()->json([

@@ -10,12 +10,12 @@ class Property extends Model
     /** @use HasFactory<\Database\Factories\PropertyFactory> */
     use HasFactory;
 
-    public function images()
+    public function image()
     {
         return $this->hasMany(Image::class, 'property_id', 'id');
     }
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

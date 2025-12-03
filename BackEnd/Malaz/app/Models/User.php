@@ -19,12 +19,12 @@ class User extends Authenticatable
      * @var list<string>
      */
 
-    public function properties()
+    public function property()
     {
         return $this->hasMany(Property::class, 'owner_id', 'id');
     }
 
-    public function edit_requests()
+    public function edit_request()
     {
         return $this->hasMany(EditRequest::class, 'user_id', 'id');
     }

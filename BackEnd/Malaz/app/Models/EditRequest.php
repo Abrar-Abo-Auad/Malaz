@@ -9,16 +9,16 @@ class EditRequest extends Model
 {
     /** @use HasFactory<\Database\Factories\EditRequestFactory> */
     use HasFactory;
-    protected $fillable = ['user_id', 'old_data', 'new_data', 'status', 'reviewed_by', 'reviewed_at'];
-
     protected $casts = [
         'old_data' => 'array',
         'new_data' => 'array',
     ];
-
-    public function users()
+    protected $fillable = ['user_id', 'old_data', 'new_data', 'status', 'reviewed_by', 'reviewed_at'];
+    public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
+
+
 
 }

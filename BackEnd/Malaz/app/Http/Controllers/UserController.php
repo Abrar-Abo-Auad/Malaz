@@ -7,12 +7,22 @@ use App\Models\EditRequest;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
+
+    public function index()
+    {
+        return response()->json([
+            'data' => User::all(),
+            'message' => 'user update completed',
+            'status' => 200,
+        ]);
+    }
     public function sendOtp(Request $request)
     {
         $request->validate([
@@ -89,13 +99,46 @@ class UserController extends Controller
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone' => $request->phone,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
             'identity_card_image' => $request->identity_card_image,
             'profile_image' => $request->profile_image,
             'date_of_birth' => $request->date_of_birth,
         ]);
+
         $user->refresh();
+        $editrequest = EditRequest::create([
+            'user_id' => $user->id,
+            'old_data' => collect($user->toArray())->except(['password']),
+            'new_data' => collect($request->validated())->except(['password']),
+            'status' => 'PENDING',
+        ]);
+
         return response()->json(['message' => 'User created Wait until it is approved by the officials', 'data' => $user], 201);
+    }
+
+    public function changepassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed'
+        ]);
+
+        $user = auth()->user();
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect'
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        auth()->user()->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Password updated successfully'
+        ], 200);
 
     }
 

@@ -18,11 +18,14 @@ Route::prefix('user')->controller(UserController::class)->group(function () {
     Route::post('/login', 'login');
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/request_update', 'request_update');
+        Route::post('/changepassword', 'changepassword');
         Route::get('/logout', 'logout');
         Route::get('/me', 'me');
     });
 
-    Route::post('/update', [PropertyController::class, 'update'])
+    Route::post('/update', [UserController::class, 'update'])
+        ->middleware(['auth:sanctum', 'role:ADMIN']);
+    Route::get('/index', [UserController::class, 'index'])
         ->middleware(['auth:sanctum', 'role:ADMIN']);
 });
 

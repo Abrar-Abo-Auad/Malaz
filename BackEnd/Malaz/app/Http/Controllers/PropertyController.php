@@ -17,7 +17,7 @@ class PropertyController extends Controller
     public function my_properties()
     {
         $user = auth()->user();
-        $properties = $user->properties()->with('images')->get();
+        $properties = $user->property()->with('image')->get();
         return response()->json(
             [
                 'data' => $properties,
@@ -29,7 +29,7 @@ class PropertyController extends Controller
 
     public function all_properties()
     {
-        $properties = Property::with('images')->get();
+        $properties = Property::with('image')->get();
         return response()->json(
             [
                 'data' => $properties,
@@ -57,7 +57,7 @@ class PropertyController extends Controller
         $validated['owner_id'] = $user->id;
         $property = Property::create($validated);
 
-        $property->images()->createMany(
+        $property->image()->createMany(
             collect($validated['images'])->map(fn($image) => ['image' => $image])->toArray()
         );
 
