@@ -6,6 +6,7 @@ use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use Auth;
 use App\Models\Property;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Http\Requests\storeproperty;
 
@@ -55,7 +56,9 @@ class PropertyController extends Controller
         $user = auth()->user();
         $validated = $request->validated();
         $validated['owner_id'] = $user->id;
-        $property = Property::create($validated);
+        $property = Property::create(
+            collect($validated)->except('images')->toArray()
+        );
 
         $property->image()->createMany(
             collect($validated['images'])->map(fn($image) => ['image' => $image])->toArray()

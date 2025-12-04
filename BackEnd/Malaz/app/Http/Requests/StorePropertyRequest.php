@@ -39,10 +39,7 @@ class StorePropertyRequest extends FormRequest
         return [
             'price.required' => 'Price is required.',
             'price.integer' => 'Price must be an integer.',
-            'price.min' => 'Price must be greater than or equal to zero.',
-
-            'owner_id.required' => 'Owner ID is required.',
-            'owner_id.exists' => 'The specified owner does not exist.',
+            'price.min' => 'Price must be greater than or equal to 0.',
 
             'city.required' => 'City name is required.',
             'city.string' => 'City name must be a string.',
@@ -57,11 +54,14 @@ class StorePropertyRequest extends FormRequest
             'governorate.max' => 'Governorate must not exceed 255 characters.',
 
             'latitude.numeric' => 'Latitude must be a numeric value.',
-
             'longitude.numeric' => 'Longitude must be a numeric value.',
 
             'description.string' => 'Description must be a string.',
             'description.max' => 'Description must not exceed 1000 characters.',
+
+            'images.array' => 'Images must be an array.',
+
+            'imager.*.string' => 'Each image must be a string (path or URL).',
         ];
     }
 }

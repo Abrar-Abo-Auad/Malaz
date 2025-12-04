@@ -9,4 +9,17 @@ class Message extends Model
 {
     /** @use HasFactory<\Database\Factories\MessageFactory> */
     use HasFactory;
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id', 'id');
+    }
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class, 'conversation_id', 'id');
+    }
+
+        protected $guarded = [];
+
 }

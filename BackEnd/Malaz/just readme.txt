@@ -12,3 +12,9 @@ _______________________________________________________
   - Consider SoftDeletes to preserve the data.  
   - Maintain a unified response format across all endpoints.
 ]
+
+- return to green api env update
+- return to pusher env update
+- update messages and read at should be build again
+- show all conversation for admin only
+- PENDING account shouldn't make a login

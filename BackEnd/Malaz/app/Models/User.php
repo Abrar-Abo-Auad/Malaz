@@ -28,6 +28,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(EditRequest::class, 'user_id', 'id');
     }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
     protected $guarded = ['role'];
 
     /**

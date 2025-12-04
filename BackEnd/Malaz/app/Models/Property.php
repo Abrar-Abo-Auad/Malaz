@@ -20,5 +20,10 @@ class Property extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function conversation()
+    {
+        return $this->hasMany(Conversation::class, 'property_id', 'id');
+    }
+
     protected $guarded = [];
 }

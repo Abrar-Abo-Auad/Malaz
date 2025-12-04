@@ -20,5 +20,5 @@ class EditRequest extends Model
     }
 
 
-
+        protected $guarded = [];
 }
