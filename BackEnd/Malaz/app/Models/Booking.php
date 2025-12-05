@@ -7,6 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
-    /** @use HasFactory<\Database\Factories\BookingFactory> */
-    use HasFactory;
+    protected $fillable = [
+        'user_id',
+        'property_id',
+        'check_in',
+        'check_out',
+        'status',
+        'total_price',
+        'currency',
+        'payment_status',
+    ];
+
+    // A booking belongs to a user
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // A booking belongs to a property
+    public function property()
+    {
+        return $this->belongsTo(Property::class);
+    }
 }

@@ -24,6 +24,11 @@ class User extends Authenticatable
         return $this->hasMany(Property::class, 'owner_id', 'id');
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
     public function edit_request()
     {
         return $this->hasMany(EditRequest::class, 'user_id', 'id');

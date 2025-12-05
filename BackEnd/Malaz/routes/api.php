@@ -77,3 +77,18 @@ Route::prefix('message')
         Route::delete('/destroy/{message}', 'destroy');
     });
 
+Route::prefix('bookings')->middleware('auth:sanctum')->controller(BookingController::class)->group(function () {
+    // User routes
+    Route::get('/', 'index');
+    Route::post('/store', 'store');
+    Route::get('/show/{booking}', 'show');
+    Route::delete('/cancel/{booking}', 'destroy');
+
+    // Admin routes
+    Route::middleware('role:ADMIN')->group(function () {
+        Route::get('/all', 'all');
+        Route::patch('/update/{booking}', 'update');
+        Route::delete('/force-cancel/{booking}', 'forceCancel');
+    });
+});
+
