@@ -27,9 +27,7 @@ class AppDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 60, 20, 40),
             width: double.infinity,
             decoration: BoxDecoration(
-              gradient: isDarkMode
-                  ? AppColors.primaryGradientDark
-                  : AppColors.primaryGradientLight,
+              gradient: AppColors.realGoldGradient
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,6 +97,7 @@ class AppDrawer extends StatelessWidget {
                         color: colorScheme.error, fontWeight: FontWeight.bold)),
                 onTap: () {
                   Navigator.pop(context); // Close drawer
+                  Navigator.pushNamed(context, '/login');
                 },
               ),
             ),

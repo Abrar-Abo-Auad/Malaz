@@ -73,4 +73,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language => 'Language';
+
+  @override
+  String get first_name => 'First Name';
+
+  @override
+  String get last_name => 'Last Name';
+
+  @override
+  String get have_account => 'Do you already have an account ? ';
+
+  @override
+  String get create_account => 'Create Account';
+
+  @override
+  String get join_to_find => 'Join us to find your perfect apartment !';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get confirm_password => 'Confirm Password';
+
+  @override
+  String get id_document_message =>
+      'Please upload a photo of your ID document for security purposes:';
+
+  @override
+  String get upload_id_message => 'Click to upload ID document';
+
+  @override
+  String get png_jpg => 'PNG, JPG, PDF up to 10MB';
+
+  @override
+  String get profile_image_message =>
+      'Choose a picture that suits you!\nIf you need that..\n\nyour profile picture will appear when you message your future apartment owner!';
 }

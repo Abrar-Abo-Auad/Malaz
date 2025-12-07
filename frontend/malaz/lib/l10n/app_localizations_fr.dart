@@ -40,16 +40,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get my_favorites => 'Mes favoris';
 
   @override
-  String get favorites => 'favoris';
+  String get favorites => 'Favoris';
 
   @override
-  String get chats => 'discussions';
+  String get chats => 'Discussions';
 
   @override
-  String get select_theme => 'sélectionner le thème';
+  String get select_theme => 'Sélectionner le thème';
 
   @override
-  String get select_language => 'sélectionner la langue';
+  String get select_language => 'Sélectionner la langue';
 
   @override
   String get messages => 'Messages';
@@ -74,4 +74,41 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get language => 'Langue';
+
+  @override
+  String get first_name => 'Prénom';
+
+  @override
+  String get last_name => 'Nom de famille';
+
+  @override
+  String get have_account => 'Avez-vous déjà un compte ?';
+
+  @override
+  String get create_account => 'Créer un compte';
+
+  @override
+  String get join_to_find =>
+      'Rejoignez-nous pour trouver l\'appartement idéal !';
+
+  @override
+  String get password => 'Mot de passe';
+
+  @override
+  String get confirm_password => 'Confirmez le mot de passe';
+
+  @override
+  String get id_document_message =>
+      'Veuillez télécharger une photo de votre pièce d\'identité pour des raisons de sécurité :';
+
+  @override
+  String get upload_id_message =>
+      'Cliquez pour télécharger une pièce d\'identité';
+
+  @override
+  String get png_jpg => 'PNG, JPG, PDF jusqu\'à 10 Mo';
+
+  @override
+  String get profile_image_message =>
+      'Choisissez une photo qui vous représente ! Si besoin, votre photo de profil apparaîtra lorsque vous contacterez le propriétaire de votre futur appartement !';
 }

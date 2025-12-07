@@ -73,4 +73,41 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get language => 'Язык';
+
+  @override
+  String get first_name => 'имя';
+
+  @override
+  String get last_name => 'Фамилия';
+
+  @override
+  String get have_account => 'У вас уже есть аккаунт ?';
+
+  @override
+  String get create_account => 'Завести аккаунт';
+
+  @override
+  String get join_to_find =>
+      'присоединяйтесь к нам, чтобы найти вашу идеальную квартиру!';
+
+  @override
+  String get password => 'пароль';
+
+  @override
+  String get confirm_password => 'Подтвердите пароль';
+
+  @override
+  String get id_document_message =>
+      'В целях безопасности загрузите фотографию вашего удостоверения личности:';
+
+  @override
+  String get upload_id_message =>
+      'нажмите, чтобы загрузить документ, удостоверяющий личность';
+
+  @override
+  String get png_jpg => 'PNG, JPG, PDF до 10 МБ';
+
+  @override
+  String get profile_image_message =>
+      'Выбирайте подходящую вам фотографию! Если она вам нужна... ваша фотография профиля будет отображаться, когда вы напишете сообщение будущему владельцу квартиры!';
 }

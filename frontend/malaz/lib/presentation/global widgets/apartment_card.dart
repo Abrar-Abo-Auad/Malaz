@@ -87,7 +87,7 @@ class ApartmentCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          gradient: isDarkMode ? AppColors.primaryGradientDark : AppColors.primaryGradientLight,
+                          gradient: isDarkMode ? AppColors.realGoldGradient : AppColors.realGoldGradient,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text('View', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),

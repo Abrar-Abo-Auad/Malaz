@@ -9,6 +9,7 @@ import 'package:malaz/presentation/cubits/home/home_cubit.dart';
 import 'package:malaz/presentation/cubits/language/language_cubit.dart';
 import 'package:malaz/presentation/cubits/theme/theme_cubit.dart';
 import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
+import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
 import 'package:malaz/presentation/screens/settings/settings_screen.dart';
 import 'package:malaz/presentation/screens/splash%20screen/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,6 +100,7 @@ class RentalAppView extends StatelessWidget {
       },
       routes: {
         '/login': (context) => const LoginScreen(),
+        '/home_register': (context) => HomeRegisterScreen(),
         '/settings': (context) => const SettingsScreen(),
       },
       home: const SplashScreen(),

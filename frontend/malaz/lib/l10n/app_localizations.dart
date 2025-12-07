@@ -235,6 +235,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @first_name.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get first_name;
+
+  /// No description provided for @last_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get last_name;
+
+  /// No description provided for @have_account.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you already have an account ? '**
+  String get have_account;
+
+  /// No description provided for @create_account.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get create_account;
+
+  /// No description provided for @join_to_find.
+  ///
+  /// In en, this message translates to:
+  /// **'Join us to find your perfect apartment !'**
+  String get join_to_find;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @confirm_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirm_password;
+
+  /// No description provided for @id_document_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please upload a photo of your ID document for security purposes:'**
+  String get id_document_message;
+
+  /// No description provided for @upload_id_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to upload ID document'**
+  String get upload_id_message;
+
+  /// No description provided for @png_jpg.
+  ///
+  /// In en, this message translates to:
+  /// **'PNG, JPG, PDF up to 10MB'**
+  String get png_jpg;
+
+  /// No description provided for @profile_image_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a picture that suits you!\nIf you need that..\n\nyour profile picture will appear when you message your future apartment owner!'**
+  String get profile_image_message;
 }
 
 class _AppLocalizationsDelegate

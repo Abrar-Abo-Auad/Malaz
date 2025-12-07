@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:malaz/core/config/color/app_color.dart';
 
 class BuildBranding extends StatelessWidget {
   const BuildBranding({super.key});
@@ -12,22 +13,28 @@ class BuildBranding extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'FROM',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: Colors.grey[600],
+            ShaderMask(
+              shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
+              child: Text(
+                'FROM',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.grey[600],
+                ),
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              'MALAZ',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-                letterSpacing: 1.5,
+            ShaderMask(
+              shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
+              child: Text(
+                'MALAZ',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.yellow,
+                  letterSpacing: 1.5,
+                ),
               ),
             ),
           ],

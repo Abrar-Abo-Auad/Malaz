@@ -29,7 +29,7 @@ class CustomButton extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: isOutline || isDeactivated
             ? null
-            : (isDarkMode ? AppColors.primaryGradientDark : AppColors.primaryGradientLight),
+            : (isDarkMode ? AppColors.realGoldGradient : AppColors.realGoldGradient),
         color: isDeactivated ? Colors.grey.shade400 : null,
         borderRadius: BorderRadius.circular(16),
         border: isOutline ? Border.all(color: colorScheme.primary, width: 2) : null,

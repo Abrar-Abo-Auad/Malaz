@@ -73,4 +73,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get language => 'اللغة';
+
+  @override
+  String get first_name => 'الاسم الأول';
+
+  @override
+  String get last_name => 'الاسم الأخير';
+
+  @override
+  String get have_account => 'هل لديك حساب بالفعل';
+
+  @override
+  String get create_account => 'إنشاء حساب';
+
+  @override
+  String get join_to_find => 'انضم إلينا للعثور على شقتك المثالية';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get confirm_password => 'تأكيد كلمة المرور';
+
+  @override
+  String get id_document_message =>
+      'يرجى تحميل صورة من وثيقة الهوية الخاصة بك لأغراض أمنية';
+
+  @override
+  String get upload_id_message => 'انقر هنا لتحميل وثيقة الهوية';
+
+  @override
+  String get png_jpg => 'MB بحد أقصى ١٠ PNG, JPG, PDF';
+
+  @override
+  String get profile_image_message =>
+      'اختر الصورة التي تناسبك! ستظهر صورة ملفك الشخصي عند مراسلة مالك شقتك المستقبلية!';
 }

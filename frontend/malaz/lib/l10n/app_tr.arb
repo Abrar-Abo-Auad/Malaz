@@ -20,5 +20,16 @@
   "theme": "Tema",
   "my_profile": "Profilim",
   "become_a_renter": "Kiracı Olun",
-  "language": "Dil"
+  "language": "Dil",
+  "first_name": "ilk adı",
+  "last_name": "Soy isim",
+  "have_account": "Zaten bir hesabınız var mı ?",
+  "create_account": "Bir hesap oluşturun",
+  "join_to_find": "mükemmel dairenizi bulmak için bize katılın",
+  "password": "şifre",
+  "confirm_password": "Şifreyi onayla",
+  "id_document_message": "Güvenlik amacıyla lütfen kimlik belgenizin fotoğrafını yükleyin:",
+  "upload_id_message": "kimlik belgesini yüklemek için tıklayın",
+  "png_jpg": "PNG, JPG, PDF 10 MB'a kadar",
+  "profile_image_message": "Kendinize uygun bir resim seçin! İhtiyacınız varsa, gelecekteki daire sahibine mesaj attığınızda profil resminiz görünecektir!"
 }

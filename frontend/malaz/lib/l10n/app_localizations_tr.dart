@@ -73,4 +73,39 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get language => 'Dil';
+
+  @override
+  String get first_name => 'ilk adı';
+
+  @override
+  String get last_name => 'Soy isim';
+
+  @override
+  String get have_account => 'Zaten bir hesabınız var mı ?';
+
+  @override
+  String get create_account => 'Bir hesap oluşturun';
+
+  @override
+  String get join_to_find => 'mükemmel dairenizi bulmak için bize katılın';
+
+  @override
+  String get password => 'şifre';
+
+  @override
+  String get confirm_password => 'Şifreyi onayla';
+
+  @override
+  String get id_document_message =>
+      'Güvenlik amacıyla lütfen kimlik belgenizin fotoğrafını yükleyin:';
+
+  @override
+  String get upload_id_message => 'kimlik belgesini yüklemek için tıklayın';
+
+  @override
+  String get png_jpg => 'PNG, JPG, PDF 10 MB\'a kadar';
+
+  @override
+  String get profile_image_message =>
+      'Kendinize uygun bir resim seçin! İhtiyacınız varsa, gelecekteki daire sahibine mesaj attığınızda profil resminiz görünecektir!';
 }
