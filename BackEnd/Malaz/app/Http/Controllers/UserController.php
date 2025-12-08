@@ -23,6 +23,41 @@ class UserController extends Controller
             'status' => 200,
         ]);
     }
+
+    public function addtofav($propertyId)
+    {
+        $user = auth()->user();
+        $user->favorites()->attach($propertyId);
+
+         return response()->json([
+            'message' => 'added to favorite completed',
+            'status' => 200,
+        ]);
+    }
+
+    public function erasefromfav($propertyId)
+    {
+        $user = auth()->user();
+        $user->favorites()->detach($propertyId);
+
+         return response()->json([
+            'message' => 'removed from favorite completed',
+            'status' => 200,
+        ]);
+    }
+
+    public function getfav()
+    {
+        $user = auth()->user();
+        $favorites = $user->favorites;
+
+        return response()->json([
+            'favorite' => $favorites,
+            'message' => 'here all your favorite list',
+            'status' => 200,
+        ]);
+    }
+
     public function sendOtp(Request $request)
     {
         $request->validate([

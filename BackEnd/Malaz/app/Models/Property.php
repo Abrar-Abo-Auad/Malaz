@@ -30,5 +30,12 @@ class Property extends Model
         return $this->hasMany(Conversation::class, 'property_id', 'id');
     }
 
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites')
+            ->withTimestamps();
+    }
+
+
     protected $guarded = [];
 }

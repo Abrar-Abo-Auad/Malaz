@@ -14,8 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_one_id')->constrained('users')->references('id');
             $table->foreignId('user_two_id')->constrained('users')->references('id');
-            $table->foreignId('property_id')->constrained('properties')->references('id');
-            $table->integer('unread_count')->default(0);
             $table->timestamps();
         });
     }

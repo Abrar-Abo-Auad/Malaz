@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PropertyController;
@@ -12,83 +13,83 @@ use App\Http\Controllers\ConversationController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-
-Route::prefix('user')
-    ->controller(UserController::class)
-    ->group(function () {
-        Route::post('/sendOtp', 'sendOtp');
-        Route::post('/verifyOtp', 'verifyOtp');
-        Route::post('/register', 'register');
-        Route::post('/login', 'login');
-        Route::middleware('auth:sanctum')
-            ->group(function () {
-                Route::post('/request_update', 'request_update');
-                Route::post('/changepassword', 'changepassword');
-                Route::get('/logout', 'logout');
-                Route::get('/me', 'me');
-            });
-
-        Route::post('/update', [UserController::class, 'update'])
-            ->middleware(['auth:sanctum', 'role:ADMIN']);
-        Route::get('/index', [UserController::class, 'index'])
-            ->middleware(['auth:sanctum', 'role:ADMIN']);
+Route::prefix('users')->controller(UserController::class)->group(function () {
+    Route::middleware(['auth:sanctum', 'role:ADMIN'])->group(function () {
+        Route::get('/', 'index')->name('users.index');
+        Route::put('{user}', 'update')->name('users.update');
     });
-
-Route::prefix('property')
-    ->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])
-    ->controller(PropertyController::class)
-    ->group(function () {
-        Route::get('/all_properties', 'all_properties');
-        Route::get('/show/{property}', 'show');
-        Route::middleware(['auth:sanctum', 'role:ADMIN,OWNER'])->group(function () {
-            Route::get('/my_properties', 'my_properties');
-            Route::post('/store', 'store');
-            Route::patch('/update/{property}', 'update');
-            Route::delete('/destroy/{property}', 'destroy');
-        });
+    Route::middleware(['auth:sanctum', 'role:ADMIN,RENTER,OWNER'])->group(function () {
+        Route::post('request-update', 'request_update')->name('users.requestUpdate');
+        Route::post('change-password', 'changepassword')->name('users.changePassword');
+        Route::post('logout', 'logout')->name('users.logout');
+        Route::get('me', 'me')->name('users.me');
+        Route::post('favorites/{property}', 'addtofav')->name('users.addFavorite');
+        Route::delete('favorites/{property}', 'erasefromfav')->name('users.removeFavorite');
+        Route::get('favorites', 'getfav')->name('users.getFavorites');
     });
+    Route::post('register', 'register')->name('users.register');
+    Route::post('login', 'login')->name('users.login');
+    Route::post('send-otp', 'sendOtp')->name('users.sendOtp');
+    Route::post('verify-otp', 'verifyOtp')->name('users.verifyOtp');
+});
 
-Route::prefix('admin')
-    ->middleware(['auth:sanctum', 'role:ADMIN'])
-    ->controller(EditRequestController::class)
-    ->group(function () {
-        Route::get('/index', 'index');
-        Route::get('/pendinglist', 'pendinglist');
-        Route::patch('/update/{editRequest}', 'update');
-    });
+Route::prefix('reviews')->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])->controller(ReviewController::class)->group(function () {
+    Route::get('/', 'index')->name('reviews.index');
+    Route::post('/properties/{property}', 'store')->name('reviews.store');
+    Route::get('{review}', 'show')->name('reviews.show');
+    Route::put('{review}', 'update')->name('reviews.update');
+    Route::patch('{review}', 'update');
+    Route::delete('{review}', 'destroy')->name('reviews.destroy');
+});
 
-Route::prefix('conversation')
-    ->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])
-    ->controller(ConversationController::class)
-    ->group(function () {
-        Route::get('/index', 'index');
-        Route::post('/store', 'store');
-        Route::get('/show/{conversation}', 'show');
-        Route::delete('/destroy/{conversation}', 'destroy');
-    });
-
-Route::prefix('message')
-    ->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])
-    ->controller(MessageController::class)
-    ->group(function () {
-        Route::get('/index/{conversation}', 'index');
-        Route::post('/store/{conversation}', 'store');
-        Route::get('/show/{message}', 'show');
-        Route::delete('/destroy/{message}', 'destroy');
-    });
-
-Route::prefix('bookings')->middleware('auth:sanctum')->controller(BookingController::class)->group(function () {
-    // User routes
-    Route::get('/', 'index');
-    Route::post('/store', 'store');
-    Route::get('/show/{booking}', 'show');
-    Route::delete('/cancel/{booking}', 'destroy');
-
-    // Admin routes
-    Route::middleware('role:ADMIN')->group(function () {
-        Route::get('/all', 'all');
-        Route::patch('/update/{booking}', 'update');
-        Route::delete('/force-cancel/{booking}', 'forceCancel');
+Route::prefix('properties')->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])->controller(PropertyController::class)->group(function () {
+    Route::get('all', 'all_properties')->name('properties.all');
+    Route::get('{property}', 'show')->name('properties.show');
+    Route::get('{property}/favorites', 'favonwho')->name('properties.favonwho');
+    Route::middleware('role:ADMIN,OWNER')->group(function () {
+        Route::get('my', 'my_properties')->name('properties.my');
+        Route::post('/', 'store')->name('properties.store');
+        Route::put('{property}', 'update')->name('properties.update');
+        Route::delete('{property}', 'destroy')->name('properties.destroy');
     });
 });
 
+Route::prefix('conversations')->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])->controller(ConversationController::class)->group(function () {
+    Route::get('/', 'index')->name('conversations.index');
+    Route::post('/', 'store')->name('conversations.store');
+    Route::get('{conversation}', 'show')->name('conversations.show');
+    Route::delete('{conversation}', 'destroy')->name('conversations.destroy');
+    Route::get('{conversation}/messages', 'showmessage')->name('conversations.messages');
+});
+
+Route::prefix('conversations/{conversation}/messages')->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])->controller(MessageController::class)->group(function () {
+    Route::get('/', 'index')->name('messages.index');
+    Route::post('/', 'store')->name('messages.store');
+});
+
+Route::prefix('messages')->middleware(['auth:sanctum', 'role:ADMIN,OWNER,RENTER'])->controller(MessageController::class)->group(function () {
+    Route::get('{message}', 'show')->name('messages.show');
+    Route::put('{message}', 'update')->name('messages.update');
+    Route::patch('{message}', 'update');
+    Route::post('{message}/read', 'readnow')->name('messages.read');
+    Route::delete('{message}', 'destroy')->name('messages.destroy');
+});
+
+Route::prefix('edit-requests')->middleware(['auth:sanctum', 'role:ADMIN'])->controller(EditRequestController::class)->group(function () {
+    Route::get('/', 'index')->name('editrequests.index');
+    Route::get('pending', 'pendinglist')->name('editrequests.pending');
+    Route::put('{editRequest}', 'update')->name('editrequests.update');
+    Route::patch('{editRequest}', 'update');
+});
+
+Route::prefix('bookings')->middleware('auth:sanctum')->controller(BookingController::class)->group(function () {
+    Route::get('/', 'index')->name('bookings.index');
+    Route::post('store', 'store')->name('bookings.store');
+    Route::get('show/{booking}', 'show')->name('bookings.show');
+    Route::delete('cancel/{booking}', 'destroy')->name('bookings.cancel');
+    Route::middleware('role:ADMIN')->group(function () {
+        Route::get('all', 'all')->name('bookings.all');
+        Route::patch('update/{booking}', 'update')->name('bookings.update');
+        Route::delete('force-cancel/{booking}', 'forceCancel')->name('bookings.forceCancel');
+    });
+});

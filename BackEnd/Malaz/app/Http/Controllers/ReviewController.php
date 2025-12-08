@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\Property;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
@@ -12,7 +14,13 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+        $reviews = $user->reviews()->with('property')->get();
+        return response()->json([
+            'reviews' => $reviews,
+            'message' => 'this is all your reviews',
+            'status' => 200,
+        ]);
     }
 
     /**
@@ -26,10 +34,52 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $propertyId)
     {
-        //
+        $request->validate([
+            'rating' => 'integer|min:1|max:5',
+            'body' => 'string|max:255',
+        ]);
+
+        $user = auth()->user();
+        $exists = Booking::where('user_id', $user->id)
+            ->where('property_id', $propertyId)
+            ->where('status', 'completed')
+            ->exists();
+
+        if ($exists) {
+            $review = Review::create([
+                'user_id' => $user->id,
+                'property_id' => $propertyId,
+                'rating' => $request->rating,
+                'body' => $request->body,
+            ]);
+
+            return response()->json([
+                'review' => $review,
+                'message' => 'The review was published successfully',
+                'status' => 201,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'It is necessary to make a reservation in this apartment before the review.',
+            'status' => 400,
+        ]);
     }
+
+    /*
+        $alreadyReviewed = Review::where('user_id', $user->id)
+    ->where('property_id', $propertyId)
+    ->exists();
+
+if ($alreadyReviewed) {
+    return response()->json([
+        'message' => 'You have already reviewed this property.',
+        'status' => 400,
+    ]);
+}
+    */
 
     /**
      * Display the specified resource.
@@ -52,7 +102,22 @@ class ReviewController extends Controller
      */
     public function update(Request $request, Review $review)
     {
-        //
+        if ($review->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'rating' => 'sometimes|integer|min:1|max:5',
+            'body' => 'sometimes|string|max:255',
+        ]);
+
+        $review->update($request->only(['rating', 'body']));
+
+        return response()->json([
+            'review' => $review,
+            'message' => 'Review updated successfully',
+            'status' => 200,
+        ]);
     }
 
     /**
@@ -60,6 +125,14 @@ class ReviewController extends Controller
      */
     public function destroy(Review $review)
     {
-        //
+        if ($review->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $review->delete();
+        return response()->json([
+            'message' => 'Review deleted successfully',
+            'status' => 200,
+        ]);
     }
 }

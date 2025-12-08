@@ -44,6 +44,17 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
+    public function favorites()
+    {
+        return $this->belongsToMany(Property::class, 'favorites')
+            ->withTimestamps();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany('reviews');
+    }
+
     protected $guarded = ['role'];
 
     /**

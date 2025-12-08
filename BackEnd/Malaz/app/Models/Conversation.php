@@ -15,11 +15,6 @@ class Conversation extends Model
         return $this->hasMany(Message::class, 'conversation_id', 'id');
     }
 
-    public function property()
-    {
-        return $this->belongsTo(Property::class);
-    }
-
     public function userOne()
     {
         return $this->belongsTo(User::class, 'user_one_id');
@@ -28,6 +23,13 @@ class Conversation extends Model
     public function userTwo()
     {
         return $this->belongsTo(User::class, 'user_two_id');
+    }
+
+    public function unreadCount($user_id)
+    {
+        return $this->messages()->whereNull('read_at')->
+            where('sender_id', '!=', $user_id)->
+            count();
     }
 
     protected $guarded = [];

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Conversation;
 use App\Models\Message;
+use App\Events\MessageRead;
 use App\Events\MessageSent;
+use App\Models\Conversation;
 use Illuminate\Http\Request;
+use App\Events\MessageUpdate;
 
 class MessageController extends Controller
 {
@@ -63,6 +65,7 @@ class MessageController extends Controller
             'conversation_id' => $conversation->id,
             'body' => $request->body,
         ]);
+        $message->load('sender');
 
         broadcast(new MessageSent($message))->toOthers();
 
@@ -113,18 +116,36 @@ class MessageController extends Controller
             $message->update([
                 'body' => $request->body
             ]);
-
+            $message->load('sender');
+            broadcast(new MessageUpdate($message))->toOthers();
             return response()->json([
                 'message' => 'message updated',
                 'status' => 200,
             ]);
         }
+    }
 
-        $message->update([
-            'read_at' => now()
-        ]);
+    public function readnow(Request $request, Message $message)
+    {
+        $user = auth()->user();
+
+        $conversation = $message->conversation;
+        if ($conversation->user_one_id !== $user->id && $conversation->user_two_id !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($message->sender_id === $user->id) {
+            return response()->json(['error' => 'You cannot mark your own message as read'], 400);
+        }
+
+        $message->update(['read_at' => now()]);
+        $message->load('sender');
+
+        broadcast(new MessageRead($message))->toOthers();
+
         return response()->json([
-            'message' => 'message marked as read now',
+            'message' => 'Message marked as read',
+            'data' => $message,
             'status' => 200,
         ]);
     }

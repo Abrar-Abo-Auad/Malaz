@@ -12,7 +12,7 @@ class FavoriteController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,6 +12,10 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->references('id')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('property_id')->constrained('properties')->references('id')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->integer('rating')->default(3);
+            $table->string('body')->nullable();
             $table->timestamps();
         });
     }
