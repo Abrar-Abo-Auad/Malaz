@@ -6,9 +6,35 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../global_widgets/build_branding.dart';
 import '../shared_widgets/shared_widgets.dart';
 
-class RegisterScreen3 extends StatelessWidget {
+class RegisterScreen4 extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  const RegisterScreen3({super.key, required this.formKey});
+  const RegisterScreen4({super.key, required this.formKey});
+
+  @override
+  State<RegisterScreen4> createState() => RegisterScreen4State();
+}
+
+class RegisterScreen4State extends State<RegisterScreen4> {
+  XFile? _image; // إضافة متغير لتخزين الصورة المختارة
+  bool _showImageError = false;
+
+  void _submit() {
+    if (_image == null) {
+      setState(() {
+        _showImageError = true;
+      });
+    } else {
+      setState(() {
+        _showImageError = false;
+      });
+      // متابعة الإجراء عند وجود صورة
+    }
+  }
+  void showImageError(bool show) {
+    setState(() {
+      _showImageError = show;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +50,7 @@ class RegisterScreen3 extends StatelessWidget {
               horizontal: 24,
             ),
             child: Form(
-              key: formKey,
+              key: widget.formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -73,29 +99,50 @@ class RegisterScreen3 extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(
-                    height: 135,
-                  ),
-
-                  // Password Field
-                  BuildTextfield(
-                    label: tr.password, icon: Icons.password, haveSuffixEyeIcon: true, obscure: true,formKey: formKey,
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-
-                  //  Confirm Password Field
-                  BuildTextfield(
-                    label: tr.confirm_password, icon: Icons.password, haveSuffixEyeIcon: true, obscure: true,formKey: formKey,
-                  ),
-                  const SizedBox(
                     height: 100,
+                  ),
+
+                  // ID Document Message
+                  ShaderMask(
+                    shaderCallback: (bounds) =>
+                        AppColors.realGoldGradient.createShader(bounds),
+                    child: Text(tr.id_document_message, // Using getter
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.yellow,
+                        )),
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+
+                  // Image Input
+                  ImageUploadWidget(
+                    isError: _showImageError,
+                    onImageSelected: (XFile? img) {
+                      setState(() {
+                        _image = img;
+                        _showImageError = false; // إزالة الخطأ عند اختيار صورة
+                      });
+                    },
+                  ),
+                  if (_showImageError)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        tr.image_required,
+                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  const SizedBox(
+                    height: 70,
                   ),
 
                   // Navigator.push to Login Page
                   const BuildLoginRow(),
                   const SizedBox(
-                    height: 135,
+                    height: 100,
                   ),
 
                   // Branding
@@ -108,15 +155,22 @@ class RegisterScreen3 extends StatelessWidget {
       ),
     );
   }
+  bool isImageSelected() {
+    return _image != null;
+  }
 }
 
 class ImageUploadWidget extends StatefulWidget {
+  final Function(XFile?) onImageSelected;
+  final bool isError; // متغير نستقبله من الخارج
+
+  const ImageUploadWidget({Key? key, required this.onImageSelected,this.isError = false,}) : super(key: key);
   @override
   _ImageUploadWidgetState createState() => _ImageUploadWidgetState();
 }
 
 class _ImageUploadWidgetState extends State<ImageUploadWidget> {
-  File? _image;
+  XFile? _image;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -124,8 +178,9 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
 
     if (pickedFile != null) {
       setState(() {
-        _image = File(pickedFile.path);
+        _image = XFile(pickedFile.path);
       });
+      widget.onImageSelected(_image); // تمرير الصورة للوالد فقط عند الاختيار الناجح
     }
   }
 
@@ -134,23 +189,23 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
     return InkWell(
       onTap: _pickImage,
       child: DottedBox(
+        isError: widget.isError,
         child: _image == null
             ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 36, color: Colors.yellow),
-                  const SizedBox(height: 8),
-                  Text(label,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600, color: Colors.yellow)),
-                  if (sub != null) ...[
-                    const SizedBox(height: 6),
-                    Text(sub,
-                        style: TextStyle(fontSize: 12, color: Colors.yellow)),
-                  ],
-                ],
-              )
-            : Image.file(_image!, fit: BoxFit.cover),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 36, color: Colors.yellow),
+            const SizedBox(height: 8),
+            Text(label,
+                style: TextStyle(
+                    fontWeight: FontWeight.w600, color: Colors.yellow)),
+            if (sub != null) ...[
+              const SizedBox(height: 6),
+              Text(sub,
+                  style: TextStyle(fontSize: 12, color: Colors.yellow)),
+            ],
+          ],
+        ) : Image.file(File(_image!.path), fit: BoxFit.cover),
       ),
     );
   }
@@ -174,7 +229,8 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
 
 class DottedBox extends StatelessWidget {
   final Widget child;
-  const DottedBox({required this.child, Key? key}) : super(key: key);
+  final bool isError; // متغير جديد لتحديد حالة الخطأ
+  const DottedBox({required this.child, this.isError = false, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +243,10 @@ class DottedBox extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white12,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.yellow, style: BorderStyle.solid),
+          border: Border.all(
+            color: isError ? Colors.red : Colors.yellow, // لون الحدود يتغير
+            style: BorderStyle.solid,
+          ),
         ),
         child: child,
       ),

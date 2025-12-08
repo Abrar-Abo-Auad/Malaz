@@ -301,6 +301,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a picture that suits you!\nIf you need that..\n\nyour profile picture will appear when you message your future apartment owner!'**
   String get profile_image_message;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @previous.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previous;
+
+  /// No description provided for @send_code.
+  ///
+  /// In en, this message translates to:
+  /// **'Send verification code'**
+  String get send_code;
+
+  /// No description provided for @date_of_birth.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Of Birth'**
+  String get date_of_birth;
+
+  /// No description provided for @six_digits.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a 6-digit PIN code'**
+  String get six_digits;
+
+  /// No description provided for @field_required.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get field_required;
+
+  /// No description provided for @image_required.
+  ///
+  /// In en, this message translates to:
+  /// **'This image is required'**
+  String get image_required;
 }
 
 class _AppLocalizationsDelegate

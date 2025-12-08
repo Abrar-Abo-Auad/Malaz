@@ -108,4 +108,25 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get profile_image_message =>
       'Kendinize uygun bir resim seçin! İhtiyacınız varsa, gelecekteki daire sahibine mesaj attığınızda profil resminiz görünecektir!';
+
+  @override
+  String get next => 'sonraki';
+
+  @override
+  String get previous => 'önceki';
+
+  @override
+  String get send_code => 'doğrulama kodunu gönder';
+
+  @override
+  String get date_of_birth => 'doğum tarihi';
+
+  @override
+  String get six_digits => 'Please enter a 6-digit PIN code';
+
+  @override
+  String get field_required => 'Bu alan gereklidir';
+
+  @override
+  String get image_required => 'Bu resim gereklidir';
 }

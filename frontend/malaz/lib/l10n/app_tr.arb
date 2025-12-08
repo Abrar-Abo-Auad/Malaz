@@ -31,5 +31,12 @@
   "id_document_message": "Güvenlik amacıyla lütfen kimlik belgenizin fotoğrafını yükleyin:",
   "upload_id_message": "kimlik belgesini yüklemek için tıklayın",
   "png_jpg": "PNG, JPG, PDF 10 MB'a kadar",
-  "profile_image_message": "Kendinize uygun bir resim seçin! İhtiyacınız varsa, gelecekteki daire sahibine mesaj attığınızda profil resminiz görünecektir!"
+  "profile_image_message": "Kendinize uygun bir resim seçin! İhtiyacınız varsa, gelecekteki daire sahibine mesaj attığınızda profil resminiz görünecektir!",
+  "next": "sonraki",
+  "previous": "önceki",
+  "send_code": "doğrulama kodunu gönder",
+  "date_of_birth": "doğum tarihi",
+  "six_digit": "Lütfen 6 haneli bir PIN kodu girin",
+  "field_required": "Bu alan gereklidir",
+  "image_required": "Bu resim gereklidir"
 }

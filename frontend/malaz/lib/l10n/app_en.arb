@@ -31,5 +31,12 @@
   "id_document_message": "Please upload a photo of your ID document for security purposes:",
   "upload_id_message": "Click to upload ID document",
   "png_jpg": "PNG, JPG, PDF up to 10MB",
-  "profile_image_message": "Choose a picture that suits you!\nIf you need that..\n\nyour profile picture will appear when you message your future apartment owner!"
+  "profile_image_message": "Choose a picture that suits you!\nIf you need that..\n\nyour profile picture will appear when you message your future apartment owner!",
+  "next": "Next",
+  "previous": "Previous",
+  "send_code": "Send verification code",
+  "date_of_birth": "Date Of Birth",
+  "six_digits": "Please enter a 6-digit PIN code",
+  "field_required": "This field is required",
+  "image_required": "This image is required"
 }

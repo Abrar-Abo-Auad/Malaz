@@ -111,4 +111,25 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get profile_image_message =>
       'Choisissez une photo qui vous représente ! Si besoin, votre photo de profil apparaîtra lorsque vous contacterez le propriétaire de votre futur appartement !';
+
+  @override
+  String get next => 'Prochain';
+
+  @override
+  String get previous => 'le précédent';
+
+  @override
+  String get send_code => 'envoyer le code de vérification';
+
+  @override
+  String get date_of_birth => 'date de naissance';
+
+  @override
+  String get six_digits => 'Veuillez saisir un code PIN à 6 chiffres';
+
+  @override
+  String get field_required => 'Ce champ est obligatoire';
+
+  @override
+  String get image_required => 'Cette image est requise';
 }

@@ -5,25 +5,32 @@ import '../../../global_widgets/build_branding.dart';
 import '../shared_widgets/shared_widgets.dart';
 
 class RegisterScreen2 extends StatelessWidget {
-  const RegisterScreen2({super.key});
+  final GlobalKey<FormState> formKey;
+  const RegisterScreen2({super.key, required this.formKey});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final tr = AppLocalizations.of(context)!;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Scaffold(
-        backgroundColor: colorScheme.surface,
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+            ),
+            child: Form(
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40),
+                  const SizedBox(
+                    height: 40,
+                  ),
+
+                  // Logo
                   Container(
                     width: 80,
                     height: 80,
@@ -32,43 +39,83 @@ class RegisterScreen2 extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: const [
                           BoxShadow(blurRadius: 20, color: Colors.black12)
-                        ]
-                    ),
+                        ]),
                     child: Image.asset('assets/icons/key_logo.png'),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(
+                    height: 24,
+                  ),
+
+                  // Create Account - Header Text 1
                   ShaderMask(
-                    shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
-                    child: Text(
-                        tr.create_account, // Using getter
+                    shaderCallback: (bounds) =>
+                        AppColors.realGoldGradient.createShader(bounds),
+                    child: Text(tr.create_account, // Using getter
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.yellow,
-                        )
-                    ),
+                        )),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // Join To Find - Header Text 2
                   ShaderMask(
-                    shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
+                    shaderCallback: (bounds) =>
+                        AppColors.realGoldGradient.createShader(bounds),
                     child: Text(
                       tr.join_to_find, // Using getter
-                      style: TextStyle(
-                          color: Colors.grey.shade600
-                      ),
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
                   ),
-                  const SizedBox(height: 100),
-                  BuildTextfield(label: tr.first_name, icon: Icons.person, obscure: false,haveSuffixEyeIcon: false,),
-                  const SizedBox(height: 16),
-                  BuildTextfield(label: tr.last_name, icon: Icons.person, obscure: false,haveSuffixEyeIcon: false,),
-                  const SizedBox(height: 16),
-                  BuildTextfield(label: tr.password, icon: Icons.password,obscure: true,haveSuffixEyeIcon: true,),
-                  const SizedBox(height: 16),
-                  BuildTextfield(label: tr.confirm_password, icon: Icons.verified, obscure: true,haveSuffixEyeIcon: true,),
-                  const SizedBox(height: 40),
+                  const SizedBox(
+                    height: 100,
+                  ),
+
+                  // First Name Field
+                  BuildTextfield(
+                    label: tr.first_name,
+                    icon: Icons.person,
+                    obscure: false,
+                    haveSuffixEyeIcon: false,
+                    formKey: formKey,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+
+                  // Last Name Field
+                  BuildTextfield(
+                    label: tr.last_name,
+                    icon: Icons.person,
+                    obscure: false,
+                    haveSuffixEyeIcon: false,
+                    formKey: formKey,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+
+                  // Date Of Birth Field
+                  BuildTextfield(
+                    label: tr.date_of_birth,
+                    icon: Icons.calendar_today_outlined,
+                    onPressedForDate: true,
+                    formKey: formKey,
+                  ),
+                  const SizedBox(
+                    height: 100,
+                  ),
+
+                  // Navigator.push to Login Page
                   const BuildLoginRow(),
-                  const SizedBox(height: 40,),
+                  const SizedBox(
+                    height: 100,
+                  ),
+
+                  // Branding
                   BuildBranding()
                 ],
               ),

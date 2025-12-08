@@ -108,4 +108,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profile_image_message =>
       'Choose a picture that suits you!\nIf you need that..\n\nyour profile picture will appear when you message your future apartment owner!';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get previous => 'Previous';
+
+  @override
+  String get send_code => 'Send verification code';
+
+  @override
+  String get date_of_birth => 'Date Of Birth';
+
+  @override
+  String get six_digits => 'Please enter a 6-digit PIN code';
+
+  @override
+  String get field_required => 'This field is required';
+
+  @override
+  String get image_required => 'This image is required';
 }

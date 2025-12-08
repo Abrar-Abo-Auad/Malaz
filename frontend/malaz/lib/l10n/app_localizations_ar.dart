@@ -108,4 +108,26 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get profile_image_message =>
       'اختر الصورة التي تناسبك! ستظهر صورة ملفك الشخصي عند مراسلة مالك شقتك المستقبلية!';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get previous => 'السابق';
+
+  @override
+  String get send_code => 'إرسال رمز التحقق';
+
+  @override
+  String get date_of_birth => 'تاريخ الميلاد';
+
+  @override
+  String get six_digits =>
+      'الرجاء إدخال الرمز المرسل الى رقمك المكون من 6 أرقام';
+
+  @override
+  String get field_required => 'هذه الخانة مطلوبة';
+
+  @override
+  String get image_required => 'هذه الصورة مطلوبة';
 }

@@ -96,7 +96,6 @@ class AppDrawer extends StatelessWidget {
                     style: TextStyle(
                         color: colorScheme.error, fontWeight: FontWeight.bold)),
                 onTap: () {
-                  Navigator.pop(context);
                   Navigator.pushNamed(context, '/login');
                 },
               ),

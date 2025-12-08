@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
+import 'package:malaz/presentation/screens/auth/register/register_screen1.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../../core/config/color/app_color.dart';
@@ -23,48 +24,114 @@ class BuildCard extends StatelessWidget {
   }
 }
 
-class BuildPincodeTextfield extends StatelessWidget {
-  const BuildPincodeTextfield({
-    super.key,
-  });
+class BuildPincodeTextfield extends StatefulWidget {
+  const BuildPincodeTextfield({super.key});
+
+  @override
+  State<BuildPincodeTextfield> createState() => BuildPincodeTextfieldState();
+}
+
+class BuildPincodeTextfieldState extends State<BuildPincodeTextfield> {
+  final TextEditingController _pinController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  bool _showError = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        _validatePin(_pinController.text);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  void _validatePin(String value) {
+    if (value.length != 6) {
+      setState(() {
+        _errorMessage = 'Please enter a 6-digit PIN code';
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
+  }
+
+  bool isPinValid() {
+    return _pinController.text.length == 6;
+  }
+
+  void showError() {
+    setState(() {
+      _errorMessage = 'Please enter a 6-digit PIN code';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final borderColor = _errorMessage == null ? Colors.yellow : Colors.red;
 
     return ShaderMask(
       shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
-      child: PinCodeTextField(
-        mainAxisAlignment: MainAxisAlignment.center,
-        appContext: context,
-        textStyle: TextStyle(
-          color: Colors.yellow,
-          fontSize: 18,
-          fontWeight: FontWeight.normal,
-        ),
-        length: 6,
-        onChanged: (value) {},
-        onCompleted: (value) {},
-        pinTheme: PinTheme(
-          selectedBorderWidth: 2,
-          inactiveBorderWidth: 2,
-          activeBorderWidth: 2,
-          borderWidth: 2,
-          shape: PinCodeFieldShape.box,
-          fieldOuterPadding: const EdgeInsets.symmetric(horizontal: 10),
-          borderRadius: BorderRadius.circular(16),
-          fieldHeight: 50,
-          fieldWidth: 40,
-          activeFillColor: Colors.yellow,
-          inactiveColor: Colors.yellow.withOpacity(0.5),
-          selectedColor: Colors.yellow,
-          selectedFillColor: Colors.yellow,
-          activeColor: Colors.yellow,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PinCodeTextField(
+            appContext: context,
+            length: 6,
+            controller: _pinController,
+            focusNode: _focusNode,
+            keyboardType: TextInputType.number,
+            textStyle: const TextStyle(
+              color: Colors.yellow,
+              fontSize: 18,
+              fontWeight: FontWeight.normal,
+            ),
+            pinTheme: PinTheme(
+              selectedBorderWidth: 2,
+              inactiveBorderWidth: 2,
+              activeBorderWidth: 2,
+              shape: PinCodeFieldShape.box,
+              borderRadius: BorderRadius.circular(16),
+              fieldHeight: 50,
+              fieldWidth: 40,
+              activeFillColor: Colors.yellow,
+              inactiveColor: Colors.yellow.withOpacity(0.5),
+              selectedColor: borderColor,
+              selectedFillColor: Colors.yellow,
+              activeColor: borderColor,
+            ),
+            onChanged: (value) {
+              if (_showError && value.length == 6) {
+                setState(() {
+                  _showError = false; // أخفي الخطأ لأن المدخل صحيح
+                });
+              }
+            },
+          ),
+          if (_errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
+
 
 class BuildRegisterRow extends StatelessWidget {
   const BuildRegisterRow({super.key});
@@ -165,7 +232,10 @@ class BuildTextfield extends StatefulWidget {
   final IconData icon;
   final bool obscure;
   final bool haveSuffixEyeIcon;
-  const BuildTextfield({super.key, required this.label, required this.icon, this.obscure = false, this.haveSuffixEyeIcon = false});
+  final bool onPressedForDate;
+  final GlobalKey<FormState>? formKey;
+
+  const BuildTextfield({super.key, required this.label, required this.icon, this.obscure = false, this.haveSuffixEyeIcon = false, this.onPressedForDate = false, this.formKey});
 
   @override
   State<BuildTextfield> createState() => _BuildTextfieldState();
@@ -174,26 +244,51 @@ class BuildTextfield extends StatefulWidget {
 class _BuildTextfieldState extends State<BuildTextfield> {
   late bool _obscureText;
   late bool _haveSuffixEyeIcon;
-
+  late bool _onPressedForDate;
+  late final GlobalKey<FormState>? _formKey;
+  final TextEditingController _controller = TextEditingController();
   @override
   void initState() {
     super.initState();
     _obscureText = widget.obscure;
     _haveSuffixEyeIcon = widget.haveSuffixEyeIcon;
+    _onPressedForDate = widget.onPressedForDate;
+    _formKey = widget.formKey;
   }
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final tr = AppLocalizations.of(context)!;
 
     return ShaderMask(
       shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
       child: TextFormField(
+        controller: _controller,
         validator: (data){
           if(data!.isEmpty){
-            return 'That field is required';
+            return tr.field_required;
           }
         },
+        onChanged: (data){
+          if(_formKey != null){
+            _formKey?.currentState?.validate();
+          }
+        },
+        readOnly: _onPressedForDate == true ? true : false,
         obscureText: _obscureText,
+          onTap: () async {
+            if (_onPressedForDate) {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (pickedDate != null) {
+                _controller.text = "${pickedDate.toLocal()}".split(' ')[0];
+              }
+            }
+          },
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: TextStyle(
@@ -249,60 +344,35 @@ class _BuildTextfieldState extends State<BuildTextfield> {
               width: 2,
             ),
           ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(30),
+            ),
+            borderSide: BorderSide(
+              color: Colors.red,
+              width: 2,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(30),
+            ),
+            borderSide: BorderSide(
+              color: Colors.red,
+              width: 2,
+            ),
+          ),
         ),
       ),
     );
   }
 }
-
-class ImageInput extends StatefulWidget {
-  @override
-  _ImageInputState createState() => _ImageInputState();
-}
-
-class _ImageInputState extends State<ImageInput> {
-  File? _image;
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    var _image = await picker.pickImage(source: ImageSource.gallery);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final tr = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: const Radius.circular(30),
-          topRight: const Radius.circular(8),
-          bottomLeft: const Radius.circular(8),
-          bottomRight: const Radius.circular(30),
-        ),
-        border: Border.all(
-          color: Color(0xFFFFD240),
-          width: 2,
-        ),
-        color: colorScheme.surface,
-      ),
-      child: Column(
-        children: [
-          ElevatedButton(
-            onPressed: _pickImage,
-            child: Text('اختر صورة من الاستوديو'),
-          ),
-          SizedBox(height: 20),
-          CircleAvatar(
-            radius: 80,
-            backgroundImage: _image == null ? null : FileImage(_image!),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 class BuildVerficationCodeButton extends StatelessWidget {
   const BuildVerficationCodeButton({super.key});
@@ -310,6 +380,7 @@ class BuildVerficationCodeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final tr = AppLocalizations.of(context)!;
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -322,7 +393,7 @@ class BuildVerficationCodeButton extends StatelessWidget {
         ),
         label: ShaderMask(
           shaderCallback: (bounds) => AppColors.realGoldGradient.createShader(bounds),
-          child: Text('Send verification code',
+          child: Text(tr.send_code,
               style: TextStyle(color: colorScheme.primary)),
         ),
       ),

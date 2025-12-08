@@ -110,4 +110,25 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get profile_image_message =>
       'Выбирайте подходящую вам фотографию! Если она вам нужна... ваша фотография профиля будет отображаться, когда вы напишете сообщение будущему владельцу квартиры!';
+
+  @override
+  String get next => 'следующий';
+
+  @override
+  String get previous => 'предыдущий';
+
+  @override
+  String get send_code => 'отправить код подтверждения';
+
+  @override
+  String get date_of_birth => 'Дата рождения';
+
+  @override
+  String get six_digits => 'Пожалуйста, введите 6-значный PIN-код.';
+
+  @override
+  String get field_required => 'Это поле обязательно к заполнению';
+
+  @override
+  String get image_required => 'Это изображение обязательно';
 }
