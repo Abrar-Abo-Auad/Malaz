@@ -1,10 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
-import 'package:malaz/presentation/screens/auth/register/register_screen1.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../../core/config/color/app_color.dart';
@@ -25,7 +23,8 @@ class BuildCard extends StatelessWidget {
 }
 
 class BuildPincodeTextfield extends StatefulWidget {
-  const BuildPincodeTextfield({super.key});
+  final GlobalKey<BuildPincodeTextfieldState>? pinKey;
+  const BuildPincodeTextfield({super.key, this.pinKey});
 
   @override
   State<BuildPincodeTextfield> createState() => BuildPincodeTextfieldState();
@@ -34,8 +33,10 @@ class BuildPincodeTextfield extends StatefulWidget {
 class BuildPincodeTextfieldState extends State<BuildPincodeTextfield> {
   final TextEditingController _pinController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  late final GlobalKey<BuildPincodeTextfieldState> _pinKey;
   bool _showError = false;
   String? _errorMessage;
+
 
   @override
   void initState() {
@@ -49,8 +50,8 @@ class BuildPincodeTextfieldState extends State<BuildPincodeTextfield> {
 
   @override
   void dispose() {
-    _focusNode.dispose();
-    _pinController.dispose();
+    // _focusNode.dispose();
+    // _pinController.dispose();
     super.dispose();
   }
 
@@ -86,6 +87,7 @@ class BuildPincodeTextfieldState extends State<BuildPincodeTextfield> {
         mainAxisSize: MainAxisSize.min,
         children: [
           PinCodeTextField(
+            key: widget.pinKey,
             appContext: context,
             length: 6,
             controller: _pinController,
