@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Message extends Model
 {
     /** @use HasFactory<\Database\Factories\MessageFactory> */
     use HasFactory;
+    // use SoftDeletes;
 
     public function sender()
     {
@@ -20,6 +22,6 @@ class Message extends Model
         return $this->belongsTo(Conversation::class, 'conversation_id', 'id');
     }
 
-        protected $guarded = [];
+    protected $guarded = [];
 
 }

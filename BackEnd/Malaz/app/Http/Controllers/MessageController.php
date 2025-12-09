@@ -171,9 +171,11 @@ class MessageController extends Controller
         }
 
         try {
+            $payload = $message->only(['id', 'conversation_id', 'sender_id', 'body', 'created_at']);
 
-            broadcast(new MessageDelete($message))->toOthers();
             $message->delete();
+            //$deleted = Message::withTrashed()->find($message->id);
+            broadcast(new MessageDelete($payload))->toOthers();
             return response()->json([
                 'message' => 'message deleted successfully',
             ], 200);

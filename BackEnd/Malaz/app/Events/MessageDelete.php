@@ -2,33 +2,34 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
-use App\Models\Message;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class MessageDelete implements ShouldBroadcast
+class MessageDelete implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
-     public $message;
+    public $payload;
 
-    public function __construct(Message $message)
+    public function __construct(array $payload)
     {
-        $this->message = $message;
+        $this->payload = $payload;
     }
-    
+
     public function broadcastOn()
     {
-        return new PrivateChannel('conversations.' . $this->message->conversation_id);
+        return new PrivateChannel('conversations.' . $this->payload['conversation_id']);
     }
 
     public function broadcastAs()
     {
-        return 'MessageRead';
+        return 'MessageDeleted';
+    }
+
+    public function broadcastWith()
+    {
+        return $this->payload;
     }
 }
