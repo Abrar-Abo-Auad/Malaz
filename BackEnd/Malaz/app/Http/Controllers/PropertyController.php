@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
+use App\Models\Image;
 use Auth;
 use App\Models\Property;
 use Illuminate\Database\Eloquent\Collection;
@@ -82,12 +83,16 @@ class PropertyController extends Controller
             collect($validated)->except('images')->toArray()
         );
 
-        if (!empty($validated->images)) {
-            $property->images()->createMany(
-                collect($validated['images'])->map(fn($image) => ['image' => $image])->toArray()
-            );
-        }
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $imageData = file_get_contents($file->getRealPath());
+                $property->images()->create([
+                    'image' => $imageData,
+                    'mime_type' => $file->getMimeType(),
 
+                ]);
+            }
+        }
         return response()->json([
             'data' => $property,
             'message' => 'Property created successfully',
@@ -134,18 +139,23 @@ class PropertyController extends Controller
         $this->authorize('update', $property);
         $validated = $request->validated();
         $property->update($validated);
-        if (!empty($validated['images']) && $validated->has('images')) {
-            $property->images()->createMany(
-                collect($validated['images'])->map(fn($image) => ['image' => $image])->toArray()
-            );
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $property->images()->create([
+                    'image' => file_get_contents($file->getRealPath()),
+                    'mime_type' => $file->getMimeType(),
+                ]);
+            }
         }
+
         if (!empty($validated['erase'])) {
             $property->images()->whereIn('id', $validated['erase'])->delete();
         }
 
         $property->refresh();
         return response()->json([
-            'property' => $property,
+            'property' => $property->load('images'),
             'message' => 'update completed',
             'status' => 200,
         ]);

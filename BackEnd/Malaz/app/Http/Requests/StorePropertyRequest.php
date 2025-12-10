@@ -30,11 +30,11 @@ class StorePropertyRequest extends FormRequest
             'longitude' => 'nullable|numeric',
             'description' => 'nullable|string|max:1000',
             'images' => 'nullable|array',
-            'images.*' => 'nullable|string',
+            'images.*' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'type' => 'required|string|in:Apartment,Farm,Villa,Restaurant,Travel Rest Stop,Residential Tower,Country Estate',
-            'number_of_rooms' => 'required|min:0|integer',
-            'number_of_baths' => 'required|min:0|integer',
-            'area' => 'required|min:0',
+            'number_of_rooms' => 'required|integer|min:0',
+            'number_of_baths' => 'required|integer|min:0',
+            'area' => 'required|numeric|min:0',
         ];
     }
 
@@ -43,43 +43,37 @@ class StorePropertyRequest extends FormRequest
         return [
             'price.required' => 'Price is required.',
             'price.integer' => 'Price must be an integer.',
-            'price.min' => 'Price must be zero or greater.',
-
+            'price.min' => 'Price cannot be less than zero.',
             'city.required' => 'City is required.',
-            'city.string' => 'City must be a valid string.',
-            'city.max' => 'City must not exceed 255 characters.',
-
+            'city.string' => 'City must be a string.',
+            'city.max' => 'City cannot exceed 255 characters.',
             'address.required' => 'Address is required.',
-            'address.string' => 'Address must be a valid string.',
-            'address.max' => 'Address must not exceed 255 characters.',
-
+            'address.string' => 'Address must be a string.',
+            'address.max' => 'Address cannot exceed 255 characters.',
             'governorate.required' => 'Governorate is required.',
-            'governorate.string' => 'Governorate must be a valid string.',
-            'governorate.max' => 'Governorate must not exceed 255 characters.',
-
-            'latitude.numeric' => 'Latitude must be a numeric value.',
-            'longitude.numeric' => 'Longitude must be a numeric value.',
-
-            'description.string' => 'Description must be a valid string.',
-            'description.max' => 'Description must not exceed 1000 characters.',
-
+            'governorate.string' => 'Governorate must be a string.',
+            'governorate.max' => 'Governorate cannot exceed 255 characters.',
+            'latitude.numeric' => 'Latitude must be a number.',
+            'longitude.numeric' => 'Longitude must be a number.',
+            'description.string' => 'Description must be a string.',
+            'description.max' => 'Description cannot exceed 1000 characters.',
             'images.array' => 'Images must be an array.',
-            'images.*.string' => 'Each image must be a valid string.',
-
-            'type.required' => 'Property type is required.',
-            'type.string' => 'Property type must be a valid string.',
-            'type.in' => 'Invalid property type. Allowed values: Apartment, Farm, Villa, Restaurant, Travel Rest Stop, Residential Tower, Country Estate.',
-
+            'images.*.file' => 'Each image must be a file.',
+            'images.*.image' => 'Each file must be an image.',
+            'images.*.mimes' => 'Images must be of type: jpeg, png, jpg, gif, svg.',
+            'images.*.max' => 'Each image must not exceed 2MB.',
+            'type.required' => 'Type is required.',
+            'type.string' => 'Type must be a string.',
+            'type.in' => 'Type must be one of: Apartment, Farm, Villa, Restaurant, Travel Rest Stop, Residential Tower, Country Estate.',
             'number_of_rooms.required' => 'Number of rooms is required.',
             'number_of_rooms.integer' => 'Number of rooms must be an integer.',
-            'number_of_rooms.min' => 'Number of rooms must be zero or greater.',
-
-            'number_of_baths.required' => 'The number of baths field is required.',
-            'number_of_baths.integer' => 'The number of baths must be an integer.',
-            'number_of_baths.min' => 'The number of baths cannot be less than 0.',
-
-            'area.required' => 'The area field is required.',
-            'area.min' => 'The area must be greater than or equal to 0.',
+            'number_of_rooms.min' => 'Number of rooms cannot be less than zero.',
+            'number_of_baths.required' => 'Number of baths is required.',
+            'number_of_baths.integer' => 'Number of baths must be an integer.',
+            'number_of_baths.min' => 'Number of baths cannot be less than zero.',
+            'area.required' => 'Area is required.',
+            'area.numeric' => 'Area must be a number.',
+            'area.min' => 'Area cannot be less than zero.',
         ];
     }
 }
