@@ -4350,6 +4350,59 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "OTP testing",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "chatId",
+							"value": "963981226535@c.us",
+							"type": "text"
+						},
+						{
+							"key": "message",
+							"value": "رمز التحقق: 123456",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://api.green-api.com/waInstance{{idInstance}}/SendMessage/{{apiTokenInstance}}?chatId=963981226535@c.us&message=رمز التحقق: 123456",
+					"protocol": "https",
+					"host": [
+						"api",
+						"green-api",
+						"com"
+					],
+					"path": [
+						"waInstance{{idInstance}}",
+						"SendMessage",
+						"{{apiTokenInstance}}"
+					],
+					"query": [
+						{
+							"key": "chatId",
+							"value": "963981226535@c.us"
+						},
+						{
+							"key": "message",
+							"value": "رمز التحقق: 123456"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
