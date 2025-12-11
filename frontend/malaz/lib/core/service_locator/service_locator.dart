@@ -11,6 +11,7 @@ import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
 import '../network/network_info.dart';
+import '../network/network_service.dart';
 
 /// [GetIt] / [service_locator]
 ///
@@ -36,18 +37,26 @@ import '../network/network_info.dart';
 /// - [Dio]: For network requests (The advanced HTTP client).
 /// - [InternetConnectionChecker]: To check if there is REAL internet access.
 /// - [NetworkInfo]: To handle connection checks cleanly.
-///
+/// - [ThemeCubit]: To handle theme changes.
+/// - [LanguageCubit]: To handle language changes.
+/// :)
 
 final sl = GetIt.instance;
 
 Future<void> setUpServices() async {
-
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   sl.registerLazySingleton<Dio>(() => Dio());
 
-  sl.registerLazySingleton<InternetConnectionChecker>(() => InternetConnectionChecker());
+  sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl());
+
+  sl.registerLazySingleton<ApartmentRemoteDataSource>(
+    () => ApartmentRemoteDataSourceImpl(networkService: sl()),
+  );
+
+  sl.registerLazySingleton<InternetConnectionChecker>(
+      () => InternetConnectionChecker());
 
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
 
@@ -59,7 +68,6 @@ Future<void> setUpServices() async {
 
   sl.registerLazySingleton(() => GetApartmentsUseCase(sl()));
 
-  sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
-
-  sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl());
+  sl.registerLazySingleton<ApartmentRepository>(
+      () => ApartmentRepositoryImpl(remoteDataSource: sl()));
 }

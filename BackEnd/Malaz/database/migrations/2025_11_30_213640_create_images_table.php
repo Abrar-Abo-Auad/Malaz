@@ -12,8 +12,9 @@ return new class extends Migration {
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->longText('image')->nullable();
-            $table->foreignId('property_id')->constrained('properties')->references('id')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('property_id')->constrained('properties')->references('id')->cascadeOnDelete();
+            $table->binary('image');
+            $table->string('mime_type');
             $table->timestamps();
         });
     }
