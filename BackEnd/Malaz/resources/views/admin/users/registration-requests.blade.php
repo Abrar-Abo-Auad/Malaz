@@ -8,7 +8,8 @@
     <li>
         <div class="flex items-center">
             <i class="fas fa-chevron-right text-gray-400"></i>
-            <a href="{{ route('admin.users.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-primary md:ml-2">Users</a>
+            <a href="{{ route('admin.users.index') }}"
+                class="ml-1 text-sm font-medium text-gray-700 hover:text-primary md:ml-2">Users</a>
         </div>
     </li>
     <li>
@@ -74,11 +75,9 @@
                             <i class="fas fa-search text-gray-400"></i>
                         </div>
                         <form method="GET" action="{{ route('admin.users.registration-requests') }}">
-                            <input type="text"
-                                   name="search"
-                                   value="{{ request('search') }}"
-                                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-light focus:border-transparent w-full md:w-64"
-                                   placeholder="Search by name or phone...">
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-light focus:border-transparent w-full md:w-64"
+                                placeholder="Search by name or phone...">
                         </form>
                     </div>
                 </div>
@@ -87,93 +86,95 @@
 
         <!-- Requests Table -->
         <div class="overflow-x-auto">
-            @if($pendingUsers->count() > 0)
+            @if ($pendingUsers->count() > 0)
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone & Date of Birth</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
+                        <tr>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Applicant</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone
+                                & Date of Birth</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Registration Date</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($pendingUsers as $user)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center bg-gray-200">
-                                        <span class="text-gray-600 font-bold">
-                                            {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
-                                        </span>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $user->first_name }} {{ $user->last_name }}
+                        @foreach ($pendingUsers as $user)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center bg-gray-200">
+                                            <span class="text-gray-600 font-bold">
+                                                {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
+                                            </span>
                                         </div>
-                                        <div class="text-sm text-gray-500">
-                                            ID: #{{ str_pad($user->id, 6, '0', STR_PAD_LEFT) }}
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $user->first_name }} {{ $user->last_name }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                ID: #{{ str_pad($user->id, 6, '0', STR_PAD_LEFT) }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">
-                                    <i class="fas fa-phone mr-1 text-gray-400"></i>
-                                    {{ $user->phone }}
-                                </div>
-                                <div class="text-sm text-gray-500 mt-1">
-                                    <i class="fas fa-birthday-cake mr-1 text-gray-400"></i>
-                                    {{ $user->date_of_birth->format('M d, Y') }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $user->created_at->format('M d, Y H:i') }}
-                                <div class="text-xs text-gray-400">
-                                    {{ $user->created_at->diffForHumans() }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-                                    <i class="fas fa-clock mr-1"></i> Pending Approval
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-2 md:space-y-0">
-                                    <!-- Approve as Owner -->
-                                    <form action="{{ route('admin.users.approve', $user) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="role" value="OWNER">
-                                        <button type="submit"
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        <i class="fas fa-phone mr-1 text-gray-400"></i>
+                                        {{ $user->phone }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        <i class="fas fa-birthday-cake mr-1 text-gray-400"></i>
+                                        {{ $user->date_of_birth->format('M d, Y') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $user->created_at->format('M d, Y H:i') }}
+                                    <div class="text-xs text-gray-400">
+                                        {{ $user->created_at->diffForHumans() }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-clock mr-1"></i> Pending Approval
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div
+                                        class="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-2 md:space-y-0">
+                                        <!-- Approve as User -->
+                                        <form action="{{ route('admin.users.approve', $user) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="role" value="USER">
+                                            <button type="submit"
                                                 class="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs">
-                                            <i class="fas fa-home mr-1"></i> Approve as Owner
-                                        </button>
-                                    </form>
+                                                <i class="fas fa-check mr-1"></i> Approve User
+                                            </button>
+                                        </form>
 
-                                    <!-- Approve as Renter -->
-                                    <form action="{{ route('admin.users.approve', $user) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="role" value="RENTER">
-                                        <button type="submit"
-                                                class="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-xs">
-                                            <i class="fas fa-key mr-1"></i> Approve as Renter
-                                        </button>
-                                    </form>
-
-                                    <!-- Reject -->
-                                    <form action="{{ route('admin.users.reject', $user) }}" method="POST">
-                                        @csrf
-                                        <button type="submit"
+                                        <!-- Reject -->
+                                        <form action="{{ route('admin.users.reject', $user) }}" method="POST">
+                                            @csrf
+                                            <button type="submit"
                                                 class="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-xs"
                                                 onclick="return confirm('Are you sure you want to reject this registration?')">
-                                            <i class="fas fa-times mr-1"></i> Reject
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
+                                                <i class="fas fa-times mr-1"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             @else
@@ -188,7 +189,7 @@
         </div>
 
         <!-- Pagination -->
-        @if($pendingUsers->hasPages())
+        @if ($pendingUsers->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
                 {{ $pendingUsers->links() }}
             </div>

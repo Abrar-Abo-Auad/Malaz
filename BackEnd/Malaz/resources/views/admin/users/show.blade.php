@@ -8,13 +8,15 @@
     <li>
         <div class="flex items-center">
             <i class="fas fa-chevron-right text-gray-400"></i>
-            <a href="{{ route('admin.users.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-primary md:ml-2">Users</a>
+            <a href="{{ route('admin.users.index') }}"
+                class="ml-1 text-sm font-medium text-gray-700 hover:text-primary md:ml-2">Users</a>
         </div>
     </li>
     <li>
         <div class="flex items-center">
             <i class="fas fa-chevron-right text-gray-400"></i>
-            <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">{{ $user->first_name }} {{ $user->last_name }}</span>
+            <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">{{ $user->first_name }}
+                {{ $user->last_name }}</span>
         </div>
     </li>
 @endsection
@@ -48,7 +50,8 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-                            <p class="text-gray-900">{{ $user->date_of_birth ? $user->date_of_birth->format('M d, Y') : 'N/A' }}</p>
+                            <p class="text-gray-900">
+                                {{ $user->date_of_birth ? $user->date_of_birth->format('M d, Y') : 'N/A' }}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Account Created</label>
@@ -57,7 +60,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Phone Verified</label>
                             <p class="text-gray-900">
-                                @if($user->phone_verified_at)
+                                @if ($user->phone_verified_at)
                                     <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                                         Verified on {{ $user->phone_verified_at->format('M d, Y') }}
                                     </span>
@@ -71,7 +74,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email Verified</label>
                             <p class="text-gray-900">
-                                @if($user->email_verified_at)
+                                @if ($user->email_verified_at)
                                     <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                                         Verified on {{ $user->email_verified_at->format('M d, Y') }}
                                     </span>
@@ -95,10 +98,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                            <span class="px-3 py-1 text-sm font-medium rounded-full
-                                {{ $user->role == 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                  ($user->role == 'OWNER' ? 'bg-blue-100 text-blue-800' :
-                                  ($user->role == 'RENTER' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')) }}">
+                            <span
+                                class="px-3 py-1 text-sm font-medium rounded-full
+                                {{ $user->role == 'ADMIN'
+                                    ? 'bg-purple-100 text-purple-800'
+                                    : ($user->role == 'OWNER'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : ($user->role == 'RENTER'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-gray-100 text-gray-800')) }}">
                                 {{ $user->role }}
                             </span>
                         </div>
@@ -111,31 +119,25 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="mt-6 flex flex-wrap gap-3">
-                        <a href="{{ route('admin.users.edit', $user) }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">
-                            <i class="fas fa-edit mr-2"></i>Edit User
-                        </a>
+                    <div class="flex items-center justify-between mt-6">
+                        <div class="flex space-x-3">
+                            <a href="{{ route('admin.users.edit', $user) }}"
+                                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">
+                                <i class="fas fa-edit mr-2"></i>Edit User
+                            </a>
 
-                        @if($user->id !== auth()->id())
-                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
+                            @if ($user->id !== auth()->id())
+                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
                                         class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                                         onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
-                                    <i class="fas fa-trash mr-2"></i>Delete User
-                                </button>
-                            </form>
-                        @endif
-
-                        @if($user->role !== 'ADMIN')
-                            <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                                    <i class="fas fa-ban mr-2"></i>Block User
-                                </button>
-                            </form>
-                        @endif
+                                        <i class="fas fa-trash mr-2"></i>Delete User
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,11 +153,13 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <p class="text-sm text-gray-600">Properties Listed</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $user->properties ? $user->properties->count() : 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-900">
+                            {{ $user->properties ? $user->properties->count() : 0 }}</p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-600">Total Bookings</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ $user->bookings ? $user->bookings->count() : 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ $user->bookings ? $user->bookings->count() : 0 }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-sm text-gray-600">Member Since</p>

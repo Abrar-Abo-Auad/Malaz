@@ -14,8 +14,10 @@ class DashboardController extends Controller
     {
         // Get statistics without payment data
         $stats = [
-            'total_users' => User::count(),
-            'new_users_today' => User::whereDate('created_at', today())->count(),
+            'total_users' => User::where('role', '!=', 'PENDING')->count(),
+            'new_users_today' => User::whereDate('created_at', today())
+                ->where('role', '!=', 'PENDING')
+                ->count(),
             'total_properties' => Property::count(),
             'pending_properties' => Property::where('status', 'pending')->count(),
             'active_bookings' => Booking::whereIn('status', ['confirmed', 'ongoing'])->count(),

@@ -24,7 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/users/{user}/make-renter', [UserController::class, 'makeRenter'])->name('users.make-renter');
 
         // Regular user management (for existing users)
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+        Route::resource('users', UserController::class)
             ->except(['create', 'store']);
     });
 });

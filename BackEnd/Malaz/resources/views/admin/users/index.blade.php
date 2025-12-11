@@ -15,7 +15,7 @@
 
 @section('content')
     <!-- Stats Bar -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="flex items-center">
                 <div class="p-2 rounded-lg mr-3" style="background: rgba(184, 134, 11, 0.1)">
@@ -23,7 +23,8 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">Total Approved</p>
-                    <p class="text-xl font-bold text-gray-900">{{ \App\Models\User::where('role', '!=', 'PENDING')->count() }}</p>
+                    <p class="text-xl font-bold text-gray-900">
+                        {{ \App\Models\User::where('role', '!=', 'PENDING')->count() }}</p>
                 </div>
             </div>
         </div>
@@ -31,23 +32,11 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="flex items-center">
                 <div class="p-2 rounded-lg mr-3" style="background: rgba(160, 82, 45, 0.1)">
-                    <i class="fas fa-user-tie text-lg" style="color: var(--accent)"></i>
+                    <i class="fas fa-user text-lg" style="color: var(--accent)"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600">Property Owners</p>
-                    <p class="text-xl font-bold text-gray-900">{{ \App\Models\User::where('role', 'OWNER')->count() }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div class="flex items-center">
-                <div class="p-2 rounded-lg mr-3" style="background: rgba(218, 165, 32, 0.1)">
-                    <i class="fas fa-key text-lg" style="color: var(--primary-light)"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Renters</p>
-                    <p class="text-xl font-bold text-gray-900">{{ \App\Models\User::where('role', 'RENTER')->count() }}</p>
+                    <p class="text-sm text-gray-600">Regular Users</p>
+                    <p class="text-xl font-bold text-gray-900">{{ \App\Models\User::where('role', 'USER')->count() }}</p>
                 </div>
             </div>
         </div>
@@ -73,7 +62,8 @@
         <div class="ml-3 flex-1">
             <p class="text-sm text-yellow-800">
                 <strong>New registration requests need your attention.</strong>
-                <a href="{{ route('admin.users.registration-requests') }}" class="font-semibold underline" style="color: var(--primary)">
+                <a href="{{ route('admin.users.registration-requests') }}" class="font-semibold underline"
+                    style="color: var(--primary)">
                     Review {{ \App\Models\User::where('role', 'PENDING')->count() }} pending requests →
                 </a>
             </p>
@@ -95,11 +85,9 @@
                             <i class="fas fa-search text-gray-400"></i>
                         </div>
                         <form method="GET" action="{{ route('admin.users.index') }}">
-                            <input type="text"
-                                   name="search"
-                                   value="{{ request('search') }}"
-                                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-light focus:border-transparent w-full md:w-64"
-                                   placeholder="Search users...">
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-light focus:border-transparent w-full md:w-64"
+                                placeholder="Search users...">
                         </form>
                     </div>
                 </div>
@@ -114,23 +102,21 @@
                 <!-- Role Filter -->
                 <div class="flex items-center space-x-2">
                     <form method="GET" action="{{ route('admin.users.index') }}" class="flex items-center">
-                        <select name="role"
-                                onchange="this.form.submit()"
-                                class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-light">
+                        <select name="role" onchange="this.form.submit()"
+                            class="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-light">
                             <option value="">All Roles</option>
+                            <option value="USER" {{ request('role') == 'USER' ? 'selected' : '' }}>User</option>
                             <option value="ADMIN" {{ request('role') == 'ADMIN' ? 'selected' : '' }}>Admin</option>
-                            <option value="OWNER" {{ request('role') == 'OWNER' ? 'selected' : '' }}>Owner</option>
-                            <option value="RENTER" {{ request('role') == 'RENTER' ? 'selected' : '' }}>Renter</option>
                         </select>
                         <!-- Keep search parameter -->
-                        @if(request('search'))
+                        @if (request('search'))
                             <input type="hidden" name="search" value="{{ request('search') }}">
                         @endif
                     </form>
                 </div>
 
                 <!-- Clear Filters -->
-                @if(request('search') || request('role'))
+                @if (request('search') || request('role'))
                     <a href="{{ route('admin.users.index') }}" class="text-sm text-primary hover:text-primary-dark">
                         Clear filters
                     </a>
@@ -142,112 +128,103 @@
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Role</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quick Actions</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">More</th>
-                </tr>
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current
+                            Role</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">More</th>
+                    </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($users as $user)
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center"
-                                     style="background: linear-gradient(135deg, var(--primary), var(--accent))">
-                                    <span class="text-white font-bold">
-                                        {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
-                                    </span>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">
-                                        {{ $user->first_name }} {{ $user->last_name }}
+                    @forelse($users as $user)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center"
+                                        style="background: linear-gradient(135deg, var(--primary), var(--accent))">
+                                        <span class="text-white font-bold">
+                                            {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
+                                        </span>
                                     </div>
-                                    <div class="text-sm text-gray-500">
-                                        ID: #{{ str_pad($user->id, 6, '0', STR_PAD_LEFT) }}
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $user->first_name }} {{ $user->last_name }}
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            ID: #{{ str_pad($user->id, 6, '0', STR_PAD_LEFT) }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ $user->phone }}</div>
-                            <div class="text-sm text-gray-500">
-                                @if($user->email)
-                                    {{ $user->email }}
-                                @else
-                                    <span class="text-gray-400">No email</span>
-                                @endif
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-3 py-1 text-xs font-medium rounded-full
-                                {{ $user->role == 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                  ($user->role == 'OWNER' ? 'bg-blue-100 text-blue-800' :
-                                  ($user->role == 'RENTER' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')) }}">
-                                {{ $user->role }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $user->created_at->format('M d, Y') }}
-                            <div class="text-xs text-gray-400">
-                                {{ $user->created_at->diffForHumans() }}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex flex-col space-y-2">
-                                @if($user->role == 'RENTER')
-                                    <form action="{{ route('admin.users.make-owner', $user) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-xs">
-                                            <i class="fas fa-home mr-1"></i> Make Owner
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if($user->role == 'OWNER')
-                                    <form action="{{ route('admin.users.make-renter', $user) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="text-green-600 hover:text-green-900 text-xs">
-                                            <i class="fas fa-key mr-1"></i> Make Renter
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-3">
-                                <a href="{{ route('admin.users.show', $user) }}"
-                                   class="text-primary hover:text-primary-dark">
-                                    View
-                                </a>
-                                <a href="{{ route('admin.users.edit', $user) }}"
-                                   class="text-gray-600 hover:text-gray-900">
-                                    Edit
-                                </a>
-                                @if($user->id !== auth()->id())
-                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline-block">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="text-red-600 hover:text-red-900"
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $user->phone }}</div>
+                                <div class="text-sm text-gray-500">
+                                    @if ($user->email)
+                                        {{ $user->email }}
+                                    @else
+                                        <span class="text-gray-400">No email</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-3 py-1 text-xs font-medium rounded-full
+                                {{ $user->role == 'ADMIN'
+                                    ? 'bg-purple-100 text-purple-800'
+                                    : ($user->role == 'OWNER'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : ($user->role == 'RENTER'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-gray-100 text-gray-800')) }}">
+                                    {{ $user->role }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $user->created_at->format('M d, Y') }}
+                                <div class="text-xs text-gray-400">
+                                    {{ $user->created_at->diffForHumans() }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-3">
+                                    <a href="{{ route('admin.users.show', $user) }}"
+                                        class="text-primary hover:text-primary-dark">
+                                        View
+                                    </a>
+                                    <a href="{{ route('admin.users.edit', $user) }}"
+                                        class="text-gray-600 hover:text-gray-900">
+                                        Edit
+                                    </a>
+                                    @if ($user->id !== auth()->id())
+                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900"
                                                 onclick="return confirm('Are you sure you want to delete this user?')">
-                                            Delete
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                            No approved users found.
-                        </td>
-                    </tr>
-                @endforelse
+                                                Delete
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                No approved users found.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

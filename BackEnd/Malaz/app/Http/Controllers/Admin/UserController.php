@@ -37,25 +37,23 @@ class UserController extends Controller
      */
     public function approve(User $user, Request $request)
     {
-        // Validate the approval type
-        $request->validate([
-            'role' => 'required|in:RENTER,OWNER',
-        ]);
-
         // Check if user is pending
         if ($user->role !== 'PENDING') {
             return redirect()->back()
                 ->with('error', 'This user is already approved.');
         }
 
-        // Approve the user
-        $user->update([
-            'role' => $request->role,
-            'phone_verified_at' => now(), // Auto-verify when admin approves
-        ]);
+        // Simple direct update
+        $user->role = 'USER';
+        $user->phone_verified_at = date('Y-m-d H:i:s');
 
-        return redirect()->route('admin.users.registration-requests')
-            ->with('success', 'User approved successfully. They can now login.');
+        if ($user->save()) {
+            return redirect()->route('admin.users.registration-requests')
+                ->with('success', 'User approved successfully.');
+        }
+
+        return redirect()->back()
+            ->with('error', 'Failed to approve user.');
     }
 
     /**
@@ -81,33 +79,12 @@ class UserController extends Controller
     }
 
     /**
-     * Make user an owner (quick action)
-     */
-    public function makeOwner(User $user)
-    {
-        $user->update(['role' => 'OWNER']);
-
-        return redirect()->back()
-            ->with('success', 'User role updated to Property Owner.');
-    }
-
-    /**
-     * Make user a renter (quick action)
-     */
-    public function makeRenter(User $user)
-    {
-        $user->update(['role' => 'RENTER']);
-
-        return redirect()->back()
-            ->with('success', 'User role updated to Renter.');
-    }
-
-    /**
      * Display a listing of all users (except pending)
      */
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $role = $request->input('role');
 
         // Get approved users (not pending)
         $users = User::where('role', '!=', 'PENDING')
@@ -117,6 +94,9 @@ class UserController extends Controller
                         ->orWhere('last_name', 'like', '%' . $search . '%')
                         ->orWhere('phone', 'like', '%' . $search . '%');
                 });
+            })
+            ->when($role, function ($query, $role) {
+                return $query->where('role', $role);
             })
             ->latest()
             ->paginate(15)
@@ -156,7 +136,7 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'date_of_birth' => 'required|date',
-            'role' => 'required|in:PENDING,RENTER,OWNER,ADMIN',
+            'role' => 'required|in:PENDING,USER,ADMIN',
         ]);
 
         // Only update email if it exists (for admin users)
