@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:malaz/core/config/color/app_color.dart';
+import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../global_widgets/build_branding.dart';
 import '../shared_widgets/shared_widgets.dart';
 
 class RegisterScreen2 extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  const RegisterScreen2({super.key, required this.formKey});
+  final RegisterData registerData;
+  const RegisterScreen2({super.key, required this.formKey, required this.registerData});
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +81,10 @@ class RegisterScreen2 extends StatelessWidget {
                     label: tr.first_name,
                     icon: Icons.person,
                     obscure: false,
+                    keyboardType: TextInputType.name,
                     haveSuffixEyeIcon: false,
                     formKey: formKey,
+                    onChanged: (value) => registerData.firstName = value,
                   ),
                   const SizedBox(
                     height: 16,
@@ -91,8 +95,10 @@ class RegisterScreen2 extends StatelessWidget {
                     label: tr.last_name,
                     icon: Icons.person,
                     obscure: false,
+                    keyboardType: TextInputType.name,
                     haveSuffixEyeIcon: false,
                     formKey: formKey,
+                    onChanged: (value) => registerData.lastName = value,
                   ),
                   const SizedBox(
                     height: 16,
@@ -104,6 +110,8 @@ class RegisterScreen2 extends StatelessWidget {
                     icon: Icons.calendar_today_outlined,
                     onPressedForDate: true,
                     formKey: formKey,
+                    onChanged: (value) => registerData.dateOfBirth = value,
+
                   ),
                   const SizedBox(
                     height: 100,

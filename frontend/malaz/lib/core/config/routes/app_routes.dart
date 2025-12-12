@@ -1,3 +1,6 @@
+// core/config/routes
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
@@ -6,8 +9,10 @@ import 'package:malaz/presentation/screens/splash_screen/splash_screen.dart';
 import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/main_wrapper/main_wrapper.dart'; // الشاشة الرئيسية
 import 'package:malaz/presentation/screens/settings/settings_screen.dart';
+import 'package:path/path.dart';
 
 import '../../../domain/entities/apartment.dart';
+import '../../../presentation/cubits/auth/auth_cubit.dart';
 
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -40,48 +45,85 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 /// GoRoute(path: '/details', name: 'details', builder: (context, state) => DetailsScreen(apartment: state.extra as Apartment)),
 /// To navigate to it: `context.go('/details', extra: myApartmentObject)`
 /// :)
-final GoRouter appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
-  initialLocation: '/',
+GoRouter buildAppRouter(AuthCubit authCubit) {
+  return GoRouter(
+    initialLocation: '/',
+    refreshListenable: GoRouterRefreshStream(authCubit.stream),
+    redirect: (context, state) {
+      final authState = authCubit.state;
+      final goingToLogin = state.matchedLocation == '/login';
+      final goingToSplash = state.matchedLocation == '/';
+      final goingToRegister = state.matchedLocation == '/home_register';
 
-  routes: [
-    GoRoute(
-      path: '/',
-      name: 'splash',
-      builder: (context, state) => const SplashScreen(),
-    ),
-
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
-    ),
-
-    GoRoute(
-      path: '/home',
-      name: 'home',
-      builder: (context, state) => const MainWrapper(),
-    ),
-
-    GoRoute(
-      path: '/settings',
-      name: 'settings',
-      builder: (context, state) => const SettingsScreen(),
-    ),
-    
-    GoRoute(
-      path: '/details',
-      name: 'details',
-      builder: (context, state) {
-        final apartment = state.extra as Apartment;
-        return DetailsScreen(apartment: apartment);
+      // While loading AuthCubit or in the startup state -> Stay in Splash
+      if (authState is AuthLoading || authState is AuthInitial) {
+        return goingToSplash ? null : '/';
       }
-    ),
 
-    GoRoute(
-      path: '/home_register',
-      name: 'home_register',
-      builder: (context, state) => HomeRegisterScreen()
-    )
-  ],
-);
+      // User not verified
+      if (authState is AuthUnauthenticated || authState is AuthError) {
+        // السماح بالوصول إلى Login و HomeRegister
+        return (goingToLogin || goingToRegister) ? null : '/login';
+      }
+
+      // User verified
+      if (authState is AuthAuthenticated) {
+        // Redirect if the user tries to go to Splash or Login
+        if (goingToSplash || goingToLogin || goingToRegister) return '/home';
+      }
+
+      return null; // No need to redirect
+    },
+
+    routes: [
+      GoRoute(
+        path: '/',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) =>
+            LoginScreen(formKey: GlobalKey<FormState>()),
+      ),
+
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        builder: (context, state) => const MainWrapper(),
+      ),
+
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+
+      GoRoute(
+          path: '/details',
+          name: 'details',
+          builder: (context, state) {
+            final apartment = state.extra as Apartment;
+            return DetailsScreen(apartment: apartment);
+          }
+      ),
+
+      GoRoute(
+          path: '/home_register',
+          name: 'home_register',
+          builder: (context, state) => HomeRegisterScreen()
+      )
+    ],
+  );
+}
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream stream){
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription _subscription;
+}

@@ -5,17 +5,21 @@ import 'package:malaz/core/config/color/app_color.dart';
 import 'package:malaz/presentation/global_widgets/custom_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../global_widgets/build_branding.dart';
+import 'home_register_screen.dart';
 
 class RegisterScreen5 extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  const RegisterScreen5({super.key, required this.formKey});
+  final RegisterData registerData;
+  final VoidCallback onRegisterPressed;
+
+  const RegisterScreen5({super.key, required this.formKey, required this.registerData, required this.onRegisterPressed});
 
   @override
   State<RegisterScreen5> createState() => RegisterScreen5State();
 }
 
 class RegisterScreen5State extends State<RegisterScreen5> {
-  XFile? _image; // إضافة متغير لتخزين الصورة المختارة
+  XFile? _image;
   bool _showImageError = false;
 
   void _submit() {
@@ -27,7 +31,6 @@ class RegisterScreen5State extends State<RegisterScreen5> {
       setState(() {
         _showImageError = false;
       });
-      // متابعة الإجراء عند وجود صورة
     }
   }
   void showImageError(bool show) {
@@ -120,6 +123,7 @@ class RegisterScreen5State extends State<RegisterScreen5> {
                     isError: _showImageError,
                     onImageSelected: (XFile? img) {
                       setState(() {
+                        widget.registerData.profileImage = img;
                         _image = img;
                         _showImageError = false; // إزالة الخطأ عند اختيار صورة
                       });
@@ -140,9 +144,7 @@ class RegisterScreen5State extends State<RegisterScreen5> {
                   // Register Button
                   CustomButton(
                     text: tr.register,
-                    onPressed: () {
-                      //
-                    },
+                    onPressed: widget.onRegisterPressed,
                   ),
                   const SizedBox(
                     height: 60,
@@ -164,7 +166,7 @@ class RegisterScreen5State extends State<RegisterScreen5> {
 }
 class ImageUploadWidget extends StatefulWidget {
   final Function(XFile?) onImageSelected;
-  final bool isError; // متغير نستقبله من الخارج
+  final bool isError;
 
   const ImageUploadWidget({Key? key, required this.onImageSelected,this.isError = false,}) : super(key: key);
 
@@ -183,7 +185,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
       setState(() {
         _image = XFile(pickedFile.path);
       });
-      widget.onImageSelected(_image); // تمرير الصورة للوالد فقط عند الاختيار الناجح
+      widget.onImageSelected(_image);
     }
   }
 
@@ -217,7 +219,7 @@ class _ImageUploadWidgetState extends State<ImageUploadWidget> {
 
 class DottedBox extends StatelessWidget {
   final Widget child;
-  final bool isError; // متغير جديد لتحديد حالة الخطأ
+  final bool isError;
   const DottedBox({required this.child, this.isError = false, Key? key}) : super(key: key);
 
   @override
@@ -233,7 +235,7 @@ class DottedBox extends StatelessWidget {
             color: Colors.white12,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isError ? Colors.red : Colors.yellow, // لون الحدود يتغير
+              color: isError ? Colors.red : Colors.yellow,
               style: BorderStyle.solid,
             ),
           ),

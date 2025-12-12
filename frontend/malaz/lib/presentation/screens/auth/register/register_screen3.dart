@@ -5,10 +5,12 @@ import 'package:malaz/core/config/color/app_color.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../global_widgets/build_branding.dart';
 import '../shared_widgets/shared_widgets.dart';
+import 'home_register_screen.dart';
 
 class RegisterScreen3 extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  const RegisterScreen3({super.key, required this.formKey});
+  final RegisterData registerData;
+  const RegisterScreen3({super.key, required this.formKey, required this.registerData});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +80,12 @@ class RegisterScreen3 extends StatelessWidget {
 
                   // Password Field
                   BuildTextfield(
-                    label: tr.password, icon: Icons.password, haveSuffixEyeIcon: true, obscure: true,formKey: formKey,
+                    label: tr.password,
+                    icon: Icons.password,
+                    haveSuffixEyeIcon: true,
+                    obscure: true,
+                    formKey: formKey,
+                    onChanged: (value) => registerData.password = value,
                   ),
                   const SizedBox(
                     height: 16,
@@ -86,7 +93,11 @@ class RegisterScreen3 extends StatelessWidget {
 
                   //  Confirm Password Field
                   BuildTextfield(
-                    label: tr.confirm_password, icon: Icons.password, haveSuffixEyeIcon: true, obscure: true,formKey: formKey,
+                    label: tr.confirm_password,
+                    icon: Icons.password,
+                    haveSuffixEyeIcon: true,
+                    obscure: true,
+                    formKey: formKey,
                   ),
                   const SizedBox(
                     height: 100,
