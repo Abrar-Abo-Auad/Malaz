@@ -65,7 +65,6 @@ class _HomeViewState extends State<HomeView> {
       key: _scaffoldKey,
       backgroundColor: colorScheme.background,
       drawer: const AppDrawer(),
-      floatingActionButton: const _BuildAddPropertyFab(),
       body: SafeArea(
         child: Column(
           children: [
@@ -275,7 +274,10 @@ class _BuildErrorView extends StatelessWidget {
   }
 }
 
-class _BuildAddPropertyFab extends StatelessWidget {
+// !important note : do not uncomment this block it's cause a failure in
+// !bottom bar navigation
+
+/*class _BuildAddPropertyFab extends StatelessWidget {
   const _BuildAddPropertyFab();
 
   @override
@@ -291,7 +293,7 @@ class _BuildAddPropertyFab extends StatelessWidget {
       child: Icon(Icons.add, color: colorScheme.onPrimary, size: 30),
     );
   }
-}
+}*/
 
 
 /// [UI_BUILDING_SUB_WIDGET]
