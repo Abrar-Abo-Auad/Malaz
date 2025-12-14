@@ -250,7 +250,7 @@ class AuthCubit extends Cubit<AuthState> {
       return 'This phone number does not exist in our records.';
     if (f is WrongPasswordFailure) return 'Incorrect Password';
     if (f is InvalidCredentialsFailure) return 'Invalid credentials';
-    if (f is ServerFailure) return f.message ?? 'Server error';
+    if (f is ServerFailure) return (f.message ?? 'Server error');
     if (f is NetworkFailure) return 'Check your internet connection';
     return 'An unexpected error occurred';
   }

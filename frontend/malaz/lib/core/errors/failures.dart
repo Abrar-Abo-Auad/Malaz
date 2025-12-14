@@ -32,26 +32,30 @@ class OfflineFailure extends Failure {
 
 /// Represents other general failures.
 class GeneralFailure extends Failure {
-  const GeneralFailure([String? message]) : super(message);
+  const GeneralFailure([super.message]);
 }
 
 /// This failure appears when the user is in a pending state,
 /// meaning an account with that username and password already exists but has not yet been approved by the admin.
 class InvalidCredentialsFailure extends Failure {
-  const InvalidCredentialsFailure([String? message]) : super(message);
+  const InvalidCredentialsFailure([super.message]);
 }
 
 /// This exception appears when there is no account with that number entered by the user.
 class PhoneNotFoundFailure extends Failure {
-  const PhoneNotFoundFailure([String? message]) : super(message);
+  const PhoneNotFoundFailure([super.message]);
 }
 
 /// This exception appears when the password for the accompanying number is incorrect.
 class WrongPasswordFailure extends Failure {
-  const WrongPasswordFailure([String? message]) : super(message);
+  const WrongPasswordFailure([super.message]);
 }
 
 class PendingApprovalFailure extends Failure {
   const PendingApprovalFailure()
       : super('Wait until approved by the officials');
+}
+
+class NetworkFailure extends Failure {
+  const NetworkFailure([super.message]);
 }

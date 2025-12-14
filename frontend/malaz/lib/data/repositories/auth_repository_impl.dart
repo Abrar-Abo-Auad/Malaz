@@ -53,7 +53,7 @@ class AuthRepositoryImpl extends AuthRepository {
         user: null,
       ));
     } catch (e) {
-      return Left(const CacheFailure());
+      return Left(CacheFailure(e.toString()));
     }
   }
 
@@ -65,7 +65,7 @@ class AuthRepositoryImpl extends AuthRepository {
       final user = await authLocalDatasource.getCachedUser();
       return Right(user);
     } catch (e) {
-      return Left(const CacheFailure());
+      return Left(CacheFailure(e.toString()));
     }
   }
 
@@ -76,11 +76,10 @@ class AuthRepositoryImpl extends AuthRepository {
       if (token != null && token.isNotEmpty) {
         return Right(true);
       }
-      // لو لا توكن، أنظر إن كان هناك user مخزن
       final user = await authLocalDatasource.getCachedUser();
       return Right(user != null);
     } catch (e) {
-      return Left(const CacheFailure());
+      return Left(CacheFailure(e.toString()));
     }
   }
 
@@ -95,7 +94,6 @@ class AuthRepositoryImpl extends AuthRepository {
         password: password,
       );
 
-// الحالة: لم تتم الموافقة
       if (result['message'] == 'Wait until is approved by the officials') {
         final us = await authLocalDatasource.getCachedUser();
         final pendingUser = UserModel.pending(phone: phoneNumber);
@@ -104,7 +102,6 @@ class AuthRepositoryImpl extends AuthRepository {
         return Right(pendingUser);
       }
 
-// تمت الموافقة
       final user = UserModel.fromJson(result['user']);
       final token = result['access_token'];
 
@@ -113,6 +110,8 @@ class AuthRepositoryImpl extends AuthRepository {
       await authLocalDatasource.setPending(false);
 
       return Right(user);
+
+      /// TODO: need to clean up
     } on PendingApprovalException{
       return Left(const PendingApprovalFailure());
     } on PhoneNotFoundException catch (e) {
@@ -136,11 +135,12 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      await authRemoteDatasource.logout();
+      /// TODO: logout out of the service
+      // await authRemoteDatasource.logout();
       await authLocalDatasource.clearToken();
       return const Right(null);
     } catch (e) {
-      return Left(const ServerFailure());
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -179,10 +179,9 @@ class AuthRepositoryImpl extends AuthRepository {
 
       return Right(user);
     } on ServerException catch (e) {
-      final msg = e.message ?? 'Server error';
-      return Left(ServerFailure(msg));
-    } on CacheException {
-      return Left(const CacheFailure());
+      return Left(ServerFailure(e.toString()));
+    } on CacheException catch(e) {
+      return Left(CacheFailure(e.toString()));
     } catch (e) {
       return Left(const GeneralFailure());
     }
@@ -205,11 +204,9 @@ class AuthRepositoryImpl extends AuthRepository {
       {required String phone, required String otp}) async {
     try {
       final res = await authRemoteDatasource.verifyOtp(phone: phone, otp: otp);
-      // assume res contains success boolean or message
-      final success = extractSuccess(res); // طبق شكل الاستجابة
+      final success = extractSuccess(res);
       if (success) return Right(true);
 
-      // فشل التحقق — حاول استخراج رسالة من الرد
       final message = extractMessage(res) ?? 'Invalid code';
       return Left(ServerFailure(message));
     } on ServerException catch (e) {

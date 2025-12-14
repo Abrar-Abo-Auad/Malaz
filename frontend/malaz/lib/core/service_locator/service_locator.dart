@@ -64,9 +64,6 @@ Future<void> setUpServices() async {
 
   sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
 
-  sl.registerLazySingleton<ApartmentRemoteDataSource>(
-    () => ApartmentRemoteDataSourceImpl(networkService: sl()),
-  );
 
   sl.registerLazySingleton<InternetConnectionChecker>(
       () => InternetConnectionChecker());
@@ -83,14 +80,12 @@ Future<void> setUpServices() async {
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
 
-  sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl());
-  sl.registerLazySingleton<ApartmentRepository>(
-          () => ApartmentRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl(networkService: sl()));
 
   /// --- Auth datasources, repository, usecases, cubit --- //
   /// Data sources
   sl.registerLazySingleton<AuthLocalDatasource>(() => AuthLocalDatasourceImpl(sl<SharedPreferences>()),);
-  sl.registerLazySingleton<AuthRemoteDatasource>(() => AuthRemoteDatasourceImpl(dio: sl<Dio>()));
+  sl.registerLazySingleton<AuthRemoteDatasource>(() => AuthRemoteDatasourceImpl(networkService: sl()));
 
   /// Repositories
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
@@ -109,8 +104,7 @@ Future<void> setUpServices() async {
 
   /// Dio interceptor needs local datasource -> attach after creating dio
   /// Auth interceptor (attach AFTER registering local datasource)
-  final dio = sl<Dio>();
-  dio.interceptors.add(AuthInterceptor(localDatasource: sl()));
+  sl.registerLazySingleton(() => AuthInterceptor(localDatasource: sl()));
 
   /// Cubit (factory so every use-case screen can create a fresh cubit if needed)
   sl.registerLazySingleton<AuthCubit>(() => AuthCubit(

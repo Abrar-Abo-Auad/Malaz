@@ -37,6 +37,12 @@ class ErrorHandler {
       return UnauthenticatedException(message: message);
     }
 
+    if(statusCode == 403) {
+      if (message.toLowerCase().contains('does not exist')) {
+        return PhoneNotFoundException(message);
+      }
+    }
+
     if (statusCode == 422 && data is Map) {
       if (data.containsKey('errors')) {
         final errors = data['errors'];

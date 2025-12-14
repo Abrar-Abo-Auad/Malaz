@@ -1,22 +1,22 @@
 
 /// Represents errors that occur during data fetching or processing.
-class ServerException implements Exception {
-  final String? message;
-  ServerException([this.message]);
-  @override
-  String toString() => 'ServerException: ${message ?? ''}';
-}
 // class ServerException implements Exception {
-//   final String message;
-//   final int? statusCode;
-//   final Map<String, dynamic>? errors;
-//
-//   ServerException({
-//     required this.message,
-//     this.statusCode,
-//     this.errors,
-//   });
+//   final String? message;
+//   ServerException([this.message]);
+//   @override
+//   String toString() => 'ServerException: ${message ?? ''}';
 // }
+class ServerException implements Exception {
+  final String message;
+  final int? statusCode;
+  final Map<String, dynamic>? errors;
+
+  ServerException({
+    required this.message,
+    this.statusCode,
+    this.errors,
+  });
+}
 /// Represents errors that occur when there is no internet connection.
 class NetworkException implements Exception {}
 
