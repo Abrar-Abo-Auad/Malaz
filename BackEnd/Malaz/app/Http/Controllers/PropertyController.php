@@ -102,7 +102,7 @@ class PropertyController extends Controller
             // return 1;
         }
 
-        $property->status = 'approved';
+        // $property->status = 'approved';
         $property->save();
 
         return response()->json([
@@ -211,7 +211,7 @@ class PropertyController extends Controller
         if (!empty($validated['erase'])) {
             $property->images()->whereIn('id', $validated['erase'])->delete();
         }
-        // $property->status = 'pending';
+        $property->status = 'pending';
         $property->save();
         $property->refresh();
 
