@@ -8,12 +8,11 @@ import 'package:equatable/equatable.dart';
 /// [Failure] extends from [Equatable] to make [Failure] objects comparable you
 /// can search for it
 abstract class Failure extends Equatable {
-  final String message;
-
-  const Failure(this.message);
+  final String? message;
+  const Failure([this.message]);
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message];
 }
 
 /// Represents a failure that occurs when communicating with a server.
@@ -32,18 +31,27 @@ class OfflineFailure extends Failure {
 }
 
 /// Represents other general failures.
-class AuthFailure extends Failure {
-  const AuthFailure(super.message);
+class GeneralFailure extends Failure {
+  const GeneralFailure([String? message]) : super(message);
 }
 
-class NetworkFailure extends Failure {
-  const NetworkFailure(super.message);
+/// This failure appears when the user is in a pending state,
+/// meaning an account with that username and password already exists but has not yet been approved by the admin.
+class InvalidCredentialsFailure extends Failure {
+  const InvalidCredentialsFailure([String? message]) : super(message);
 }
 
-class ValidationFailure extends Failure {
-  const ValidationFailure(super.message);
+/// This exception appears when there is no account with that number entered by the user.
+class PhoneNotFoundFailure extends Failure {
+  const PhoneNotFoundFailure([String? message]) : super(message);
 }
 
-class UnauthenticatedFailure extends Failure {
-  const UnauthenticatedFailure(super.message);
+/// This exception appears when the password for the accompanying number is incorrect.
+class WrongPasswordFailure extends Failure {
+  const WrongPasswordFailure([String? message]) : super(message);
+}
+
+class PendingApprovalFailure extends Failure {
+  const PendingApprovalFailure()
+      : super('Wait until approved by the officials');
 }

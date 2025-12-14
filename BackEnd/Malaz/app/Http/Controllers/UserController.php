@@ -90,10 +90,11 @@ class UserController extends Controller
 
     public function sendOtp(Request $request)
     {
+        //return response()->json(['message' => 'OTP sent111']);;
         $request->validate([
             'phone' => 'required|regex:/^\+?\d{9,15}$/|unique:users,phone',
         ]);
-
+        
         $otp = rand(100000, 999999);
         //$otp = 111111;
         Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
