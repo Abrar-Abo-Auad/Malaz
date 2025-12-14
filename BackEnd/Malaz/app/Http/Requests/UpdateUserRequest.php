@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Carbon\Carbon;
 
-class UpdateUserRequest extends FormRequest
+class UpdateUserRequest extends BaseFormRequest
 {
     public function authorize()
     {

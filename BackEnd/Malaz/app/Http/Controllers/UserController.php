@@ -25,22 +25,6 @@ class UserController extends Controller
         ]);
     }
 
-    // public function profileImage($id)
-    // {
-    //     $user = User::findOrFail($id);
-
-    //     return response($user->profile_image)
-    //         ->header('Content-Type', $user->mime_type);
-    // }
-
-    // public function identityImage($id)
-    // {
-    //     $user = User::findOrFail($id);
-
-    //     return response($user->identity_image)
-    //         ->header('Content-Type', $user->mime_type);
-    // }
-
     public function showProfileImage(User $user)
     {
         $image = base64_decode($user->profile_image);
@@ -95,7 +79,7 @@ class UserController extends Controller
         ]);
 
         $otp = rand(100000, 999999);
-        //$otp = 111111;
+
         Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
 
         app('greenapi')->sendMessage($request->phone, "Verification code: {$otp}");
@@ -178,12 +162,20 @@ class UserController extends Controller
 
     public function register(RegisterRequest $request)
     {
+
+        $locale = $request->header('Accept-Language', $request->input('language'));
+
+        if (!in_array($locale, ['en', 'ar', 'fr', 'ru', 'tr'])) {
+            $locale = config('app.locale');
+        }
+
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'date_of_birth' => $request->date_of_birth,
+            'language' => $locale,
         ]);
         if ($request->hasFile('profile_image')) {
             try {

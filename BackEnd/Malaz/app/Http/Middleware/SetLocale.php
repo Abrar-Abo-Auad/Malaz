@@ -10,11 +10,18 @@ class SetLocale
 {
     public function handle($request, Closure $next)
     {
-        if (Auth::check()) {
-            App::setLocale(Auth::user()->language ?? config('app.locale'));
-        } else {
-            App::setLocale(session('locale', config('app.locale')));
+        $locale = $request->header('Accept-Language', $request->query('lang'));
+
+        if ((!$locale || !in_array($locale, ['en', 'ar', 'fr', 'ru', 'tr'])) && Auth::check()) {
+            $locale = Auth::user()->language;
         }
+
+        if (!in_array($locale, ['en', 'ar', 'fr', 'ru', 'tr'])) {
+            $locale = config('app.locale');
+        }
+
+        App::setLocale($locale);
+
         return $next($request);
     }
 }
