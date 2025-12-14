@@ -16,14 +16,15 @@ import '../../data/repositories/apartment_repository_impl.dart';
 import '../../domain/repositories/apartment_repository.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
-import '../../domain/usecases/get_apartments_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
+import '../../domain/usecases/apartments_use_case.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
+import '../network/network_service.dart';
 
 /// [GetIt] / [service_locator]
 ///
@@ -55,23 +56,20 @@ import '../network/network_info.dart';
 
 final sl = GetIt.instance;
 
-
 Future<void> setUpServices() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   sl.registerLazySingleton<Dio>(() => Dio());
 
-  // sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl());
-  //
-  // sl.registerLazySingleton<ApartmentRemoteDataSource>(
-  //       () => ApartmentRemoteDataSourceImpl(networkService: sl()),
-  // );
-  //
-  // sl.registerLazySingleton<InternetConnectionChecker>(
-  //         () => InternetConnectionChecker());
+  sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
 
-  sl.registerLazySingleton<InternetConnectionChecker>(() => InternetConnectionChecker());
+  sl.registerLazySingleton<ApartmentRemoteDataSource>(
+    () => ApartmentRemoteDataSourceImpl(networkService: sl()),
+  );
+
+  sl.registerLazySingleton<InternetConnectionChecker>(
+      () => InternetConnectionChecker());
 
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
 
@@ -86,8 +84,8 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
 
   sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl());
-  // sl.registerLazySingleton<ApartmentRepository>(
-  //         () => ApartmentRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton<ApartmentRepository>(
+          () => ApartmentRepositoryImpl(remoteDataSource: sl()));
 
   /// --- Auth datasources, repository, usecases, cubit --- //
   /// Data sources

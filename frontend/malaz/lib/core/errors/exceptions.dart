@@ -1,4 +1,4 @@
-// core/errors/exceptions.dart
+
 /// Represents errors that occur during data fetching or processing.
 class ServerException implements Exception {
   final String? message;
@@ -6,7 +6,17 @@ class ServerException implements Exception {
   @override
   String toString() => 'ServerException: ${message ?? ''}';
 }
-
+// class ServerException implements Exception {
+//   final String message;
+//   final int? statusCode;
+//   final Map<String, dynamic>? errors;
+//
+//   ServerException({
+//     required this.message,
+//     this.statusCode,
+//     this.errors,
+//   });
+// }
 /// Represents errors that occur when there is no internet connection.
 class NetworkException implements Exception {}
 
@@ -20,6 +30,12 @@ class CacheException implements Exception {
 
 /// Can be used for other general exceptions.
 class GeneralException implements Exception {}
+
+class UnauthenticatedException implements Exception {
+  final String message;
+  UnauthenticatedException(
+      {this.message = 'Session expired, please login again'}); /// TODO: translate
+}
 
 /// This exception appears when the user is in a pending state,
 /// meaning an account with that username and password already exists but has not yet been approved by the admin.

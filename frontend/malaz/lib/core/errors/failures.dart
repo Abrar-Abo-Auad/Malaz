@@ -1,4 +1,4 @@
-// core/errors/failures.dart
+
 import 'package:equatable/equatable.dart';
 
 /// [Failure]
@@ -17,17 +17,17 @@ abstract class Failure extends Equatable {
 
 /// Represents a failure that occurs when communicating with a server.
 class ServerFailure extends Failure {
-  const ServerFailure([String? message]) : super(message);
+  const ServerFailure(super.message);
 }
 
 /// Represents a failure that occurs when there is no internet connection.
-class NetworkFailure extends Failure {
-  const NetworkFailure([String? message]) : super(message);
+class CacheFailure extends Failure {
+  const CacheFailure(super.message);
 }
 
 /// Represents a failure that occurs when accessing cached data.
-class CacheFailure extends Failure {
-  const CacheFailure([String? message]) : super(message);
+class OfflineFailure extends Failure {
+  const OfflineFailure(super.message);
 }
 
 /// Represents other general failures.
