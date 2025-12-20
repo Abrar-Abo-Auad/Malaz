@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../booking/booking_screen.dart';
 import '../chats/chats_screen.dart';
 import '../favorites/favorites_screen.dart';
@@ -80,7 +81,8 @@ class _MainWrapperState extends State<MainWrapper> {
                 });
               },
             )
-        ));
+        ),
+    );
   }
 }
 
