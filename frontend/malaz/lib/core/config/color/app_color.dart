@@ -8,6 +8,7 @@ class AppColors {
   static const Color secondaryLight = Color(0xFF6D4C41);
 
   static const Color accent = Color(0x2DFFE1ED);
+  static const tertiary = Colors.blue;
 
   static const Color backgroundLight = Color(0xFFFFFCF3);
   static const Color backgroundDark = Color(0xFF1A1614);
