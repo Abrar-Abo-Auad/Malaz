@@ -146,13 +146,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get essential_details => 'Essential Details';
 
   @override
-  String get bedroom => 'Bedrooms:';
+  String get bedrooms => 'Bedrooms:';
 
   @override
-  String get bathroom => 'Bathrooms:';
+  String get bathrooms => 'Bathrooms:';
 
   @override
-  String get property_area => 'Property Area:';
+  String get bathrooms_no_dots => 'Bathrooms';
+
+  @override
+  String get area => 'Area:';
 
   @override
   String get price => 'Price';
@@ -204,4 +207,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get verified_host => 'Verified Host';
+
+  @override
+  String get owner => 'Owner';
+
+  @override
+  String get rooms => 'Rooms';
+
+  @override
+  String get reviews => 'Reviews';
+
+  @override
+  String get review => 'Review';
+
+  @override
+  String get view_all => 'View All';
+
+  @override
+  String get per_month => 'per month';
+
+  @override
+  String get book_now => 'Book Now';
+
+  @override
+  String get month => 'month';
+
+  @override
+  String get new_ => 'New';
 }

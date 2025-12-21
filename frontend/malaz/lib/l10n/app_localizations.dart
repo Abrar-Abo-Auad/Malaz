@@ -374,23 +374,29 @@ abstract class AppLocalizations {
   /// **'Essential Details'**
   String get essential_details;
 
-  /// No description provided for @bedroom.
+  /// No description provided for @bedrooms.
   ///
   /// In en, this message translates to:
   /// **'Bedrooms:'**
-  String get bedroom;
+  String get bedrooms;
 
-  /// No description provided for @bathroom.
+  /// No description provided for @bathrooms.
   ///
   /// In en, this message translates to:
   /// **'Bathrooms:'**
-  String get bathroom;
+  String get bathrooms;
 
-  /// No description provided for @property_area.
+  /// No description provided for @bathrooms_no_dots.
   ///
   /// In en, this message translates to:
-  /// **'Property Area:'**
-  String get property_area;
+  /// **'Bathrooms'**
+  String get bathrooms_no_dots;
+
+  /// No description provided for @area.
+  ///
+  /// In en, this message translates to:
+  /// **'Area:'**
+  String get area;
 
   /// No description provided for @price.
   ///
@@ -493,6 +499,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
+
+  /// No description provided for @verified_host.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified Host'**
+  String get verified_host;
+
+  /// No description provided for @owner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get owner;
+
+  /// No description provided for @rooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Rooms'**
+  String get rooms;
+
+  /// No description provided for @reviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get reviews;
+
+  /// No description provided for @review.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get review;
+
+  /// No description provided for @view_all.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get view_all;
+
+  /// No description provided for @per_month.
+  ///
+  /// In en, this message translates to:
+  /// **'per month'**
+  String get per_month;
+
+  /// No description provided for @book_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Now'**
+  String get book_now;
+
+  /// No description provided for @month.
+  ///
+  /// In en, this message translates to:
+  /// **'month'**
+  String get month;
+
+  /// No description provided for @new_.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get new_;
 }
 
 class _AppLocalizationsDelegate
