@@ -71,7 +71,8 @@ class AppDrawer extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     children: [
                       _buildDrawerItem(context, Icons.person_outline, tr.my_profile, () {
-                        context.go('/profile');
+                        //Navigator.pop(context);
+                        context.push('/profile');
                       }),
                       _buildDrawerItem(context, Icons.palette_outlined, tr.theme, () {
                         Navigator.pop(context);
