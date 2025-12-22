@@ -4,17 +4,17 @@ class AppColors {
   static const Color primaryDark = Color(0xFFEDB95E);
   static const Color primaryLight = Color(0xFFC59232);
 
-  static const Color secondaryDark = Color(0xFF4E342E);
-  static const Color secondaryLight = Color(0xFF6D4C41);
+  static const Color secondaryDark = Color(0xFF3D3D3D);
+  static const Color secondaryLight = Color(0xFF909090);
 
   static const Color accent = Color(0x2DFFE1ED);
   static const tertiary = Colors.blue;
 
   static const Color backgroundLight = Color(0xFFFFFCF3);
-  static const Color backgroundDark = Color(0xFF1A1614);
+  static const Color backgroundDark = Color(0xFF1B1A1A);
 
   static const Color surfaceLight = Color(0xFFFFFFFF);
-  static const Color surfaceDark = Color(0xFF2C2420);
+  static const Color surfaceDark = Color(0xFF2D2C2C);
 
   static const Color textPrimaryLight = Color(0xFF2C2420);
   static const Color textSecondaryLight = Color(0xFF8D7F7D);
