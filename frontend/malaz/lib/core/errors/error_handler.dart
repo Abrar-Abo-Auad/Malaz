@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:malaz/l10n/app_localizations.dart';
+import 'package:path/path.dart';
 import '../errors/exceptions.dart';
 
 /// TODO: translate
@@ -9,7 +12,7 @@ class ErrorHandler {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.connectionError:
-        return NetworkException();
+        return NetworkException(AppLocalizations.of(context as BuildContext).network_error_message);
 
       case DioExceptionType.badResponse:
         return _handleBadResponse(error.response);
@@ -34,7 +37,7 @@ class ErrorHandler {
     }
 
     if (statusCode == 401) {
-      return UnauthenticatedException(message: message);
+      return UnauthenticatedException(message);
     }
 
     if(statusCode == 403) {
