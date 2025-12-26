@@ -248,4 +248,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unexpected_error_message => 'Произошла непредвиденная ошибка';
+
+  @override
+  String get retry => 'Повторить';
+
+  @override
+  String get warring => 'Предупреждение';
 }

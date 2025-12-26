@@ -1,27 +1,23 @@
 
 /// Represents errors that occur during data fetching or processing.
 class ServerException implements Exception {
-  final String message;
+  final String? message;
   final int? statusCode;
   final Map<String, dynamic>? errors;
 
   ServerException({
-    required this.message,
+    this.message,
     this.statusCode,
     this.errors,
   });
 
   @override
-  String toString() => message;
+  String toString() => message ?? 'server exception';
 }
 /// Represents errors that occur when there is no internet connection.
-class NetworkException implements Exception {
-  final String message;
-  NetworkException(this.message);
+class NetworkException implements Exception {}
 
-  @override
-  String toString() => message;
-}
+class UnexpectedException implements Exception {}
 
 /// Represents errors that occur when there is no cached data available.
 class CacheException implements Exception {

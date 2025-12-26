@@ -77,5 +77,7 @@
   "new_": "Yeni",
   "network_error_message": "Ağ hatası oluştu. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.",
   "request_cancelled_error_message": "İstek iptal edildi",
-  "unexpected_error_message": "Beklenmedik bir hata oluştu"
+  "unexpected_error_message": "Beklenmedik bir hata oluştu",
+  "retry": "Tekrar dene",
+  "warring": "Uyarı"
 }

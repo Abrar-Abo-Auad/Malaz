@@ -18,7 +18,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mobile_number => 'رقم الهاتف';
 
   @override
-  String get send_verification_code => 'أرسل رمز التحقق';
+  String get send_verification_code => 'إرسال رمز التحقق';
 
   @override
   String get login => 'تسجيل الدخول';
@@ -121,7 +121,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get date_of_birth => 'تاريخ الميلاد';
 
   @override
-  String get six_digits => 'يرجى إدخال رمز PIN المكون من 6 أرقام';
+  String get six_digits => 'يرجى إداخل رمز PIN المكون من 6 أرقام';
 
   @override
   String get field_required => 'هذا الحقل مطلوب';
@@ -246,4 +246,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unexpected_error_message => 'حدث خطأ غير متوقع';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get warring => 'تنبيه';
 }

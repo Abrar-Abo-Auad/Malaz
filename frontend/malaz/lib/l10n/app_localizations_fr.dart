@@ -253,4 +253,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get unexpected_error_message =>
       'Une erreur inattendue s\'est produite';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get warring => 'Avertissement';
 }

@@ -2,7 +2,7 @@
   "welcome_back": "مرحباً بعودتك",
   "login_to_continue": "سجل الدخول للمتابعة في البحث",
   "mobile_number": "رقم الهاتف",
-  "send_verification_code": "أرسل رمز التحقق",
+  "send_verification_code": "إرسال رمز التحقق",
   "login": "تسجيل الدخول",
   "logout": "تسجيل الخروج",
   "dont_have_account": "ليس لديك حساب؟",
@@ -36,7 +36,7 @@
   "previous": "السابق",
   "send_code": "إرسال رمز التحقق",
   "date_of_birth": "تاريخ الميلاد",
-  "six_digits": "يرجى إدخال رمز PIN المكون من 6 أرقام",
+  "six_digits": "يرجى إداخل رمز PIN المكون من 6 أرقام",
   "field_required": "هذا الحقل مطلوب",
   "image_required": "هذه الصورة مطلوبة",
   "malaz": "ملاذ",
@@ -77,5 +77,7 @@
   "new_": "جديد",
   "network_error_message": "حدث خطأ في الشبكة. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
   "request_cancelled_error_message": "تم إلغاء الطلب",
-  "unexpected_error_message": "حدث خطأ غير متوقع"
+  "unexpected_error_message": "حدث خطأ غير متوقع",
+  "retry": "إعادة المحاولة",
+  "warring": "تنبيه"
 }

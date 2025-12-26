@@ -12,16 +12,16 @@ class ErrorHandler {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
       case DioExceptionType.connectionError:
-        return NetworkException(AppLocalizations.of(context as BuildContext).network_error_message);
+        return NetworkException();
 
       case DioExceptionType.badResponse:
         return _handleBadResponse(error.response);
 
       case DioExceptionType.cancel:
-        return ServerException(message: AppLocalizations.of(context as BuildContext).request_cancelled_error_message);
+        return ServerException();
 
       default:
-        return ServerException(message: AppLocalizations.of(context as BuildContext).unexpected_error_message);
+        return UnexpectedException();
     }
   }
 

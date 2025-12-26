@@ -247,4 +247,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unexpected_error_message => 'Unexpected error occurred';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get warring => 'warring';
 }

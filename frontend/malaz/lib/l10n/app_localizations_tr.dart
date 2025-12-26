@@ -248,4 +248,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unexpected_error_message => 'Beklenmedik bir hata oluştu';
+
+  @override
+  String get retry => 'Tekrar dene';
+
+  @override
+  String get warring => 'Uyarı';
 }
