@@ -217,7 +217,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                 controller: _bedroomsController,
                 icon: Icons.bed,
                 hint: "0",
-                preffix: tr.bedroom,
+                preffix: tr.bedrooms,
                 isnumber: true,
                 validator: (value) {
                   if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) <= 0) {
@@ -231,7 +231,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                 controller: _bathroomsController,
                 icon: Icons.bathtub,
                 hint: "0",
-                preffix: tr.bathroom,
+                preffix: tr.bathrooms,
                 isnumber: true,
                 validator: (value) {
                   if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) <= 0) {
@@ -246,7 +246,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
           controller: _areaController,
           icon: Icons.square_foot,
           hint: "0",
-          preffix: tr.property_area,
+          preffix: tr.area,
           isnumber: true,
           suffix: ("sqft"),
           validator: (value) {

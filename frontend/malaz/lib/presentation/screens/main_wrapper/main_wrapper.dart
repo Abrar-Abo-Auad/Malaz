@@ -1,13 +1,13 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
+// تأكد من صحة هذه المسارات بناءً على بنية ملفاتك
 import '../booking/booking_screen.dart';
 import '../chats/chats_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../home/home_screen.dart';
-import '../property/add_property.dart';
+import '../manage_property/manage_property.dart'; // هذا الملف يجب أن يحتوي على ManagePropertiesScreen
 import '../side_drawer/app_drawer.dart';
-import '../../../l10n/app_localizations.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
@@ -19,11 +19,13 @@ class MainWrapper extends StatefulWidget {
 class _MainWrapperState extends State<MainWrapper> {
   int _currentIndex = 0;
 
+  // قائمة الصفحات مرتبة حسب الترتيب في شريط التنقل
   final List<Widget> _screens = const [
-    HomeScreen(),
-    ChatsScreen(),
-    FavoritesScreen(),
-    BookingsScreen(),
+    HomeScreen(),             // 0
+    ChatsScreen(),            // 1
+    FavoritesScreen(),        // 2
+    BookingsScreen(),         // 3
+    ManagePropertiesScreen(), // 4
   ];
 
   final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
@@ -31,115 +33,43 @@ class _MainWrapperState extends State<MainWrapper> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final tr = AppLocalizations.of(context)!;
-    final Color fabColor = colorScheme.primary;
 
-    final item = <Widget>[
-      Icon(Icons.home_outlined, size: 30, color:colorScheme.onPrimary),
-      Icon(Icons.chat_outlined, size: 30, color:colorScheme.onPrimary),
-      Icon(Icons.favorite_outline, size: 30, color:colorScheme.onPrimary),
-      Icon(Icons.calendar_today_outlined, size: 30, color:colorScheme.onPrimary),
-    ];
+    // إعداد ألوان الأيقونات بناءً على الثيم
 
-    return Padding(padding: EdgeInsetsGeometry.only(bottom: 20),
-        child: Scaffold(
-            //extendBody: true,
-            drawer: const AppDrawer(),
-            body: IndexedStack(
-              index: _currentIndex,
-              children: _screens,
-            ),
 
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
-            floatingActionButton: Visibility(
-              visible: _currentIndex == 0,
-              child: _FabAnimationWrapper(
-                child: FloatingActionButton(
-                  heroTag: 'main_add_fab',
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPropertyScreen()));
-                  },
-                  backgroundColor: fabColor,
-                  shape: const CircleBorder(),
-                  child: Icon(Icons.add, color: colorScheme.onPrimary, size: 30),
-                ),
-              ),
-            ),
-
-            bottomNavigationBar: CurvedNavigationBar(
-              key: _bottomNavigationKey,
-              color: colorScheme.secondary,
-              backgroundColor: Colors.transparent,
-              buttonBackgroundColor: colorScheme.primary,
-              height: 55,
-              index: _currentIndex,
-              items: item,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            )
-        ),
-    );
-  }
-}
-
-class _FabAnimationWrapper extends StatefulWidget {
-  final Widget child;
-  const _FabAnimationWrapper({required this.child});
-
-  @override
-  State<_FabAnimationWrapper> createState() => _FabAnimationWrapperState();
-}
-
-class _FabAnimationWrapperState extends State<_FabAnimationWrapper>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _opacityAnimation;
-  late final Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 1.0),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SlideTransition(
-      position: _slideAnimation,
-      child: FadeTransition(
-        opacity: _opacityAnimation,
-        child: widget.child,
+    return SafeArea(child:
+      Scaffold(
+      // تم حذف الـ FloatingActionButton من هنا بناءً على طلبك
+      drawer: const AppDrawer(),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
       ),
-    );
+      bottomNavigationBar: CurvedNavigationBar(
+        key: _bottomNavigationKey,
+        index: _currentIndex,
+        height: 45,
+        items: <Widget>[
+          Icon(Icons.home_outlined,
+              size: _currentIndex == 0 ? 30:24,color: colorScheme.surface,),
+          Icon(Icons.chat_bubble_outline,
+              size: _currentIndex == 1 ? 30:24,color: colorScheme.surface,),
+          Icon(Icons.favorite_outline,
+              size: _currentIndex == 2 ? 30:24,color: colorScheme.surface,),
+          Icon(Icons.calendar_today_outlined,
+              size: _currentIndex == 3 ? 30:24,color: colorScheme.surface,),
+          Icon(Icons.person_outline,
+              size: _currentIndex == 4 ? 30:24,color: colorScheme.surface,),
+        ],
+        color: colorScheme.secondary,
+        buttonBackgroundColor: colorScheme.primary,
+        backgroundColor: Colors.transparent,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
+    ));
   }
 }
