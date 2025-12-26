@@ -173,17 +173,17 @@
 
                     <!-- Properties -->
                     <li>
-                        <a href="#"
-                            class="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-gray-800">
+                        <a href="{{ route('admin.properties.index') }}"
+                            class="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-gray-800 {{ Request::routeIs('admin.properties.*') ? 'active-nav-item' : '' }}">
                             <div class="flex items-center">
                                 <i class="fas fa-home w-5 mr-3"></i>
                                 <span>Properties</span>
                             </div>
                             @php
-                                $pendingProperties = \App\Models\Property::where('status', 'pending')->count();
+                                $pendingCount = \App\Models\Property::where('status', 'pending')->count();
                             @endphp
-                            @if ($pendingProperties > 0)
-                                <span class="badge badge-warning">{{ $pendingProperties }}</span>
+                            @if ($pendingCount > 0)
+                                <span class="badge badge-danger">{{ $pendingCount }}</span>
                             @else
                                 <span class="text-xs text-gray-400">0</span>
                             @endif
