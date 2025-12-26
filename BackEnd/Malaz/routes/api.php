@@ -32,7 +32,7 @@ Route::prefix('users')->controller(UserController::class)->group(function () {
         Route::delete('favorites/{property}', 'erasefromfav')->name('users.removeFavorite');
         Route::get('favorites', 'getfav')->name('users.getFavorites');
         Route::post('send-otppassword', 'sendOtp_passwordone')->name('users.sendOtppassword');
-        Route::get('showinfo', 'showinfo')->name('users.showinfo');
+        Route::get('showinfo/{user}', 'showinfo')->name('users.showinfo');
     });
     Route::post('register', 'register')->name('users.register');
     Route::post('login', 'login')->name('users.login');
