@@ -29,14 +29,14 @@ return [
     'identity_card_image.file' => 'L’image de la carte d’identité doit être un fichier.',
     'identity_card_image.image' => 'L’image de la carte d’identité doit être une image.',
     'identity_card_image.mimes' => 'L’image de la carte d’identité doit être de type : jpeg, png, jpg, gif, svg.',
-    'identity_card_image.max' => 'L’image de la carte d’identité ne doit pas dépasser 2MB.',
+    'identity_card_image.max' => 'L’image de la carte d’identité ne doit pas dépasser 10MB.',
 
     // Photo de profil
     'profile_image.required' => 'La photo de profil est requise.',
     'profile_image.file' => 'La photo de profil doit être un fichier.',
     'profile_image.image' => 'La photo de profil doit être une image.',
     'profile_image.mimes' => 'La photo de profil doit être de type : jpeg, png, jpg, gif, svg.',
-    'profile_image.max' => 'La photo de profil ne doit pas dépasser 2MB.',
+    'profile_image.max' => 'La photo de profil ne doit pas dépasser 10MB.',
 
     // Date de naissance
     'date_of_birth.required' => 'La date de naissance est requise.',
@@ -81,7 +81,7 @@ return [
     'images.*.file' => 'Chaque image doit être un fichier valide.',
     'images.*.image' => 'Chaque fichier doit être une image.',
     'images.*.mimes' => 'Les images doivent être de type : jpeg, png, jpg, gif, svg.',
-    'images.*.max' => 'Chaque image ne doit pas dépasser 2MB.',
+    'images.*.max' => 'Chaque image ne doit pas dépasser 10MB.',
 
     // Effacement
     'erase.array' => 'Le champ effacer doit être un tableau.',
@@ -126,7 +126,7 @@ return [
     'main_pic.file' => 'L’image principale doit être un fichier valide.',
     'main_pic.image' => 'L’image principale doit être une image.',
     'main_pic.mimes' => 'L’image principale doit être de type : jpeg, png, jpg, gif, svg.',
-    'main_pic.max' => 'L’image principale ne doit pas dépasser 2MB.',
+    'main_pic.max' => 'L’image principale ne doit pas dépasser 10MB.',
 
     'conversation' => [
         'self_start' => 'Vous ne pouvez pas commencer une conversation avec vous-même',
