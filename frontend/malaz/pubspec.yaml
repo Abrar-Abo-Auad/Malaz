@@ -37,6 +37,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   #cached_network_image: ^3.4.1
   table_calendar: ^3.0.9
+  google_nav_bar: any
 
 dev_dependencies:
   flutter_test:
