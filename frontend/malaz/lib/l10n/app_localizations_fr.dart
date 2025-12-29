@@ -348,7 +348,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get baths => 'Bains';
 
-
   @override
   String get click_to_view => 'Cliquez pour voir les messages';
 

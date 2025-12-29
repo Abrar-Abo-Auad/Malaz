@@ -337,7 +337,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get baths => 'الحمامات';
 
-
   @override
   String get click_to_view => 'انقر لعرض الرسائل';
 

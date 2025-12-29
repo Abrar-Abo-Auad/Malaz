@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:malaz/presentation/global_widgets/custom_button.dart';
 import '../../../../domain/entities/apartment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../book_now/book_now_screen.dart';
@@ -71,7 +72,7 @@ class _BuildSliverAppBar extends StatelessWidget {
     ];
 
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: 600,
       pinned: true,
       backgroundColor: theme.colorScheme.background,
       elevation: 0,
@@ -504,7 +505,7 @@ class _BuildBottomBookingBar extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: ElevatedButton(
+            child: CustomButton(
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -515,17 +516,7 @@ class _BuildBottomBookingBar extends StatelessWidget {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                elevation: 0,
-              ),
-              child: Text(
-                l10n.book_now,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
+              text: l10n.book_now,
             ),
           ),
         ],

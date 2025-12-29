@@ -341,7 +341,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get baths => 'Ванны';
 
-
   @override
   String get click_to_view => 'Нажмите, чтобы прочитать';
 

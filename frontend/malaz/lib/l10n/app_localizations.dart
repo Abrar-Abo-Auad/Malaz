@@ -752,7 +752,6 @@ abstract class AppLocalizations {
   /// **'Baths'**
   String get baths;
 
-
   /// No description provided for @click_to_view.
   ///
   /// In en, this message translates to:

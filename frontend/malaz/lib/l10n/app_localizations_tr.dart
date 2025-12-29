@@ -341,7 +341,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get baths => 'Banyolar';
 
-
   @override
   String get click_to_view => 'Mesajları görmek için tıklayın';
 
