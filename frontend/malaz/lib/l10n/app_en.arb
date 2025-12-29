@@ -101,5 +101,7 @@
   "passwords_do_not_match": "Passwords do not match",
   "wronge_otp": "The entered code is incorrect, please try again",
   "otp_verified_success": "OTP verified successfully",
-  "booking_request_sent": "Booking Request Sent To The Owner"
+  "booking_request_sent": "Booking Request Sent To The Owner",
+  "nights": "nights",
+  "confirm_booking": "Confirm Booking"
 }

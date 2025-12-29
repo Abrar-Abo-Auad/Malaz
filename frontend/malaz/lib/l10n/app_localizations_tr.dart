@@ -323,4 +323,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get booking_request_sent =>
       'Rezervasyon talebi ev sahibine gönderildi';
+
+  @override
+  String get nights => 'gece';
+
+  @override
+  String get confirm_booking => 'Rezervasyonu Onayla';
 }

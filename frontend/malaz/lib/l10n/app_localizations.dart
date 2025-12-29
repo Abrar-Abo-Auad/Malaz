@@ -721,6 +721,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Booking Request Sent To The Owner'**
   String get booking_request_sent;
+
+  /// No description provided for @nights.
+  ///
+  /// In en, this message translates to:
+  /// **'nights'**
+  String get nights;
+
+  /// No description provided for @confirm_booking.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Booking'**
+  String get confirm_booking;
 }
 
 class _AppLocalizationsDelegate

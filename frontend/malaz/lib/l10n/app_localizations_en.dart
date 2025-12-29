@@ -320,4 +320,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get booking_request_sent => 'Booking Request Sent To The Owner';
+
+  @override
+  String get nights => 'nights';
+
+  @override
+  String get confirm_booking => 'Confirm Booking';
 }

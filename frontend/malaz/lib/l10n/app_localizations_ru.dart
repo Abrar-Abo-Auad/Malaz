@@ -323,4 +323,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get booking_request_sent =>
       'Запрос на бронирование отправлен владельцу';
+
+  @override
+  String get nights => 'ночи';
+
+  @override
+  String get confirm_booking => 'Подтвердить бронирование';
 }

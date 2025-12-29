@@ -319,4 +319,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get booking_request_sent => 'تم إرسال طلب الحجز إلى المالك';
+
+  @override
+  String get nights => 'ليالي';
+
+  @override
+  String get confirm_booking => 'تأكيد الحجز';
 }

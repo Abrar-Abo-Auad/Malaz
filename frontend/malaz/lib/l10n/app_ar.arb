@@ -101,5 +101,7 @@
   "passwords_do_not_match": "كلمتا السر غير متطابقتين",
   "wronge_otp": "الرمز المدخل غير صحيح، يرجى المحاولة مرة أخرى",
   "otp_verified_success": "تم التحقق من الرمز بنجاح",
-  "booking_request_sent": "تم إرسال طلب الحجز إلى المالك"
+  "booking_request_sent": "تم إرسال طلب الحجز إلى المالك",
+  "nights": "ليالي",
+  "confirm_booking": "تأكيد الحجز"
 }

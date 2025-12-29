@@ -330,4 +330,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get booking_request_sent =>
       'La demande de réservation a été envoyée au propriétaire';
+
+  @override
+  String get nights => 'nuits';
+
+  @override
+  String get confirm_booking => 'Confirmer la réservation';
 }

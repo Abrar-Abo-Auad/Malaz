@@ -101,5 +101,7 @@
   "passwords_do_not_match": "Şifreler eşleşmiyor",
   "wronge_otp": "Girilen kod yanlış, lütfen tekrar deneyin",
   "otp_verified_success": "Doğrulama kodu başarıyla onaylandı",
-  "booking_request_sent": "Rezervasyon talebi ev sahibine gönderildi"
+  "booking_request_sent": "Rezervasyon talebi ev sahibine gönderildi",
+  "nights": "gece",
+  "confirm_booking": "Rezervasyonu Onayla"
 }
