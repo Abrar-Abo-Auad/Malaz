@@ -328,6 +328,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirm_booking => 'Confirm Booking';
 
   @override
+  String reviews_count(int count) {
+    return '($count reviews)';
+  }
+
+  @override
+  String get no_description => 'No description provided.';
+
+  @override
+  String get baths => 'Baths';
+
+
+  @override
   String get click_to_view => 'Click to view messages';
 
   @override

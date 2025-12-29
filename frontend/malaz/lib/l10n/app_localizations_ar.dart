@@ -327,6 +327,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirm_booking => 'تأكيد الحجز';
 
   @override
+  String reviews_count(int count) {
+    return '($count تقييم)';
+  }
+
+  @override
+  String get no_description => 'لا يوجد وصف متوفر.';
+
+  @override
+  String get baths => 'الحمامات';
+
+
+  @override
   String get click_to_view => 'انقر لعرض الرسائل';
 
   @override

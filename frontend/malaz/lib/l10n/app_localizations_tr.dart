@@ -331,6 +331,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get confirm_booking => 'Rezervasyonu Onayla';
 
   @override
+  String reviews_count(int count) {
+    return '($count değerlendirme)';
+  }
+
+  @override
+  String get no_description => 'Açıklama belirtilmedi.';
+
+  @override
+  String get baths => 'Banyolar';
+
+
+  @override
   String get click_to_view => 'Mesajları görmek için tıklayın';
 
   @override

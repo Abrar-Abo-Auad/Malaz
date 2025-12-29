@@ -104,6 +104,16 @@
   "booking_request_sent": "Booking Request Sent To The Owner",
   "nights": "nights",
   "confirm_booking": "Confirm Booking",
+  "reviews_count": "({count} reviews)",
+  "@reviews_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "no_description": "No description provided.",
+  "baths": "Baths",
   "click_to_view": "Click to view messages",
   "active_partners": "Active Partners",
   "recent_messages": "Recent Messages",
