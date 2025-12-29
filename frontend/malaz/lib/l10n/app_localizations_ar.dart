@@ -325,4 +325,55 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirm_booking => 'تأكيد الحجز';
+
+  @override
+  String get click_to_view => 'انقر لعرض الرسائل';
+
+  @override
+  String get active_partners => 'الشركاء النشطون';
+
+  @override
+  String get recent_messages => 'الرسائل الأخيرة';
+
+  @override
+  String get malaz_chat => 'دردشة ملاذ';
+
+  @override
+  String get no_conversations => 'لا توجد محادثات بعد';
+
+  @override
+  String get active => 'نشط';
+
+  @override
+  String get delete_chat_title => 'حذف الدردشة؟';
+
+  @override
+  String get delete_chat_confirm => 'سيؤدي هذا إلى إزالة المحادثة نهائيًا.';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get online_now => 'متصل الآن';
+
+  @override
+  String get editing_message_hint => 'تعديل الرسالة...';
+
+  @override
+  String get type_message_hint => 'اكتب رسالتك...';
+
+  @override
+  String get edit_message => 'تعديل الرسالة';
+
+  @override
+  String get copy_text => 'نسخ النص';
+
+  @override
+  String get text_copied => 'تم نسخ النص';
+
+  @override
+  String get delete_message => 'حذف الرسالة';
+
+  @override
+  String get edited => 'معدلة';
 }

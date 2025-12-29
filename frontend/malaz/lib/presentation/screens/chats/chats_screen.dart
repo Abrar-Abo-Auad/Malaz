@@ -7,6 +7,7 @@ import 'package:malaz/domain/entities/user_entity.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/service_locator/service_locator.dart';
 import '../../../data/models/conversation_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../cubits/chat/chat_cubit.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
@@ -30,6 +31,7 @@ class ChatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : ChatsColors.darkCoffee;
     final myUser = _getCurrentUser(context);
@@ -46,18 +48,18 @@ class ChatsScreen extends StatelessWidget {
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                 slivers: [
-                  _buildAppBar(isDark),
+                  _buildAppBar(isDark, tr),
                   SliverToBoxAdapter(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _BuildHeader(title: 'Active Partners', textColor: textColor),
+                        _BuildHeader(title: tr.active_partners, textColor: textColor),
                         _buildActivitySection(state, isDark, myUser?.id),
-                        _BuildHeader(title: 'Recent Messages', textColor: textColor),
+                        _BuildHeader(title: tr.recent_messages, textColor: textColor),
                       ],
                     ),
                   ),
-                  _buildMessagesContent(state, isDark, textColor, myUser?.id),
+                  _buildMessagesContent(state, isDark, textColor, myUser?.id, tr),
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               ),
@@ -68,7 +70,7 @@ class ChatsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(bool isDark) {
+  Widget _buildAppBar(bool isDark, AppLocalizations tr) {
     return SliverAppBar(
       expandedHeight: 100,
       floating: true,
@@ -77,9 +79,9 @@ class ChatsScreen extends StatelessWidget {
       backgroundColor: isDark ? const Color(0xFF0C0D10).withOpacity(0.9) : ChatsColors.creamBg.withOpacity(0.9),
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: false,
-        titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+        titlePadding: const EdgeInsets.only(left: 20,right: 20, bottom: 16),
         title: Text(
-          'Malaz Chat',
+          tr.malaz_chat,
           style: TextStyle(
             color: ChatsColors.caramel,
             fontWeight: FontWeight.w900,
@@ -114,12 +116,12 @@ class ChatsScreen extends StatelessWidget {
     return const SizedBox(height: 110);
   }
 
-  Widget _buildMessagesContent(ChatState state, bool isDark, Color textColor, int? myId) {
+  Widget _buildMessagesContent(ChatState state, bool isDark, Color textColor, int? myId, AppLocalizations tr) {
     if (state is ChatConversationsLoading) return _BuildShimmerList(isDark: isDark);
     if (state is ChatConversationsLoaded) {
       if (state.conversations.isEmpty) {
-        return const SliverToBoxAdapter(
-          child: Center(child: Padding(padding: EdgeInsets.only(top: 80), child: Center(child: Text("No conversations yet")))),
+        return SliverToBoxAdapter(
+          child: Center(child: Padding(padding: EdgeInsets.only(top: 80), child: Center(child: Text(tr.no_conversations)))),
         );
       }
       return _BuildMessagesList(conversations: state.conversations, isDark: isDark, textColor: textColor, myId: myId);
@@ -196,6 +198,8 @@ class _BuildMessagesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
+
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverList(
@@ -245,8 +249,8 @@ class _BuildMessagesList extends StatelessWidget {
                     leading: UserProfileImage(userId: otherUser.id, radius: 28),
                     title: Text('${otherUser.first_name} ${otherUser.last_name}',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor)),
-                    subtitle: const Text("Click to view messages", style: TextStyle(fontSize: 13, color: Colors.grey)),
-                    trailing: _buildTrailing(conv),
+                    subtitle: Text(tr.click_to_view, style: TextStyle(fontSize: 13, color: Colors.grey)),
+                    trailing: _buildTrailing(conv, tr),
                   ),
                 ),
               ),
@@ -257,12 +261,12 @@ class _BuildMessagesList extends StatelessWidget {
     );
   }
 
-  Widget _buildTrailing(ConversationModel conv) {
+  Widget _buildTrailing(ConversationModel conv, AppLocalizations tr) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Text('Active', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
+        Text(tr.active, style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         if (conv.unreadCount > 0)
           Container(
@@ -277,14 +281,16 @@ class _BuildMessagesList extends StatelessWidget {
   }
 
   Future<bool?> _showDeleteConfirm(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
+
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete Chat?"),
-        content: const Text("This will permanently remove the conversation."),
+        title: Text(tr.delete_chat_title),
+        content: Text(tr.delete_chat_confirm),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete", style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(tr.cancel)),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(tr.delete, style: TextStyle(color: Colors.red))),
         ],
       ),
     );

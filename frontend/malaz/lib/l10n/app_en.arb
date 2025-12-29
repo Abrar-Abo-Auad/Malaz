@@ -103,5 +103,22 @@
   "otp_verified_success": "OTP verified successfully",
   "booking_request_sent": "Booking Request Sent To The Owner",
   "nights": "nights",
-  "confirm_booking": "Confirm Booking"
+  "confirm_booking": "Confirm Booking",
+  "click_to_view": "Click to view messages",
+  "active_partners": "Active Partners",
+  "recent_messages": "Recent Messages",
+  "malaz_chat": "Malaz Chat",
+  "no_conversations": "No conversations yet",
+  "active": "Active",
+  "delete_chat_title": "Delete Chat?",
+  "delete_chat_confirm": "This will permanently remove the conversation.",
+  "delete": "Delete",
+  "online_now": "Online now",
+  "editing_message_hint": "Editing message...",
+  "type_message_hint": "Type a message...",
+  "edit_message": "Edit Message",
+  "copy_text": "Copy Text",
+  "text_copied": "Text copied",
+  "delete_message": "Delete Message",
+  "edited": "Edited"
 }

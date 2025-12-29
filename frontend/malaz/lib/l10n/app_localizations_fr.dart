@@ -336,4 +336,56 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get confirm_booking => 'Confirmer la réservation';
+
+  @override
+  String get click_to_view => 'Cliquez pour voir les messages';
+
+  @override
+  String get active_partners => 'Partenaires actifs';
+
+  @override
+  String get recent_messages => 'Messages récents';
+
+  @override
+  String get malaz_chat => 'Chat Malaz';
+
+  @override
+  String get no_conversations => 'Aucune conversation pour le moment';
+
+  @override
+  String get active => 'Actif';
+
+  @override
+  String get delete_chat_title => 'Supprimer le chat ?';
+
+  @override
+  String get delete_chat_confirm =>
+      'Cela supprimera définitivement la conversation.';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get online_now => 'En ligne';
+
+  @override
+  String get editing_message_hint => 'Modifier le message...';
+
+  @override
+  String get type_message_hint => 'Écrivez votre message...';
+
+  @override
+  String get edit_message => 'Modifier le message';
+
+  @override
+  String get copy_text => 'Copier le texte';
+
+  @override
+  String get text_copied => 'Texte copié';
+
+  @override
+  String get delete_message => 'Supprimer le message';
+
+  @override
+  String get edited => 'Modifié';
 }

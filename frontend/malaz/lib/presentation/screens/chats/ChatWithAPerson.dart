@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/service_locator/service_locator.dart';
 import '../../../data/models/chat_message_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../cubits/chat/chat_cubit.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
@@ -76,6 +77,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
       create: (context) => sl<ChatCubit>()..getMessages(widget.conversationId),
       child: Builder(
         builder: (childContext) {
+          final tr = AppLocalizations.of(childContext)!;
           return Scaffold(
             backgroundColor: bgColor,
             resizeToAvoidBottomInset: true,
@@ -149,7 +151,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                                 return ChatBubble(
                                   message: msg,
                                   isMe: msg.senderId == myId,
-                                  onLongPress: () => _showMessageActions(childContext, msg, msg.senderId == myId),
+                                  onLongPress: () => _showMessageActions(childContext, msg, msg.senderId == myId, tr),
                                   isSameUser: index > 0 && state.messages[index].senderId == state.messages[index - 1].senderId,
                                 );
                               },
@@ -159,7 +161,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                         },
                       ),
                     ),
-                    _buildMessageInput(childContext, isDark, myId ?? 0),
+                    _buildMessageInput(childContext, isDark, myId ?? 0, tr),
                   ],
                 ),
               ],
@@ -171,6 +173,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context, bool isDark) {
+    final tr = AppLocalizations.of(context)!;
     final primaryGold = const Color(0xFFAF895F);
     return AppBar(
       elevation: 0,
@@ -201,7 +204,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                   children: [
                     Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
                     const SizedBox(width: 5),
-                    const Text("متصل الآن", style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.w500)),
+                    Text(tr.online_now, style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.w500)),
                   ],
                 ),
               ],
@@ -212,7 +215,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
     );
   }
 
-  Widget _buildMessageInput(BuildContext context, bool isDark, int myId) {
+  Widget _buildMessageInput(BuildContext context, bool isDark, int myId, AppLocalizations tr) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 25),
       decoration: BoxDecoration(
@@ -229,7 +232,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                 children: [
                   const Icon(Icons.edit, size: 14, color: Color(0xFFAF895F)),
                   const SizedBox(width: 5),
-                  const Text("تعديل الرسالة...", style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+                  Text(tr.editing_message_hint, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
                   const Spacer(),
                   IconButton(icon: const Icon(Icons.close, size: 16), onPressed: () => setState(() => _editingMessage = null)),
                 ],
@@ -247,7 +250,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                   child: TextField(
                     controller: _messageController,
                     maxLines: null,
-                    decoration: const InputDecoration(hintText: 'اكتب رسالتك...', border: InputBorder.none),
+                    decoration: InputDecoration(hintText: tr.type_message_hint, border: InputBorder.none),
                   ),
                 ),
               ),
@@ -267,7 +270,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
     );
   }
 
-  void _showMessageActions(BuildContext cubitContext, ChatMessageModel message, bool isMe) {
+  void _showMessageActions(BuildContext cubitContext, ChatMessageModel message, bool isMe, AppLocalizations tr) {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
@@ -282,17 +285,17 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
           children: [
             const SizedBox(height: 10),
             Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
-            if (isMe) ListTile(leading: const Icon(Icons.edit_rounded, color: Color(0xFFAF895F)), title: const Text("تعديل الرسالة"), onTap: () {
+            if (isMe) ListTile(leading: const Icon(Icons.edit_rounded, color: Color(0xFFAF895F)), title: Text(tr.edit_message), onTap: () {
               context.pop();
               _messageController.text = message.body;
               setState(() => _editingMessage = message);
             }),
-            ListTile(leading: const Icon(Icons.copy_rounded, color: Color(0xFFAF895F)), title: const Text("نسخ النص"), onTap: () {
+            ListTile(leading: const Icon(Icons.copy_rounded, color: Color(0xFFAF895F)), title: Text(tr.copy_text), onTap: () {
               Clipboard.setData(ClipboardData(text: message.body));
               context.pop();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("تم نسخ النص")));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr.text_copied)));
             }),
-            if (isMe) ListTile(leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent), title: const Text("حذف الرسالة", style: TextStyle(color: Colors.redAccent)), onTap: () {
+            if (isMe) ListTile(leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent), title: Text(tr.delete_message, style: TextStyle(color: Colors.redAccent)), onTap: () {
               cubitContext.read<ChatCubit>().deleteMessage(message.id);
               context.pop();
             }),
@@ -330,6 +333,7 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryGold = const Color(0xFFAF895F);
 
@@ -363,9 +367,9 @@ class ChatBubble extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (message.isEdited)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 5),
-                      child: Text(" (معدلة) ", style: TextStyle(fontSize: 9, fontStyle: FontStyle.italic, color: Colors.white70)),
+                      child: Text(tr.edited, style: TextStyle(fontSize: 9, fontStyle: FontStyle.italic, color: Colors.white70)),
                     ),
                   Text(
                     DateFormat('hh:mm a').format(message.createdAt),

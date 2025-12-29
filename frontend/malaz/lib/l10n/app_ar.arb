@@ -103,5 +103,22 @@
   "otp_verified_success": "تم التحقق من الرمز بنجاح",
   "booking_request_sent": "تم إرسال طلب الحجز إلى المالك",
   "nights": "ليالي",
-  "confirm_booking": "تأكيد الحجز"
+  "confirm_booking": "تأكيد الحجز",
+  "click_to_view": "انقر لعرض الرسائل",
+  "active_partners": "الشركاء النشطون",
+  "recent_messages": "الرسائل الأخيرة",
+  "malaz_chat": "دردشة ملاذ",
+  "no_conversations": "لا توجد محادثات بعد",
+  "active": "نشط",
+  "delete_chat_title": "حذف الدردشة؟",
+  "delete_chat_confirm": "سيؤدي هذا إلى إزالة المحادثة نهائيًا.",
+  "delete": "حذف",
+  "online_now": "متصل الآن",
+  "editing_message_hint": "تعديل الرسالة...",
+  "type_message_hint": "اكتب رسالتك...",
+  "edit_message": "تعديل الرسالة",
+  "copy_text": "نسخ النص",
+  "text_copied": "تم نسخ النص",
+  "delete_message": "حذف الرسالة",
+  "edited": "معدلة"
 }
