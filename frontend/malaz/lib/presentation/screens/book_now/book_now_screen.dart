@@ -90,8 +90,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
           const _BuildHeader(),
 
-          const Divider(),
-
           Expanded(
             child: SingleChildScrollView(
               child: _BuildCalendar(
@@ -224,20 +222,20 @@ class _BuildCalendar extends StatelessWidget {
           titleTextStyle: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
+            color: theme.colorScheme.primary,
           ),
-          leftChevronIcon: Icon(Icons.chevron_left, color: theme.colorScheme.primary),
-          rightChevronIcon: Icon(Icons.chevron_right, color: theme.colorScheme.primary),
+          leftChevronIcon: Icon(Icons.chevron_left, color: theme.colorScheme.tertiary),
+          rightChevronIcon: Icon(Icons.chevron_right, color: theme.colorScheme.tertiary),
         ),
 
         calendarStyle: CalendarStyle(
-          rangeHighlightColor: theme.colorScheme.primary.withOpacity(0.2),
+          rangeHighlightColor: theme.colorScheme.tertiary.withOpacity(0.2),
           todayDecoration: BoxDecoration(
             color: theme.colorScheme.primary.withOpacity(0.5),
             shape: BoxShape.circle,
           ),
           selectedDecoration: BoxDecoration(
-            color: theme.colorScheme.primary,
+            color: theme.colorScheme.tertiary,
             shape: BoxShape.circle,
           ),
         ),
@@ -275,7 +273,7 @@ class _BuildCalendar extends StatelessWidget {
               margin: const EdgeInsets.all(4.0),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
+                color: theme.colorScheme.tertiary,
                 shape: BoxShape.circle,
               ),
               child: Text(
@@ -289,7 +287,7 @@ class _BuildCalendar extends StatelessWidget {
               margin: const EdgeInsets.all(4.0),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
+                color: theme.colorScheme.tertiary,
                 shape: BoxShape.circle,
               ),
               child: Text(
