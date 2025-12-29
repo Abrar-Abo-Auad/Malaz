@@ -103,5 +103,8 @@
   "otp_verified_success": "OTP-код успешно подтвержден",
   "booking_request_sent": "Запрос на бронирование отправлен владельцу",
   "nights": "ночи",
-  "confirm_booking": "Подтвердить бронирование"
+  "confirm_booking": "Подтвердить бронирование",
+  "reviews_count": "({count} отзывов)",
+  "no_description": "Описание не предоставлено.",
+  "baths": "Ванны"
 }

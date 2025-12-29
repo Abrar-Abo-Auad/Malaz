@@ -261,7 +261,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get identity_verification_input =>
-      'يرجى إدخال كلمة المرور الخاصة بك لتأكيد هويتك';
+      'يرجى إدخل كلمة المرور الخاصة بك لتأكيد هويتك';
 
   @override
   String get current_password => 'كلمة المرور الحالية';
@@ -325,4 +325,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirm_booking => 'تأكيد الحجز';
+
+  @override
+  String reviews_count(int count) {
+    return '($count تقييم)';
+  }
+
+  @override
+  String get no_description => 'لا يوجد وصف متوفر.';
+
+  @override
+  String get baths => 'الحمامات';
 }

@@ -82,7 +82,7 @@
   "warring": "تنبيه",
   "edit_profile": "تعديل الحساب",
   "identity_verification": "التحقق من الهوية",
-  "identity_verification_input": "يرجى إدخال كلمة المرور الخاصة بك لتأكيد هويتك",
+  "identity_verification_input": "يرجى إدخل كلمة المرور الخاصة بك لتأكيد هويتك",
   "current_password": "كلمة المرور الحالية",
   "cancel": "إلغاء",
   "incorrect_password": "كلمة المرور غير صحيحة",
@@ -103,5 +103,8 @@
   "otp_verified_success": "تم التحقق من الرمز بنجاح",
   "booking_request_sent": "تم إرسال طلب الحجز إلى المالك",
   "nights": "ليالي",
-  "confirm_booking": "تأكيد الحجز"
+  "confirm_booking": "تأكيد الحجز",
+  "reviews_count": "({count} تقييم)",
+  "no_description": "لا يوجد وصف متوفر.",
+  "baths": "الحمامات"
 }

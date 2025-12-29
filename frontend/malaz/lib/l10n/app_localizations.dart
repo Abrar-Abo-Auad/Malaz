@@ -733,6 +733,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm Booking'**
   String get confirm_booking;
+
+  /// No description provided for @reviews_count.
+  ///
+  /// In en, this message translates to:
+  /// **'({count} reviews)'**
+  String reviews_count(int count);
+
+  /// No description provided for @no_description.
+  ///
+  /// In en, this message translates to:
+  /// **'No description provided.'**
+  String get no_description;
+
+  /// No description provided for @baths.
+  ///
+  /// In en, this message translates to:
+  /// **'Baths'**
+  String get baths;
 }
 
 class _AppLocalizationsDelegate

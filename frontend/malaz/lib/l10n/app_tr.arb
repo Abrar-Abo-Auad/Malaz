@@ -92,7 +92,7 @@
   "otp_sent_success": "Doğrulama kodu telefonunuza gönderildi",
   "enter_otp_hint": "Size gönderilen 6 haneli kodu girin",
   "new_password": "Yeni Şifre",
-  "confirm_new_password": "Yeni Şifreyi Onayla",
+  "confirm_new_password": "Yeni Şifreyي Onayla",
   "password_mismatch": "Şifreler eşleşmiyor",
   "password_changed_success": "Şifre başarıyla değiştirildi",
   "resend_code": "Kodu Tekrar Gönder",
@@ -103,5 +103,8 @@
   "otp_verified_success": "Doğrulama kodu başarıyla onaylandı",
   "booking_request_sent": "Rezervasyon talebi ev sahibine gönderildi",
   "nights": "gece",
-  "confirm_booking": "Rezervasyonu Onayla"
+  "confirm_booking": "Rezervasyonu Onayla",
+  "reviews_count": "({count} değerlendirme)",
+  "no_description": "Açıklama belirtilmedi.",
+  "baths": "Banyolar"
 }

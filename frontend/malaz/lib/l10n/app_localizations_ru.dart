@@ -329,4 +329,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get confirm_booking => 'Подтвердить бронирование';
+
+  @override
+  String reviews_count(int count) {
+    return '($count отзывов)';
+  }
+
+  @override
+  String get no_description => 'Описание не предоставлено.';
+
+  @override
+  String get baths => 'Ванны';
 }

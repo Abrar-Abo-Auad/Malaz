@@ -294,7 +294,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get new_password => 'Yeni Şifre';
 
   @override
-  String get confirm_new_password => 'Yeni Şifreyi Onayla';
+  String get confirm_new_password => 'Yeni Şifreyي Onayla';
 
   @override
   String get password_mismatch => 'Şifreler eşleşmiyor';
@@ -329,4 +329,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get confirm_booking => 'Rezervasyonu Onayla';
+
+  @override
+  String reviews_count(int count) {
+    return '($count değerlendirme)';
+  }
+
+  @override
+  String get no_description => 'Açıklama belirtilmedi.';
+
+  @override
+  String get baths => 'Banyolar';
 }
