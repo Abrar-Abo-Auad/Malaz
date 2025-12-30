@@ -319,4 +319,43 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get otp_verified_success => 'OTP-код успешно подтвержден';
+
+  @override
+  String get damascus_countryside => 'Дамаск (сельская местность)';
+
+  @override
+  String get aleppo => 'Алеппо';
+
+  @override
+  String get homs => 'Хомс';
+
+  @override
+  String get hama => 'Хама';
+
+  @override
+  String get latakia => 'Латакия';
+
+  @override
+  String get tartous => 'Тартус';
+
+  @override
+  String get idlib => 'Идлиб';
+
+  @override
+  String get deir_alZor => 'Дейр-эз-Зор';
+
+  @override
+  String get raqa => 'Ракка';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'Деръа';
+
+  @override
+  String get sweida => 'Эс-Сувейда';
+
+  @override
+  String get quneitra => 'Эль-Кунейтра';
 }

@@ -181,19 +181,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get location_details => 'تفاصيل الموقع';
 
   @override
-  String get city => 'المدينة:';
+  String get city => 'المدينة';
 
   @override
   String get syria => 'سوريا';
 
   @override
-  String get governorate => 'المحافظة:';
+  String get governorate => 'المحافظة';
 
   @override
   String get damascus => 'دمشق';
 
   @override
-  String get address => 'العنوان:';
+  String get address => 'العنوان';
 
   @override
   String get address_loc => 'الهمك، بستان الدور';
@@ -316,4 +316,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get otp_verified_success => 'تم التحقق من الرمز بنجاح';
+
+  @override
+  String get damascus_countryside => 'ريف دمشق';
+
+  @override
+  String get aleppo => 'حلب';
+
+  @override
+  String get homs => 'حمص';
+
+  @override
+  String get hama => 'حماة';
+
+  @override
+  String get latakia => 'اللاذقية';
+
+  @override
+  String get tartous => 'طرطوس';
+
+  @override
+  String get idlib => 'ادلب';
+
+  @override
+  String get deir_alZor => 'دير الزور';
+
+  @override
+  String get raqa => 'الرقة';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'درعا';
+
+  @override
+  String get sweida => 'السويداء';
+
+  @override
+  String get quneitra => 'القنيطرة';
 }

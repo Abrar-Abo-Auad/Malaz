@@ -715,6 +715,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OTP verified successfully'**
   String get otp_verified_success;
+
+  /// No description provided for @damascus_countryside.
+  ///
+  /// In en, this message translates to:
+  /// **'Damascus Countryside'**
+  String get damascus_countryside;
+
+  /// No description provided for @aleppo.
+  ///
+  /// In en, this message translates to:
+  /// **'Aleppo'**
+  String get aleppo;
+
+  /// No description provided for @homs.
+  ///
+  /// In en, this message translates to:
+  /// **'Homs'**
+  String get homs;
+
+  /// No description provided for @hama.
+  ///
+  /// In en, this message translates to:
+  /// **'Hama'**
+  String get hama;
+
+  /// No description provided for @latakia.
+  ///
+  /// In en, this message translates to:
+  /// **'Latakia'**
+  String get latakia;
+
+  /// No description provided for @tartous.
+  ///
+  /// In en, this message translates to:
+  /// **'Tartous'**
+  String get tartous;
+
+  /// No description provided for @idlib.
+  ///
+  /// In en, this message translates to:
+  /// **'Idlib'**
+  String get idlib;
+
+  /// No description provided for @deir_alZor.
+  ///
+  /// In en, this message translates to:
+  /// **'Deir ez-Zor'**
+  String get deir_alZor;
+
+  /// No description provided for @raqa.
+  ///
+  /// In en, this message translates to:
+  /// **'Alraqa'**
+  String get raqa;
+
+  /// No description provided for @al_hasakah.
+  ///
+  /// In en, this message translates to:
+  /// **'AL_Hasaka'**
+  String get al_hasakah;
+
+  /// No description provided for @daraa.
+  ///
+  /// In en, this message translates to:
+  /// **'Daraa'**
+  String get daraa;
+
+  /// No description provided for @sweida.
+  ///
+  /// In en, this message translates to:
+  /// **'Aweida'**
+  String get sweida;
+
+  /// No description provided for @quneitra.
+  ///
+  /// In en, this message translates to:
+  /// **'Quneitra'**
+  String get quneitra;
 }
 
 class _AppLocalizationsDelegate

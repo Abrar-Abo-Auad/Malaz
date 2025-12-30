@@ -14,13 +14,16 @@ import '../../data/datasources/remote/apartment_remote_data_source.dart';
 import '../../data/datasources/remote/auth_remote_datasource.dart';
 import '../../data/repositories/apartment_repository_impl.dart';
 import '../../domain/repositories/apartment_repository.dart';
+import '../../domain/usecases/apartment/add_apartment_use_case.dart';
+import '../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
-import '../../domain/usecases/home/apartments_use_case.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
+import '../../domain/usecases/apartment/home_apartments_use_case.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
+import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
@@ -66,7 +69,7 @@ Future<void> setUpServices() async {
 
 
   sl.registerLazySingleton<InternetConnectionChecker>(
-      () => InternetConnectionChecker());
+          () => InternetConnectionChecker());
 
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
 
@@ -76,9 +79,17 @@ Future<void> setUpServices() async {
 
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
 
+  sl.registerLazySingleton(() => AddApartmentUseCase(sl()));
+
+  sl.registerLazySingleton(() => GetMyApartmentsUseCase(sl()));
+
   sl.registerLazySingleton(() => GetApartmentsUseCase(sl()));
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
+
+  sl.registerFactory(() => AddApartmentCubit(addApartmentUseCase: sl()));
+
+  sl.registerFactory(() => MyApartmentsCubit(getMyApartmentsUseCase: sl()));
 
   sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl(networkService: sl()));
 

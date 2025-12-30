@@ -1,12 +1,17 @@
 
+import 'package:dartz/dartz.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/data/datasources/remote/apartment_remote_data_source.dart';
 import 'package:malaz/domain/repositories/apartment_repository.dart';
 
+import '../../core/errors/exceptions.dart';
+import '../../domain/entities/apartment.dart';
 import '../../domain/entities/apartments_list.dart';
+import '../models/apartment_model.dart';
 
 class ApartmentRepositoryImpl implements ApartmentRepository {
   final ApartmentRemoteDataSource remoteDataSource;
-
   ApartmentRepositoryImpl({required this.remoteDataSource});
 
   @override
@@ -18,4 +23,59 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
       rethrow;
     }
   }
+  @override
+  Future<ApartmentsList> getMyApartments({required String? cursor}) async {
+    try {
+      final remoteApartments = await remoteDataSource.getMyApartments(
+          cursor: cursor);
+      return remoteApartments;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> addApartment({
+    required String title,
+    required int price,
+    required String city,
+    required String governorate,
+    required String address,
+    required String description,
+    required String type,
+    required int rooms,
+    required int bathrooms,
+    required int bedrooms,
+    required int area,
+    required List <XFile> mainImageUrl,
+    required XFile main_pic
+    }) async {
+    try {
+      final resault =await remoteDataSource.addApartment(
+        title: title,
+        price: price,
+        city: city,
+        governorate: governorate,
+        address: address,
+        description: description,
+        type: type,
+        rooms: rooms,
+        bathrooms: bathrooms,
+        bedrooms: bedrooms,
+        area: area,
+        mainImageUrl: mainImageUrl,
+        main_pic:main_pic
+      );
+      return const Right(unit); // إرجاع النجاح
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.toString()));
+    } on NetworkException {
+      return Left(NetworkFailure());
+    } on CacheException catch(e) {
+      return Left(CacheFailure(e.toString()));
+    } catch (e) {
+      return Left(const GeneralFailure());
+    }
+  }
+
 }

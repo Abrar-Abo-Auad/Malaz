@@ -326,4 +326,43 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get otp_verified_success => 'Code OTP vérifié avec succès';
+
+  @override
+  String get damascus_countryside => 'Damas rural';
+
+  @override
+  String get aleppo => 'Alep';
+
+  @override
+  String get homs => 'Homs';
+
+  @override
+  String get hama => 'Hama';
+
+  @override
+  String get latakia => 'Lattaquié';
+
+  @override
+  String get tartous => 'Tartous';
+
+  @override
+  String get idlib => 'Idlib';
+
+  @override
+  String get deir_alZor => 'Deir ez-Zor';
+
+  @override
+  String get raqa => 'Raqqa';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'Daraa';
+
+  @override
+  String get sweida => 'Sweida';
+
+  @override
+  String get quneitra => 'Quneitra';
 }

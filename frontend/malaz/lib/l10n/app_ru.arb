@@ -80,7 +80,6 @@
   "unexpected_error_message": "Произошла непредвиденная ошибка",
   "retry": "Повторить",
   "warring": "Предупреждение",
-  "new_": "Новое",
   "edit_profile": "Редактировать профиль",
   "identity_verification": "проверка личности",
   "identity_verification_input": "Пожалуйста, введите свой пароль для подтверждения личности",
@@ -101,5 +100,18 @@
   "please_enter_password": "Пожалуйста, введите пароль",
   "passwords_do_not_match": "Пароли не совпадают",
   "wronge_otp": "Введенный код неверный, пожалуйста, попробуйте еще раз",
-  "otp_verified_success": "OTP-код успешно подтвержден"
+  "otp_verified_success": "OTP-код успешно подтвержден",
+  "damascus_countryside": "Дамаск (сельская местность)",
+  "aleppo": "Алеппо",
+  "homs": "Хомс",
+  "hama": "Хама",
+  "latakia": "Латакия",
+  "tartous": "Тартус",
+  "idlib": "Идлиб",
+  "deir_alZor": "Дейр-эз-Зор",
+  "raqa": "Ракка",
+  "al-hasakah": "Эль-Хасака",
+  "daraa": "Деръа",
+  "sweida": "Эс-Сувейда",
+  "quneitra": "Эль-Кунейтра"
 }

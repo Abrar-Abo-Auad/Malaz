@@ -1,4 +1,6 @@
-class Apartment {
+import 'package:equatable/equatable.dart';
+
+class Apartment extends Equatable {
   final int id;
   final int ownerId;
   final String status;
@@ -33,9 +35,13 @@ class Apartment {
     required this.bathrooms,
     required this.bedrooms,
     required this.area,
-    required this.rating,
-    required this.numberOfReviews,
+    this.rating=0,
+    this.numberOfReviews=0,
     required this.mainImageUrl,
     this.isFav = false,
   });
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [id,ownerId,status,title,price,city,governorate,address,description,type,rooms,bathrooms,bedrooms,area,rating,numberOfReviews,mainImageUrl,isFav];
 }

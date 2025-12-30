@@ -101,5 +101,18 @@
   "please_enter_password": "Please enter your password",
   "passwords_do_not_match": "Passwords do not match",
   "wronge_otp": "The entered code is incorrect, please try again",
-  "otp_verified_success": "OTP verified successfully"
+  "otp_verified_success": "OTP verified successfully",
+  "damascus_countryside":"Damascus Countryside",
+  "aleppo":"Aleppo",
+  "homs":"Homs",
+  "hama":"Hama",
+  "latakia":"Latakia",
+  "tartous":"Tartous",
+  "idlib":"Idlib",
+  "deir_alZor":"Deir ez-Zor",
+  "raqa":"Alraqa",
+  "al_hasakah":"AL_Hasaka",
+  "daraa":"Daraa",
+  "sweida":"Aweida",
+  "quneitra":"Quneitra"
 }
