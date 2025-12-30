@@ -27,6 +27,7 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
     List<ApartmentModel> apartments = [];
     if (response.data['data'] != null) {
       print('data : ${response.data['data']}');
+      print('owner : ${response.data['user']}');
       apartments = List<ApartmentModel>.from(
         (response.data['data'] as List).map((e) => ApartmentModel.fromJson(e)),
       );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:malaz/data/models/user_model.dart';
 import 'package:malaz/domain/entities/user_entity.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/service_locator/service_locator.dart';
@@ -167,7 +168,7 @@ class _BuildActivitiesSection extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: conversations.length,
         itemBuilder: (context, index) {
-          final otherUser = conversations[index].userOne.id == myId ? conversations[index].userTwo : conversations[index].userOne;
+          final otherUser = conversations[index].userOneId == myId ? conversations[index].userTwo : conversations[index].userOne;
           return Padding(
             padding: const EdgeInsets.only(right: 18),
             child: Column(
@@ -175,10 +176,10 @@ class _BuildActivitiesSection extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: ChatsColors.caramel, width: 2)),
-                  child: UserProfileImage(userId: otherUser.id, radius: 28),
+                  child: UserProfileImage(userId: otherUser!.id, radius: 28),
                 ),
                 const SizedBox(height: 8),
-                Text(otherUser.first_name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : ChatsColors.darkCoffee)),
+                Text(otherUser!.first_name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : ChatsColors.darkCoffee)),
               ],
             ),
           );
@@ -205,7 +206,7 @@ class _BuildMessagesList extends StatelessWidget {
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate((context, index) {
           final conv = conversations[index];
-          final otherUser = conv.userOne.id == myId ? conv.userTwo : conv.userOne;
+          final otherUser = conv.userOneId == myId ? conv.userTwo : conv.userOne;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
@@ -229,7 +230,7 @@ class _BuildMessagesList extends StatelessWidget {
                 onTap: () async {
                   await context.push('/one_chat', extra: {
                     'id': conv.id,
-                    'name': '${otherUser.first_name} ${otherUser.last_name}',
+                    'name': '${otherUser!.first_name} ${otherUser!.last_name}',
                     'otherUserId': otherUser.id,
                   });
                   if (context.mounted) {
@@ -246,8 +247,8 @@ class _BuildMessagesList extends StatelessWidget {
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    leading: UserProfileImage(userId: otherUser.id, radius: 28),
-                    title: Text('${otherUser.first_name} ${otherUser.last_name}',
+                    leading: UserProfileImage(userId: otherUser!.id, radius: 28),
+                    title: Text('${otherUser!.first_name} ${otherUser!.last_name}',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor)),
                     subtitle: Text(tr.click_to_view, style: TextStyle(fontSize: 13, color: Colors.grey)),
                     trailing: _buildTrailing(conv, tr),

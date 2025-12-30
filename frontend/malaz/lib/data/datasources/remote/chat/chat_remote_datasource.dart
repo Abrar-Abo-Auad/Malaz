@@ -6,6 +6,7 @@ abstract class ChatRemoteDataSource {
   Future<Map<String, dynamic>> sendMessage(int conversationId, String body);
   Future<Map<String, dynamic>> deleteMessage(int messageId);
   Future<Map<String, dynamic>> editMessage(int messageId, String newBody);
+  Future<Map<String, dynamic>> saveNewConversation(int ownerId);
   Future<Map<String, dynamic>> deleteConversation(int conversationId);
   Future<Map<String, dynamic>> markAsRead(int messageId);
 }
@@ -51,6 +52,14 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       queryParameters: {
         'body': newBody,
       },
+    );
+    return response.data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> saveNewConversation(int ownerId) async {
+    final response = await networkService.post(
+      '/conversations/$ownerId',
     );
     return response.data;
   }

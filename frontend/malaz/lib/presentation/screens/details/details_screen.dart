@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
+import 'package:go_router/go_router.dart';
+import 'package:malaz/domain/entities/user_entity.dart';
+import 'package:malaz/presentation/global_widgets/user_profile_image/user_profile_image.dart';
 import '../../../../domain/entities/apartment.dart';
-import '../../../core/config/color/app_color.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/favorites/favorites_cubit.dart';
-import '../../global_widgets/buttons/animated_heart_button.dart';
+import '../../cubits/chat/chat_cubit.dart';
 import '../book_now/book_now_screen.dart';
 
 /// ============================================================================
@@ -36,7 +38,7 @@ class DetailsScreen extends StatelessWidget {
                 children: [
                   _BuildTitleAndRating(apartment: apartment),
                   const SizedBox(height: 24),
-                  const _BuildOwnerCard(),
+                  _BuildOwnerCard(owner: apartment.owner,),
                   const SizedBox(height: 24),
                   _BuildAmenitiesSection(apartment: apartment),
                   const SizedBox(height: 24),
@@ -312,7 +314,8 @@ class _BuildTypeBadge extends StatelessWidget {
 /// [_BuildOwnerCard]
 /// A mock card to display host information.
 class _BuildOwnerCard extends StatelessWidget {
-  const _BuildOwnerCard();
+  final UserEntity owner;
+  const _BuildOwnerCard({required this.owner});
 
   @override
   Widget build(BuildContext context) {
@@ -341,7 +344,8 @@ class _BuildOwnerCard extends StatelessWidget {
               color: theme.colorScheme.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.person, color: theme.colorScheme.primary),
+            child: UserProfileImage(userId: owner.id),
+            //Icon(Icons.person, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -349,7 +353,8 @@ class _BuildOwnerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${l10n.owner} #${DateTime.now().millisecond}',
+                  '${owner.first_name} ${owner.last_name}',
+                  //'${l10n.owner} #${DateTime.now().millisecond}',
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -360,8 +365,20 @@ class _BuildOwnerCard extends StatelessWidget {
             ),
           ),
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary),
+            onPressed: () async {
+              final chatCubit = context.read<ChatCubit>();
+              chatCubit.clearMessages();
+              final newId = await chatCubit.saveNewConversation(owner.id);
+
+              if (newId != null) {
+                context.pushNamed('one_chat', extra: {
+                  'id': newId,
+                  'name': '${owner.first_name} ${owner.last_name}',
+                  'otherUserId': owner.id,
+                });
+              }
+            },
+            icon: Icon(Icons.chat_outlined, color: theme.colorScheme.primary),
           )
         ],
       ),
