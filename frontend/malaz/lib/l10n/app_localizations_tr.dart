@@ -392,4 +392,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get edited => 'Düzenlendi';
+
+  @override
+  String get no_favorites_yet => 'Henüz favori yok';
+
+  @override
+  String get explore_and_save =>
+      'Keşfetmeye başlayın ve beğendiğiniz daireleri buraya kaydedin.';
 }

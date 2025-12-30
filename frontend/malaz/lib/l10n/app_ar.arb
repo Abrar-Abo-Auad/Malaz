@@ -123,5 +123,7 @@
   "copy_text": "نسخ النص",
   "text_copied": "تم نسخ النص",
   "delete_message": "حذف الرسالة",
-  "edited": "معدلة"
+  "edited": "معدلة",
+  "no_favorites_yet": "لا توجد مفضلات بعد",
+  "explore_and_save": "ابدأ في الاستكشاف واحفظ شقق هنا."
 }

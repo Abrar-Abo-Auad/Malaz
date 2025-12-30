@@ -387,4 +387,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get edited => 'معدلة';
+
+  @override
+  String get no_favorites_yet => 'لا توجد مفضلات بعد';
+
+  @override
+  String get explore_and_save => 'ابدأ في الاستكشاف واحفظ شقق هنا.';
 }

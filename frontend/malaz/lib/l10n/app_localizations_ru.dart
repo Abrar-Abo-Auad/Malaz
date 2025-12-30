@@ -392,4 +392,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get edited => 'Изменено';
+
+  @override
+  String get no_favorites_yet => 'Избранного пока нет';
+
+  @override
+  String get explore_and_save =>
+      'Начните поиск и сохраняйте понравившиеся квартиры здесь.';
 }

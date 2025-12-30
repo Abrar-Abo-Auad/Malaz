@@ -853,6 +853,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edited'**
   String get edited;
+
+  /// No description provided for @no_favorites_yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Favorites Yet'**
+  String get no_favorites_yet;
+
+  /// No description provided for @explore_and_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Start exploring and save your apartments here.'**
+  String get explore_and_save;
 }
 
 class _AppLocalizationsDelegate

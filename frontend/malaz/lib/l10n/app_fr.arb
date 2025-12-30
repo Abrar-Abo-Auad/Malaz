@@ -123,5 +123,7 @@
   "copy_text": "Copier le texte",
   "text_copied": "Texte copié",
   "delete_message": "Supprimer le message",
-  "edited": "Modifié"
+  "edited": "Modifié",
+  "no_favorites_yet": "Pas encore de favoris",
+  "explore_and_save": "Commencez à explorer et enregistrez vos appartements ici."
 }

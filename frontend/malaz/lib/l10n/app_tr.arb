@@ -124,5 +124,7 @@
     "copy_text": "Metni Kopyala",
     "text_copied": "Metin kopyalandı",
     "delete_message": "Mesajı Sil",
-    "edited": "Düzenlendi"
+    "edited": "Düzenlendi",
+    "no_favorites_yet": "Henüz favori yok",
+    "explore_and_save": "Keşfetmeye başlayın ve beğendiğiniz daireleri buraya kaydedin."
 }

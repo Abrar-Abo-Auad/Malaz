@@ -399,4 +399,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get edited => 'Modifié';
+
+  @override
+  String get no_favorites_yet => 'Pas encore de favoris';
+
+  @override
+  String get explore_and_save =>
+      'Commencez à explorer et enregistrez vos appartements ici.';
 }

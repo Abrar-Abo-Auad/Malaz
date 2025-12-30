@@ -130,5 +130,7 @@
   "copy_text": "Copy Text",
   "text_copied": "Text copied",
   "delete_message": "Delete Message",
-  "edited": "Edited"
+  "edited": "Edited",
+  "no_favorites_yet": "No Favorites Yet",
+  "explore_and_save": "Start exploring and save your apartments here."
 }

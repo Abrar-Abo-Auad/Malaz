@@ -389,4 +389,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get edited => 'Edited';
+
+  @override
+  String get no_favorites_yet => 'No Favorites Yet';
+
+  @override
+  String get explore_and_save =>
+      'Start exploring and save your apartments here.';
 }
