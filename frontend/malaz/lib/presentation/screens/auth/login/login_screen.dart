@@ -7,7 +7,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../cubits/auth/auth_cubit.dart';
 import '../../../global_widgets/build_branding.dart';
-import '../../../global_widgets/custom_button.dart';
+import '../../../global_widgets/buttons/custom_button.dart';
 import '../shared_widgets/shared_widgets.dart';
 
 class LoginScreen extends StatefulWidget {

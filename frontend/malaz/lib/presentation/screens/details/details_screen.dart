@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:malaz/presentation/global_widgets/custom_button.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import '../../../../domain/entities/apartment.dart';
+import '../../../core/config/color/app_color.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../cubits/favorites/favorites_cubit.dart';
+import '../../global_widgets/buttons/animated_heart_button.dart';
 import '../book_now/book_now_screen.dart';
 
 /// ============================================================================
@@ -76,56 +80,119 @@ class _BuildSliverAppBar extends StatelessWidget {
       pinned: true,
       backgroundColor: theme.colorScheme.background,
       elevation: 0,
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: CircleAvatar(
-          backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-          child: const BackButton(),
+        child: _AppBarActionButton(
+          icon: Icons.arrow_back_ios_rounded,
+          onTap: () => Navigator.pop(context),
         ),
       ),
       actions: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: CircleAvatar(
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-            child: IconButton(
-              icon: const Icon(Icons.share, size: 20),
-              onPressed: () {
-                // TODO: Implement Share Logic
-              },
-            ),
+          child: _AppBarActionButton(
+            icon: Icons.share,
+            onTap: () {
+              // TODO: Implement Share Logic
+            },
           ),
         ),
+
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: CircleAvatar(
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-            child: IconButton(
-              icon: Icon(
-                apartment.isFav ? Icons.favorite : Icons.favorite_border,
-                color: apartment.isFav ? Colors.red : theme.iconTheme.color,
-                size: 20,
-              ),
-              onPressed: () {
-                // TODO: Implement Favorite Logic
-              },
-            ),
+          child: BlocBuilder<FavoritesCubit, FavoritesState>(
+            builder: (context, state) {
+              final isFav = context.read<FavoritesCubit>().isFavorite(apartment.id);
+
+              return _AppBarActionButton(
+                icon: isFav ? Icons.favorite : Icons.favorite_border,
+                iconColor: isFav ? Colors.red : null,
+                onTap: () {
+                  context.read<FavoritesCubit>().toggleFavorite(apartment);
+                },
+              );
+            },
           ),
         ),
       ],
+
       flexibleSpace: FlexibleSpaceBar(
         background: Hero(
           tag: 'apartment_image_${apartment.id}',
           child: PageView.builder(
             itemCount: galleryImages.length,
             itemBuilder: (context, index) {
-              return Image.network(
-                galleryImages[index],
-                fit: BoxFit.cover,
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    galleryImages[index],
+                    fit: BoxFit.cover,
+                  ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.center,
+                        colors: [
+                          Colors.black26,
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ============================================================================
+/// [HELPER_WIDGET] - _AppBarActionButton
+/// ============================================================================
+class _AppBarActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? iconColor;
+
+  const _AppBarActionButton({
+    required this.icon,
+    required this.onTap,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withOpacity(0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: iconColor ?? Colors.white,
+          size: 20,
         ),
       ),
     );

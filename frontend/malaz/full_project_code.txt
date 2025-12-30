@@ -315,7 +315,7 @@ class AppTheme {
 // =======================================================
 
 class AppConstants {
-  static const baseurl = 'http://192.168.1.100:8000/api';
+  static const baseurl = 'http://192.168.1.102:8000/api';
   /// [SharedPreferences] Keys
   static const String themeKey = 'theme_mode';
   static const String languageKey = 'language_code';
@@ -570,6 +570,8 @@ class AuthInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     try {
       final token = await localDatasource.getCachedToken();
+      // 8|ivp99G2oBm5aTgI5I3Ds8xKO8Pi38hFAai0T2I8S97daa26a old token !
+      print('token = $token');
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
       }
@@ -701,8 +703,9 @@ class NetworkServiceImpl implements NetworkService {
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:malaz/data/datasources/local/auth_local_datasource.dart';
-import 'package:malaz/data/repositories/auth_repository_impl.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/data/datasources/remote/favorites/favorites_remote_datasource.dart';
+import 'package:malaz/data/repositories/auth/auth_repository_impl.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 import 'package:malaz/domain/usecases/auth/check_auth_usecase.dart';
 import 'package:malaz/domain/usecases/auth/get_current_user_usecase.dart';
 import 'package:malaz/domain/usecases/auth/login_usecase.dart';
@@ -710,19 +713,25 @@ import 'package:malaz/domain/usecases/auth/logout_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
-import '../../data/datasources/remote/apartment_remote_data_source.dart';
-import '../../data/datasources/remote/auth_remote_datasource.dart';
-import '../../data/datasources/remote/chat_remote_datasource.dart';
-import '../../data/repositories/apartment_repository_impl.dart';
-import '../../data/repositories/chat_repository_impl.dart';
-import '../../domain/repositories/apartment_repository.dart';
-import '../../domain/repositories/chat_repository.dart';
+import '../../data/datasources/remote/apartment/apartment_remote_data_source.dart';
+import '../../data/datasources/remote/auth/auth_remote_datasource.dart';
+import '../../data/datasources/remote/chat/chat_remote_datasource.dart';
+import '../../data/repositories/apartment/apartment_repository_impl.dart';
+import '../../data/repositories/chat/chat_repository_impl.dart';
+import '../../data/repositories/favorites/favorites_repository_impl.dart';
+import '../../domain/repositories/apartment/apartment_repository.dart';
+import '../../domain/repositories/chat/chat_repository.dart';
+import '../../domain/repositories/favorites/favorites_repository.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
+import '../../domain/usecases/favorites/add_favorites_use_case.dart';
+import '../../domain/usecases/favorites/delete_favorites_use_case.dart';
+import '../../domain/usecases/favorites/get_favorites_use_case.dart';
 import '../../domain/usecases/home/apartments_use_case.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
+import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
@@ -778,10 +787,12 @@ Future<void> setUpServices() async {
   sl.registerFactory(() => LanguageCubit(sl()));
 
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
+  sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
 
   sl.registerLazySingleton(() => GetApartmentsUseCase(sl()));
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
 
   sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl(networkService: sl()));
 
@@ -793,6 +804,8 @@ Future<void> setUpServices() async {
     authLocalDatasource: sl(),
   ));
 
+  sl.registerLazySingleton<FavoritesRemoteDataSource>(() => FavoritesRemoteDataSourceImpl(sl()));
+
   sl.registerLazySingleton(() => RegisterUsecase(repository: sl()));
   sl.registerLazySingleton(() => LoginUsecase(repository: sl()));
   sl.registerLazySingleton(() => LogoutUsecase(repository: sl()));
@@ -800,6 +813,9 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton(() => CheckAuthUsecase(repository: sl()));
   sl.registerLazySingleton(() => SendOtpUsecase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUsecase(sl()));
+  sl.registerLazySingleton(() => GetFavoritesUseCase(sl()));
+  sl.registerLazySingleton(() => AddFavoriteUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteFavoriteUseCase(sl()));
 
   sl.registerLazySingleton(() => AuthInterceptor(localDatasource: sl()));
 
@@ -835,34 +851,6 @@ abstract class UseCase<Type, Params>{
 }
 
 class  NoParams {}
-// =======================================================
-// FILE PATH: lib\data\datasources\apartments\apartments_source.dart
-// =======================================================
-
-// import '../../../domain/entities/apartment.dart';
-//
-// final List<Apartment> mockApartments = [
-//   Apartment(
-//     id: '1',
-//     title: 'Modern Downtown Apartment',
-//     location: 'Downtown, City Center',
-//     price: 1200,
-//     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&fit=crop',
-//     bedrooms: 2,
-//     bathrooms: 2,
-//     areaSqft: 1200,
-//   ),
-//   Apartment(
-//     id: '2',
-//     title: 'Luxury Penthouse Suite',
-//     location: 'Uptown, Premium District',
-//     price: 2500,
-//     imageUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&fit=crop',
-//     bedrooms: 3,
-//     bathrooms: 3,
-//     areaSqft: 2000,
-//   ),
-// ];
 // =======================================================
 // FILE PATH: lib\data\datasources\local\auth_local_datasource.dart
 // =======================================================
@@ -962,14 +950,14 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
 }
 
 // =======================================================
-// FILE PATH: lib\data\datasources\remote\apartment_remote_data_source.dart
+// FILE PATH: lib\data\datasources\remote\apartment\apartment_remote_data_source.dart
 // =======================================================
 
 import 'package:malaz/core/constants/app_constants.dart';
 
-import '../../../../core/network/network_service.dart';
-import '../../../domain/entities/apartments_list.dart';
-import '../../models/apartment_model.dart';
+import '../../../../../core/network/network_service.dart';
+import '../../../../domain/entities/apartments_list.dart';
+import '../../../models/apartment_model.dart';
 
 abstract class ApartmentRemoteDataSource {
   Future<ApartmentsList> getApartments({String? cursor});
@@ -1021,7 +1009,7 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
   }
 }
 // =======================================================
-// FILE PATH: lib\data\datasources\remote\auth_remote_datasource.dart
+// FILE PATH: lib\data\datasources\remote\auth\auth_remote_datasource.dart
 // =======================================================
 
 import 'package:dio/dio.dart';
@@ -1030,8 +1018,8 @@ import 'package:malaz/core/constants/app_constants.dart';
 import 'package:malaz/core/errors/exceptions.dart';
 import 'package:path/path.dart';
 
-import '../../../core/network/network_service.dart';
-import '../../models/user_model.dart';
+import '../../../../core/network/network_service.dart';
+import '../../../models/user_model.dart';
 
 abstract class AuthRemoteDatasource {
   Future<Map<String, dynamic>> login({
@@ -1240,10 +1228,10 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 }
 
 // =======================================================
-// FILE PATH: lib\data\datasources\remote\chat_remote_datasource.dart
+// FILE PATH: lib\data\datasources\remote\chat\chat_remote_datasource.dart
 // =======================================================
 
-import '../../../../core/network/network_service.dart';
+import '../../../../../core/network/network_service.dart';
 
 abstract class ChatRemoteDataSource {
   Future<Map<String, dynamic>> getConversations();
@@ -1314,6 +1302,47 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       '/messages/$messageId/read',
     );
     return response.data;
+  }
+}
+// =======================================================
+// FILE PATH: lib\data\datasources\remote\favorites\favorites_remote_datasource.dart
+// =======================================================
+
+import 'package:dio/dio.dart';
+import 'package:malaz/core/network/network_service.dart';
+
+import '../../../models/apartment_model.dart';
+
+abstract class FavoritesRemoteDataSource {
+  Future<List<ApartmentModel>> getFavorites();
+  Future<void> addFavorite(int apartmentId);
+  Future<void> delFavorite(int apartmentId);
+}
+
+class FavoritesRemoteDataSourceImpl implements FavoritesRemoteDataSource {
+  final NetworkService networkService;
+
+  FavoritesRemoteDataSourceImpl(this.networkService);
+
+  @override
+  Future<List<ApartmentModel>> getFavorites() async {
+    final response = await networkService.get('/users/favorites');
+    if(response.data['favorite'] == null) {
+      return [];
+    }
+    return (response.data['favorite'] as List)
+        .map((e) => ApartmentModel.fromJson(e))
+        .toList();
+  }
+
+  @override
+  Future<void> addFavorite(int apartmentId) async {
+    final response = await networkService.post('/users/favorites/$apartmentId');
+  }
+
+  @override
+  Future<void> delFavorite(int apartmentId) async {
+    await networkService.delete('/users/favorites/$apartmentId');
   }
 }
 // =======================================================
@@ -1559,14 +1588,14 @@ class UserModel extends UserEntity{
   }
 }
 // =======================================================
-// FILE PATH: lib\data\repositories\apartment_repository_impl.dart
+// FILE PATH: lib\data\repositories\apartment\apartment_repository_impl.dart
 // =======================================================
 
 
-import 'package:malaz/data/datasources/remote/apartment_remote_data_source.dart';
-import 'package:malaz/domain/repositories/apartment_repository.dart';
+import 'package:malaz/data/datasources/remote/apartment/apartment_remote_data_source.dart';
+import 'package:malaz/domain/repositories/apartment/apartment_repository.dart';
 
-import '../../domain/entities/apartments_list.dart';
+import '../../../domain/entities/apartments_list.dart';
 
 class ApartmentRepositoryImpl implements ApartmentRepository {
   final ApartmentRemoteDataSource remoteDataSource;
@@ -1585,7 +1614,7 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
 }
 
 // =======================================================
-// FILE PATH: lib\data\repositories\auth_repository_impl.dart
+// FILE PATH: lib\data\repositories\auth\auth_repository_impl.dart
 // =======================================================
 
 import 'package:dartz/dartz.dart';
@@ -1594,13 +1623,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/exceptions.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/data/datasources/local/auth_local_datasource.dart';
-import 'package:malaz/data/datasources/remote/auth_remote_datasource.dart';
+import 'package:malaz/data/datasources/remote/auth/auth_remote_datasource.dart';
 import 'package:malaz/domain/entities/user_entity.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 
-import '../../domain/entities/auth_state.dart';
-import '../models/user_model.dart';
-import '../utils/response_parser.dart';
+import '../../../domain/entities/auth_state.dart';
+import '../../models/user_model.dart';
+import '../../utils/response_parser.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   final AuthRemoteDatasource authRemoteDatasource;
@@ -1854,15 +1883,15 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 }
 // =======================================================
-// FILE PATH: lib\data\repositories\chat_repository_impl.dart
+// FILE PATH: lib\data\repositories\chat\chat_repository_impl.dart
 // =======================================================
 
 import 'package:dartz/dartz.dart';
-import '../../../domain/repositories/chat_repository.dart';
-import '../../core/errors/failures.dart';
-import '../datasources/remote/chat_remote_datasource.dart';
-import '../models/conversation_model.dart';
-import '../models/chat_message_model.dart';
+import '../../../domain/repositories/chat/chat_repository.dart';
+import '../../../core/errors/failures.dart';
+import '../../datasources/remote/chat/chat_remote_datasource.dart';
+import '../../models/conversation_model.dart';
+import '../../models/chat_message_model.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   final ChatRemoteDataSource remoteDataSource;
@@ -1938,6 +1967,54 @@ class ChatRepositoryImpl implements ChatRepository {
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
+    }
+  }
+}
+// =======================================================
+// FILE PATH: lib\data\repositories\favorites\favorites_repository_impl.dart
+// =======================================================
+
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failures.dart';
+import '../../../domain/entities/apartment.dart';
+import '../../../domain/repositories/favorites/favorites_repository.dart';
+import '../../datasources/remote/favorites/favorites_remote_datasource.dart';
+import '../../utils/failure_mapper.dart';
+
+class FavoritesRepositoryImpl implements FavoritesRepository {
+  final FavoritesRemoteDataSource remoteDataSource;
+
+  FavoritesRepositoryImpl(this.remoteDataSource);
+
+  @override
+  Future<Either<Failure, List<Apartment>>> getFavorites() async {
+    try {
+      final result = await remoteDataSource.getFavorites();
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addFavorite(int apartmentId) async {
+    try {
+      await remoteDataSource.addFavorite(apartmentId);
+      return const Right(null);
+    } catch(e) {
+      final failure = FailureMapper.map(e);
+      return Left(failure);
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> delFavorite(int apartmentId) async {
+    try {
+      await remoteDataSource.delFavorite(apartmentId);
+      return Right(null);
+    } catch(e) {
+      final failure = FailureMapper.map(e);
+      return Left(failure);
     }
   }
 }
@@ -2209,7 +2286,7 @@ class UserEntity extends Equatable{
 
 }
 // =======================================================
-// FILE PATH: lib\domain\repositories\apartment_repository.dart
+// FILE PATH: lib\domain\repositories\apartment\apartment_repository.dart
 // =======================================================
 
 
@@ -2220,7 +2297,7 @@ abstract class ApartmentRepository {
 }
 
 // =======================================================
-// FILE PATH: lib\domain\repositories\auth_repository.dart
+// FILE PATH: lib\domain\repositories\auth\auth_repository.dart
 // =======================================================
 
 import 'package:dartz/dartz.dart';
@@ -2229,8 +2306,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/domain/entities/user_entity.dart';
 
-import '../../data/models/auth_result.dart';
-import '../entities/auth_state.dart';
+import '../../../data/models/auth_result.dart';
+import '../../entities/auth_state.dart';
 
 abstract class AuthRepository {
 
@@ -2276,13 +2353,13 @@ abstract class AuthRepository {
   });
 }
 // =======================================================
-// FILE PATH: lib\domain\repositories\chat_repository.dart
+// FILE PATH: lib\domain\repositories\chat\chat_repository.dart
 // =======================================================
 
 import 'package:dartz/dartz.dart';
-import '../../core/errors/failures.dart';
-import '../../data/models/conversation_model.dart';
-import '../../data/models/chat_message_model.dart';
+import '../../../core/errors/failures.dart';
+import '../../../data/models/conversation_model.dart';
+import '../../../data/models/chat_message_model.dart';
 
 abstract class ChatRepository {
   Future<Either<Failure, List<ConversationModel>>> getConversations();
@@ -2294,13 +2371,28 @@ abstract class ChatRepository {
   Future<Either<Failure, void>> markAsRead(int messageId);
 }
 // =======================================================
+// FILE PATH: lib\domain\repositories\favorites\favorites_repository.dart
+// =======================================================
+
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failures.dart';
+import '../../entities/apartment.dart';
+
+abstract class FavoritesRepository {
+  Future<Either<Failure, List<Apartment>>> getFavorites();
+  Future<Either<Failure, void>> addFavorite(int apartmentId);
+  Future<Either<Failure, void>> delFavorite(int apartmentId);
+}
+
+
+// =======================================================
 // FILE PATH: lib\domain\usecases\auth\check_auth_usecase.dart
 // =======================================================
 
 import 'package:dartz/dartz.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/core/usecases/usecase.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 
 import '../../entities/auth_state.dart';
 
@@ -2323,7 +2415,7 @@ import 'package:dartz/dartz.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/core/usecases/usecase.dart';
 import 'package:malaz/domain/entities/user_entity.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 
 class  GetCurrentUserUsecase implements UseCase<UserEntity?,NoParams>{
   final AuthRepository repository;
@@ -2344,7 +2436,7 @@ class  GetCurrentUserUsecase implements UseCase<UserEntity?,NoParams>{
 import 'package:dartz/dartz.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/core/usecases/usecase.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 
 import '../../entities/user_entity.dart';
 
@@ -2373,7 +2465,7 @@ class LoginParams{
 import 'package:dartz/dartz.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/core/usecases/usecase.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 
 class LogoutUsecase implements UseCase<void,NoParams>{
   final AuthRepository repository;
@@ -2394,7 +2486,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/core/usecases/usecase.dart';
 import 'package:malaz/domain/entities/user_entity.dart';
-import 'package:malaz/domain/repositories/auth_repository.dart';
+import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 
 class RegisterUsecase implements UseCase<UserEntity, RegisterParams> {
   final AuthRepository repository;
@@ -2449,7 +2541,7 @@ class RegisterParams {
 import 'package:dartz/dartz.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/usecases/usecase.dart';
-import '../../repositories/auth_repository.dart';
+import '../../repositories/auth/auth_repository.dart';
 
 class SendOtpParams {
   final String phone;
@@ -2474,7 +2566,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../core/errors/failures.dart';
 import '../../../core/usecases/usecase.dart';
-import '../../repositories/auth_repository.dart';
+import '../../repositories/auth/auth_repository.dart';
 
 class VerifyOtpParams {
   final String phone;
@@ -2492,12 +2584,71 @@ class VerifyOtpUsecase implements UseCase<bool, VerifyOtpParams> {
 }
 
 // =======================================================
+// FILE PATH: lib\domain\usecases\favorites\add_favorites_use_case.dart
+// =======================================================
+
+
+import 'package:dartz/dartz.dart';
+import 'package:malaz/core/errors/failures.dart';
+import 'package:malaz/domain/repositories/favorites/favorites_repository.dart';
+
+class AddFavoriteUseCase {
+  final FavoritesRepository repository;
+
+  AddFavoriteUseCase(this.repository);
+
+  Future<Either<Failure, void>> call(int apartmentId) async {
+    return await repository.addFavorite(apartmentId);
+  }
+}
+
+// =======================================================
+// FILE PATH: lib\domain\usecases\favorites\delete_favorites_use_case.dart
+// =======================================================
+
+
+import 'package:dartz/dartz.dart';
+import 'package:malaz/core/errors/failures.dart';
+import 'package:malaz/domain/repositories/favorites/favorites_repository.dart';
+
+class DeleteFavoriteUseCase {
+  final FavoritesRepository repository;
+
+  DeleteFavoriteUseCase(this.repository);
+
+  Future<Either<Failure, void>> call(int apartmentId) async {
+    return await repository.delFavorite(apartmentId);
+  }
+}
+
+// =======================================================
+// FILE PATH: lib\domain\usecases\favorites\get_favorites_use_case.dart
+// =======================================================
+
+
+import 'package:dartz/dartz.dart';
+import 'package:malaz/core/errors/failures.dart';
+import 'package:malaz/domain/repositories/favorites/favorites_repository.dart';
+
+import '../../entities/apartment.dart';
+
+class GetFavoritesUseCase {
+  final FavoritesRepository repository;
+
+  GetFavoritesUseCase(this.repository);
+
+  Future<Either<Failure, List<Apartment>>> call() async {
+    return await repository.getFavorites();
+  }
+}
+
+// =======================================================
 // FILE PATH: lib\domain\usecases\home\apartments_use_case.dart
 // =======================================================
 
 
 import 'package:malaz/domain/entities/apartment.dart';
-import 'package:malaz/domain/repositories/apartment_repository.dart';
+import 'package:malaz/domain/repositories/apartment/apartment_repository.dart';
 
 import '../../entities/apartments_list.dart';
 
@@ -5419,6 +5570,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:malaz/presentation/cubits/auth/auth_cubit.dart';
+import 'package:malaz/presentation/cubits/favorites/favorites_cubit.dart';
 
 import 'package:malaz/presentation/cubits/home/home_cubit.dart';
 import 'package:malaz/presentation/cubits/language/language_cubit.dart';
@@ -5493,6 +5645,7 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<ThemeCubit>()),
         BlocProvider(create: (context) => sl<LanguageCubit>()),
         BlocProvider(create: (context) => sl<HomeCubit>()),
+        BlocProvider(create: (context) => sl<FavoritesCubit>()..loadFavorites()),
         BlocProvider.value(value: sl<AuthCubit>()),
         //BlocProvider(create: (context) => sl<AuthCubit>()),// ..checkAuth()
       ],
@@ -5561,7 +5714,7 @@ import '../../../core/errors/failures.dart';
 import '../../../core/service_locator/service_locator.dart';
 import '../../../core/usecases/usecase.dart';
 import '../../../data/datasources/local/auth_local_datasource.dart';
-import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/repositories/auth/auth_repository.dart';
 import '../../../domain/usecases/auth/register_usecase.dart';
 import '../../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../../domain/usecases/auth/verify_otp_usecase.dart';
@@ -5967,7 +6120,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/models/chat_message_model.dart';
 import '../../../data/models/conversation_model.dart';
-import '../../../domain/repositories/chat_repository.dart';
+import '../../../domain/repositories/chat/chat_repository.dart';
 
 /////////////////////////  Chat States ///////////////////////////
 
@@ -6122,6 +6275,124 @@ class ChatCubit extends Cubit<ChatState> {
 
       emit(ChatMessagesLoaded(newList));
     }
+  }
+}
+// =======================================================
+// FILE PATH: lib\presentation\cubits\favorites\favorites_cubit.dart
+// =======================================================
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:malaz/domain/usecases/favorites/delete_favorites_use_case.dart';
+
+import '../../../domain/entities/apartment.dart';
+import '../../../domain/usecases/favorites/add_favorites_use_case.dart';
+import '../../../domain/usecases/favorites/get_favorites_use_case.dart';
+
+// --- States ---
+abstract class FavoritesState extends Equatable {
+  const FavoritesState();
+  @override
+  List<Object> get props => [];
+}
+
+class FavoritesInitial extends FavoritesState {}
+class FavoritesLoading extends FavoritesState {}
+
+class FavoritesLoaded extends FavoritesState {
+  final List<Apartment> favorites;
+  // نستخدم timestamp لإجبار الواجهة على التحديث عند حدوث تغيير حتى لو كانت القائمة نفسها كمرجع
+  final int lastUpdated;
+
+  const FavoritesLoaded(this.favorites, this.lastUpdated);
+
+  @override
+  List<Object> get props => [favorites, lastUpdated];
+}
+
+class FavoritesError extends FavoritesState {
+  final String message;
+  const FavoritesError(this.message);
+}
+
+// --- Cubit ---
+class FavoritesCubit extends Cubit<FavoritesState> {
+  final GetFavoritesUseCase getFavoritesUseCase;
+  final AddFavoriteUseCase addFavoriteUseCase;
+  final DeleteFavoriteUseCase deleteFavoriteUseCase;
+
+
+  List<Apartment> _currentFavorites = [];
+
+  FavoritesCubit({
+    required this.getFavoritesUseCase,
+    required this.addFavoriteUseCase,
+    required this.deleteFavoriteUseCase,
+  }) : super(FavoritesInitial());
+
+  // 1. تحميل المفضلة (عند بدء التطبيق أو فتح الصفحة)
+  Future<void> loadFavorites() async {
+    if (_currentFavorites.isEmpty) emit(FavoritesLoading());
+
+    final result = await getFavoritesUseCase.call();
+
+    result.fold(
+          (failure) => emit(FavoritesError(failure.message!)),
+          (apartments) {
+        _currentFavorites = apartments;
+        _emitLoaded();
+      },
+    );
+  }
+
+  // 2. إدارة الإضافة والحذف بذكاء (Optimistic Update)
+  Future<void> toggleFavorite(Apartment apartment) async {
+    final isFav = isFavorite(apartment.id);
+
+    // أ) التحديث الفوري للواجهة (قبل انتظار السيرفر) 🚀
+    if (isFav) {
+      _currentFavorites.removeWhere((element) => element.id == apartment.id);
+    } else {
+      _currentFavorites.add(apartment);
+    }
+    _emitLoaded(); // تحديث الواجهة فوراً
+
+    // ب) الاتصال بالسيرفر في الخلفية
+    final result = isFav
+        ? await deleteFavoriteUseCase.call(apartment.id)
+        : await addFavoriteUseCase.call(apartment.id);
+
+    // ج) التعامل مع الفشل (Rollback)
+    result.fold(
+          (failure) {
+        // تراجع عن التغيير المحلي لأن السيرفر رفض الطلب
+        if (isFav) {
+          _currentFavorites.add(apartment); // نعيدها
+        } else {
+          _currentFavorites.removeWhere((element) => element.id == apartment.id); // نحذفها
+        }
+
+        // نعرض رسالة خطأ ولكن نبقي القائمة ظاهرة
+        emit(FavoritesError(failure.message!));
+        _emitLoaded();
+      },
+          (_) {
+            print('i am here');
+        // نجاح: لا نفعل شيئاً لأننا قمنا بالتحديث مسبقاً
+      },
+    );
+  }
+
+  // دالة مساعدة للتحقق هل العنصر مفضل أم لا
+  bool isFavorite(int id) {
+    return _currentFavorites.any((element) => element.id == id);
+  }
+
+  void _emitLoaded() {
+    emit(FavoritesLoaded(
+      List.from(_currentFavorites), // نرسل نسخة جديدة من القائمة
+      DateTime.now().millisecondsSinceEpoch,
+    ));
   }
 }
 // =======================================================
@@ -6460,8 +6731,11 @@ class ThemeCubit extends Cubit<ThemeState> {
 // =======================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:malaz/l10n/app_localizations.dart';
+import 'package:malaz/presentation/global_widgets/buttons/animated_heart_button.dart';
 import '../../../domain/entities/apartment.dart';
+import '../../cubits/favorites/favorites_cubit.dart';
 
 /// ============================================================================
 /// [ApartmentCard]
@@ -6573,10 +6847,10 @@ class _BuildCardImageAreaState extends State<_BuildCardImageArea> {
           child: _BuildRatingBadge(rating: widget.apartment.rating),
         ),
 
-        const Positioned(
+        Positioned(
           top: 16,
           right: 16,
-          child: _BuildFavoriteIcon(),
+          child: _BuildFavoriteIcon(apartment: widget.apartment),
         ),
 
         Positioned(
@@ -6738,24 +7012,15 @@ class _BuildRatingBadge extends StatelessWidget {
 /// [_BuildFavoriteIcon]
 /// A dedicated widget for the favorite button on the card.
 class _BuildFavoriteIcon extends StatelessWidget {
-  const _BuildFavoriteIcon();
+  final Apartment apartment;
+
+  const _BuildFavoriteIcon({required this.apartment});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: const Icon(Icons.favorite_border, size: 20, color: Colors.grey),
-    );
+    return AnimatedHeartButton(isFavorite: apartment.isFav, onTap: () {
+      context.read<FavoritesCubit>().toggleFavorite(apartment);
+    });
   }
 }
 
@@ -7101,11 +7366,104 @@ class BuildBranding extends StatelessWidget {
 }
 
 // =======================================================
-// FILE PATH: lib\presentation\global_widgets\custom_button.dart
+// FILE PATH: lib\presentation\global_widgets\buttons\animated_heart_button.dart
 // =======================================================
 
 import 'package:flutter/material.dart';
-import '../../core/config/color/app_color.dart';
+
+class AnimatedHeartButton extends StatefulWidget {
+  final bool isFavorite;
+  final VoidCallback onTap;
+  final double size;
+
+  const AnimatedHeartButton({
+    super.key,
+    required this.isFavorite,
+    required this.onTap,
+    this.size = 24,
+  });
+
+  @override
+  State<AnimatedHeartButton> createState() => _AnimatedHeartButtonState();
+}
+
+class _AnimatedHeartButtonState extends State<AnimatedHeartButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedHeartButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isFavorite != oldWidget.isFavorite) {
+      _triggerAnimation();
+    }
+  }
+
+  void _triggerAnimation() {
+    _controller.forward().then((_) => _controller.reverse());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _triggerAnimation();
+        widget.onTap();
+      },
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(
+            widget.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            color: widget.isFavorite ? Colors.red : Colors.white,
+            size: widget.size,
+          ),
+        ),
+      ),
+    );
+  }
+}
+// =======================================================
+// FILE PATH: lib\presentation\global_widgets\buttons\custom_button.dart
+// =======================================================
+
+import 'package:flutter/material.dart';
+import '../../../core/config/color/app_color.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -7272,7 +7630,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../cubits/auth/auth_cubit.dart';
 import '../../../global_widgets/build_branding.dart';
-import '../../../global_widgets/custom_button.dart';
+import '../../../global_widgets/buttons/custom_button.dart';
 import '../shared_widgets/shared_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -7470,7 +7828,7 @@ class MyProfileScreen extends StatefulWidget {
   State<MyProfileScreen> createState() => _MyProfileScreenState();
 }
 
-class _MyProfileScreenState extends State<MyProfileScreen> {
+class _MyProfileScreenState  extends State<MyProfileScreen> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   bool _isEditable = false;
@@ -9014,7 +9372,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/config/color/app_color.dart';
-import 'package:malaz/presentation/global_widgets/custom_button.dart';
+import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../cubits/auth/auth_cubit.dart';
 import '../../../global_widgets/build_branding.dart';
@@ -10150,7 +10508,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:malaz/presentation/global_widgets/custom_button.dart';
+import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../../../../core/config/color/app_color.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -10463,7 +10821,7 @@ import 'package:malaz/l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/config/color/app_color.dart';
-import '../../global_widgets/custom_button.dart';
+import '../../global_widgets/buttons/custom_button.dart';
 
 /// ============================================================================
 /// [BookingBottomSheet]
@@ -11583,9 +11941,13 @@ class ChatBubble extends StatelessWidget {
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:malaz/presentation/global_widgets/custom_button.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import '../../../../domain/entities/apartment.dart';
+import '../../../core/config/color/app_color.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../cubits/favorites/favorites_cubit.dart';
+import '../../global_widgets/buttons/animated_heart_button.dart';
 import '../book_now/book_now_screen.dart';
 
 /// ============================================================================
@@ -11648,6 +12010,7 @@ class _BuildSliverAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // الصور
     final List<String> galleryImages = [
       apartment.mainImageUrl,
       apartment.mainImageUrl,
@@ -11659,56 +12022,121 @@ class _BuildSliverAppBar extends StatelessWidget {
       pinned: true,
       backgroundColor: theme.colorScheme.background,
       elevation: 0,
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: CircleAvatar(
-          backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-          child: const BackButton(),
+        child: _AppBarActionButton(
+          icon: Icons.arrow_back_ios_rounded,
+          onTap: () => Navigator.pop(context),
         ),
       ),
+
       actions: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: CircleAvatar(
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-            child: IconButton(
-              icon: const Icon(Icons.share, size: 20),
-              onPressed: () {
-                // TODO: Implement Share Logic
-              },
-            ),
+          child: _AppBarActionButton(
+            icon: Icons.share,
+            onTap: () {
+              // TODO: Implement Share Logic
+            },
           ),
         ),
+
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: CircleAvatar(
-            backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
-            child: IconButton(
-              icon: Icon(
-                apartment.isFav ? Icons.favorite : Icons.favorite_border,
-                color: apartment.isFav ? Colors.red : theme.iconTheme.color,
-                size: 20,
-              ),
-              onPressed: () {
-                // TODO: Implement Favorite Logic
-              },
-            ),
+          child: BlocBuilder<FavoritesCubit, FavoritesState>(
+            builder: (context, state) {
+              final isFav = context.read<FavoritesCubit>().isFavorite(apartment.id);
+
+              return _AppBarActionButton(
+                icon: isFav ? Icons.favorite : Icons.favorite_border,
+                iconColor: isFav ? Colors.red : null,
+                onTap: () {
+                  context.read<FavoritesCubit>().toggleFavorite(apartment);
+                },
+              );
+            },
           ),
         ),
       ],
+
       flexibleSpace: FlexibleSpaceBar(
         background: Hero(
           tag: 'apartment_image_${apartment.id}',
           child: PageView.builder(
             itemCount: galleryImages.length,
             itemBuilder: (context, index) {
-              return Image.network(
-                galleryImages[index],
-                fit: BoxFit.cover,
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    galleryImages[index],
+                    fit: BoxFit.cover,
+                  ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.center,
+                        colors: [
+                          Colors.black26,
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ============================================================================
+/// [HELPER WIDGET] - _AppBarActionButton
+/// تصميم موحد للأزرار العلوية (خلفية ضبابية/زجاجية)
+/// ============================================================================
+class _AppBarActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? iconColor;
+
+  const _AppBarActionButton({
+    required this.icon,
+    required this.onTap,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withOpacity(0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: iconColor ?? Colors.white,
+          size: 20,
         ),
       ),
     );
@@ -12107,24 +12535,274 @@ class _BuildBottomBookingBar extends StatelessWidget {
     );
   }
 }
+
+class _BuildFloatingActionButtons extends StatelessWidget {
+  final Apartment apartment;
+
+  const _BuildFloatingActionButtons({required this.apartment});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // زر المشاركة (Share Button)
+        _BuildGlassButton(
+          icon: Icons.share_rounded,
+          onTap: () {
+            // TODO: Implement Share Logic (e.g., using share_plus package)
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Share tapped! Implement me.")));
+          },
+        ),
+        const SizedBox(width: 12), // مسافة بين الزرين
+
+        // زر المفضلة (Favorite Button) - مربوط بالـ Cubit
+        BlocBuilder<FavoritesCubit, FavoritesState>(
+          builder: (context, state) {
+            // 1. التحقق من حالة المفضلة الحالية لهذه الشقة
+            final isFavorite = context.read<FavoritesCubit>().isFavorite(apartment.id);
+
+            // 2. استخدام الزر النابض الذي صنعناه سابقاً
+            return AnimatedHeartButton(
+              isFavorite: isFavorite,
+              size: 26, // حجم مناسب للهيدر
+              onTap: () {
+                // 3. استدعاء دالة التبديل في الكيوبت
+                context.read<FavoritesCubit>().toggleFavorite(apartment);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _BuildGlassButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _BuildGlassButton({
+    required this.icon,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          // خلفية شبه شفافة (تأثير زجاجي بسيط)
+            color: isDark ? Colors.black.withOpacity(0.4) : Colors.white.withOpacity(0.8),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              )
+            ],
+            border: Border.all(
+                color: isDark ? Colors.white.withOpacity(0.1) : Colors.white,
+                width: 1.5
+            )
+        ),
+        child: Icon(
+          icon,
+          color: color ?? (isDark ? Colors.white : Colors.black87),
+          size: 22,
+        ),
+      ),
+    );
+  }
+}
+
+class _BuildBottomTitleBar extends StatelessWidget {
+  final Apartment apartment;
+
+  const _BuildBottomTitleBar({required this.apartment});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      // تدرج لوني خلف النص لضمان القراءة
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [
+            Colors.black.withOpacity(0.8),
+            Colors.transparent,
+          ],
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            apartment.title,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.location_on_rounded, color: AppColors.primaryLight, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  apartment.address,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
 // =======================================================
 // FILE PATH: lib\presentation\screens\favorites\favorites_screen.dart
 // =======================================================
 
-
 import 'package:flutter/material.dart';
-import '../../../data/datasources/apartments/apartments_source.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../presentation/global_widgets/apartment_cards/apartment_card.dart';
+import '../../../../presentation/global_widgets/buttons/animated_heart_button.dart';
+import '../../cubits/favorites/favorites_cubit.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 
   @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<FavoritesCubit>().loadFavorites();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Text("sara working on it");
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "My Favorites",
+          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+      ),
+      body: BlocConsumer<FavoritesCubit, FavoritesState>(
+        listener: (context, state) {
+          if (state is FavoritesError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${state.message} here'), backgroundColor: Colors.red),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is FavoritesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is FavoritesLoaded) {
+            final favorites = state.favorites;
+
+            if (favorites.isEmpty) {
+              return _BuildEmptyFavorites();
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: favorites.length,
+              itemBuilder: (context, index) {
+                final apartment = favorites[index];
+
+                return Padding(
+                  key: ValueKey(apartment.id),
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Stack(
+                    children: [
+                      ApartmentCard(
+                        apartment: apartment,
+                          onTap: () {
+                            context.push('/details', extra: apartment);
+                          },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
+    );
   }
 }
 
+class _BuildEmptyFavorites extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.favorite_border_rounded, size: 60, color: Theme.of(context).colorScheme.tertiary),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "No Favorites Yet",
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "Start exploring and save your\ndream apartments here.",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+}
 // =======================================================
 // FILE PATH: lib\presentation\screens\home\home_screen.dart
 // =======================================================
@@ -12598,8 +13276,8 @@ class _MainWrapperScreenState extends State<MainWrapper> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const ChatsScreen(),
-    const BookingsScreen(),
     const FavoritesScreen(),
+    const BookingsScreen(),
     const ManagePropertiesScreen(),
   ];
 
@@ -12688,12 +13366,12 @@ class _BuildModernNavBar extends StatelessWidget {
                 text: 'Chats',
               ),
               GButton(
-                icon: Icons.edit_calendar_sharp,
-                text: 'Booking',
-              ),
-              GButton(
                 icon: Icons.favorite_border_rounded,
                 text: 'Saved',
+              ),
+              GButton(
+                icon: Icons.edit_calendar_sharp,
+                text: 'Booking',
               ),
               GButton(
                 icon: Icons.paid_outlined,

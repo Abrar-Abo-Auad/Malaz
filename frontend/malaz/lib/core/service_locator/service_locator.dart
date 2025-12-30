@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:malaz/data/datasources/local/auth_local_datasource.dart';
+import 'package:malaz/data/datasources/remote/favorites/favorites_remote_datasource.dart';
 import 'package:malaz/data/repositories/auth/auth_repository_impl.dart';
 import 'package:malaz/domain/repositories/auth/auth_repository.dart';
 import 'package:malaz/domain/usecases/auth/check_auth_usecase.dart';
@@ -15,14 +16,20 @@ import '../../data/datasources/remote/auth/auth_remote_datasource.dart';
 import '../../data/datasources/remote/chat/chat_remote_datasource.dart';
 import '../../data/repositories/apartment/apartment_repository_impl.dart';
 import '../../data/repositories/chat/chat_repository_impl.dart';
+import '../../data/repositories/favorites/favorites_repository_impl.dart';
 import '../../domain/repositories/apartment/apartment_repository.dart';
 import '../../domain/repositories/chat/chat_repository.dart';
+import '../../domain/repositories/favorites/favorites_repository.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
+import '../../domain/usecases/favorites/add_favorites_use_case.dart';
+import '../../domain/usecases/favorites/delete_favorites_use_case.dart';
+import '../../domain/usecases/favorites/get_favorites_use_case.dart';
 import '../../domain/usecases/home/apartments_use_case.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
+import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
@@ -78,10 +85,12 @@ Future<void> setUpServices() async {
   sl.registerFactory(() => LanguageCubit(sl()));
 
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
+  sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
 
   sl.registerLazySingleton(() => GetApartmentsUseCase(sl()));
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
 
   sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl(networkService: sl()));
 
@@ -93,6 +102,8 @@ Future<void> setUpServices() async {
     authLocalDatasource: sl(),
   ));
 
+  sl.registerLazySingleton<FavoritesRemoteDataSource>(() => FavoritesRemoteDataSourceImpl(sl()));
+
   sl.registerLazySingleton(() => RegisterUsecase(repository: sl()));
   sl.registerLazySingleton(() => LoginUsecase(repository: sl()));
   sl.registerLazySingleton(() => LogoutUsecase(repository: sl()));
@@ -100,6 +111,9 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton(() => CheckAuthUsecase(repository: sl()));
   sl.registerLazySingleton(() => SendOtpUsecase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUsecase(sl()));
+  sl.registerLazySingleton(() => GetFavoritesUseCase(sl()));
+  sl.registerLazySingleton(() => AddFavoriteUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteFavoriteUseCase(sl()));
 
   sl.registerLazySingleton(() => AuthInterceptor(localDatasource: sl()));
 
