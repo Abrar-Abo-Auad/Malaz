@@ -219,6 +219,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rooms => 'Комнаты';
 
   @override
+  String get title => 'Заголовок';
+
+  @override
   String get reviews => 'Отзывы';
 
   @override
@@ -404,6 +407,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get damascus_countryside => 'Дамаск (сельская местность)';
 
   @override
+  String get jaramana => 'Джарамана';
+
+  @override
   String get aleppo => 'Алеппо';
 
   @override
@@ -438,4 +444,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get quneitra => 'Эль-Кунейтра';
+
+  @override
+  String get property_manager => 'Управляющий недвижимостью';
+
+  @override
+  String get add_new => 'Добавить';
+
+  @override
+  String get my_properties => 'Моя недвижимость';
+
+  @override
+  String get properties => 'Объекты';
+
+  @override
+  String get inbound => 'Входящие';
+
+  @override
+  String get history => 'История';
+
+  @override
+  String get no_properties_found => 'Объекты не найдены.';
+
+  @override
+  String get guests => 'Гости';
+
+  @override
+  String get saved => 'сохранено';
+
+  @override
+  String get title_hint => 'Апартаменты Жасмин';
 }

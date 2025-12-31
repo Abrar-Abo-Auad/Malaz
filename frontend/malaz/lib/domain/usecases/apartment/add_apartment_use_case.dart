@@ -1,6 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
+
+import '../../entities/apartment.dart';
 import '../../repositories/apartment/apartment_repository.dart';
 
 class AddApartmentUseCase {
@@ -44,18 +46,18 @@ class ApartmentParams {
   final XFile main_pic;
 
   ApartmentParams({
-  required this.title,
-  required this.price,
-  required this.city,
-  required this.governorate,
-  required this.address,
-  required this.description,
-  required this.type,
-  required this.rooms,
-  required this.bathrooms,
-  required this.bedrooms,
-  required this.area,
-  required this.mainImageUrl,
-  required this.main_pic
-});
+    required this.title,
+    required this.price,
+    required this.city,
+    required this.governorate,
+    required this.address,
+    required this.description,
+    required this.type,
+    required this.rooms,
+    required this.bathrooms,
+    required this.bedrooms,
+    required this.area,
+    required this.mainImageUrl,
+    required this.main_pic
+  });
 }

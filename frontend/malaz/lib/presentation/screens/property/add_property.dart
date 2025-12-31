@@ -39,7 +39,6 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   @override
   void initState() {
     super.initState();
-    // تصفير الحالة لضمان عدم ظهور نجاح/فشل قديم
     context.read<AddApartmentCubit>().resetState();
   }
 
@@ -93,8 +92,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
     if (localType == tr.apartment) return 'Apartment';
     if (localType == tr.villa) return 'Villa';
     if (localType == tr.farm) return 'Farm';
-    if (localType == tr.house) return 'Villa';
-    if (localType == tr.country_house) return 'Country Estate';
+    if (localType == tr.house) return 'House';
+    if (localType == tr.country_house) return 'Country House';
     return 'Apartment';
   }
 
@@ -255,15 +254,14 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           child: Text(tr.essential_details, style: TextStyle(color: colorScheme.primary, fontSize: 18, fontWeight: FontWeight.bold)),
         ),
-        _PropertyFormInputField(controller: _titleController, icon: Icons.title, hint: "E.g. Sea View Apartment", preffix: "Title:", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
+        _PropertyFormInputField(controller: _titleController, icon: Icons.title, hint: tr.title_hint, preffix: tr.title+":", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
         Row(children: [
-          Expanded(child: _PropertyFormInputField(controller: _roomsController, icon: Icons.meeting_room, hint: "0", preffix: "Rooms:", isnumber: true, validator: (v) => v!.isEmpty ? tr.field_required : null)),
+          Expanded(child: _PropertyFormInputField(controller: _roomsController, icon: Icons.meeting_room, hint: "0", preffix: "${tr.rooms}:", isnumber: true, validator: (v) => v!.isEmpty ? tr.field_required : null)),
           Expanded(child: _PropertyFormInputField(controller: _bedroomsController, icon: Icons.bed, hint: "0", preffix: tr.bedrooms, isnumber: true, validator: (v) => v!.isEmpty ? tr.field_required : null)),
         ]),
         Row(children: [
           Expanded(child: _PropertyFormInputField(controller: _bathroomsController, icon: Icons.bathtub, hint: "0", preffix: tr.bathrooms, isnumber: true, validator: (v) => v!.isEmpty ? tr.field_required : null)),
         ]),
-        // Area بسطر منفصل
         _PropertyFormInputField(controller: _areaController, icon: Icons.square_foot, hint: "0", preffix: tr.area, isnumber: true, suffix: "sqft", validator: (v) => v!.isEmpty ? tr.field_required : null),
       ],
     );
@@ -299,7 +297,6 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
           child: Text(tr.location_details, style: TextStyle(color: colorScheme.primary, fontSize: 18, fontWeight: FontWeight.bold)),
 
         ),
-        // تعديل الـ Governorate ليناسب عرض باقي الحقول
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 8),
           child: DropdownButtonFormField<String>(
@@ -334,7 +331,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
             ),
           ),
         ),
-        _PropertyFormInputField(controller: _cityController, icon: Icons.location_city, hint: "", preffix: "${tr.city}", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
+        _PropertyFormInputField(controller: _cityController, icon: Icons.location_city, hint: tr.jaramana, preffix: "${tr.city}", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
         _PropertyFormInputField(controller: _addressController, icon: Icons.pin_drop, hint: tr.address_loc, preffix: "${tr.address}", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
       ],
     );
@@ -358,7 +355,6 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   }
 }
 
-// --- الكلاسات المساعدة (تظل كما هي تماماً من كودك) ---
 
 class _PropertyAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _PropertyAppBar();

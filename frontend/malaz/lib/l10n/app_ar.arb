@@ -68,6 +68,7 @@
   "verified_host": "مضيف موثق",
   "owner": "المالك",
   "rooms": "الغرف",
+  "title": "العنوان",
   "reviews": "التقييمات",
   "review": "تقييم",
   "view_all": "عرض الكل",
@@ -105,6 +106,13 @@
   "nights": "ليالي",
   "confirm_booking": "تأكيد الحجز",
   "reviews_count": "({count} تقييم)",
+  "@reviews_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "no_description": "لا يوجد وصف متوفر.",
   "baths": "الحمامات",
   "click_to_view": "انقر لعرض الرسائل",
@@ -126,17 +134,28 @@
   "edited": "معدلة",
   "no_favorites_yet": "لا توجد مفضلات بعد",
   "explore_and_save": "ابدأ في الاستكشاف واحفظ شقق هنا.",
-  "damascus_countryside":"ريف دمشق",
-  "aleppo":"حلب",
-  "homs":"حمص",
-  "hama":"حماة",
-  "latakia":"اللاذقية",
-  "tartous":"طرطوس",
-  "idlib":"ادلب",
-  "deir_alZor":"دير الزور",
-  "raqa":"الرقة",
-  "al-hasakah":"الحسكة",
-  "daraa":"درعا",
-  "sweida":"السويداء",
-  "quneitra":"القنيطرة"
+  "damascus_countryside": "ريف دمشق",
+  "jaramana": "جرمانا",
+  "aleppo": "حلب",
+  "homs": "حمص",
+  "hama": "حماة",
+  "latakia": "اللاذقية",
+  "tartous": "طرطوس",
+  "idlib": "ادلب",
+  "deir_alZor": "دير الزور",
+  "raqa": "الرقة",
+  "al_hasakah": "الحسكة",
+  "daraa": "درعا",
+  "sweida": "السويداء",
+  "quneitra": "القنيطرة",
+  "property_manager": "إدارة العقارات",
+  "add_new": "إضافة جديد",
+  "my_properties": "عقاراتي",
+  "properties": "العقارات",
+  "inbound": "الواردة",
+  "history": "الأرشيف",
+  "no_properties_found": "لم يتم إضافة عقارات بعد.",
+  "guests": "ضيوف",
+  "saved":"المفضلة",
+  "title_hint":"شقة الياسمين"
 }

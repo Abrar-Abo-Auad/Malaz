@@ -68,6 +68,7 @@
   "verified_host": "Проверенный хозяин",
   "owner": "Владелец",
   "rooms": "Комнаты",
+  "title": "Заголовок",
   "reviews": "Отзывы",
   "review": "Отзыв",
   "view_all": "Посмотреть все",
@@ -105,6 +106,13 @@
   "nights": "ночи",
   "confirm_booking": "Подтвердить бронирование",
   "reviews_count": "({count} отзывов)",
+  "@reviews_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "no_description": "Описание не предоставлено.",
   "baths": "Ванны",
   "confirm_booking": "Подтвердить бронирование",
@@ -128,6 +136,7 @@
   "no_favorites_yet": "Избранного пока нет",
   "explore_and_save": "Начните поиск и сохраняйте понравившиеся квартиры здесь.",
   "damascus_countryside": "Дамаск (сельская местность)",
+  "jaramana":"Джарамана",
   "aleppo": "Алеппо",
   "homs": "Хомс",
   "hama": "Хама",
@@ -139,5 +148,16 @@
   "al-hasakah": "Эль-Хасака",
   "daraa": "Деръа",
   "sweida": "Эс-Сувейда",
-  "quneitra": "Эль-Кунейтра"
+  "quneitra": "Эль-Кунейтра",
+  "property_manager": "Управляющий недвижимостью",
+  "add_new": "Добавить",
+  "my_properties": "Моя недвижимость",
+  "properties": "Объекты",
+  "inbound": "Входящие",
+  "history": "История",
+  "no_properties_found": "Объекты не найдены.",
+  "guests": "Гости",
+  "saved":"сохранено",
+  "title_hint":"Апартаменты Жасмин"
+
 }

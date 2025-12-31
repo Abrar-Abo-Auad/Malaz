@@ -217,6 +217,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rooms => 'الغرف';
 
   @override
+  String get title => 'العنوان';
+
+  @override
   String get reviews => 'التقييمات';
 
   @override
@@ -398,6 +401,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get damascus_countryside => 'ريف دمشق';
 
   @override
+  String get jaramana => 'جرمانا';
+
+  @override
   String get aleppo => 'حلب';
 
   @override
@@ -422,7 +428,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get raqa => 'الرقة';
 
   @override
-  String get al_hasakah => 'AL_Hasaka';
+  String get al_hasakah => 'الحسكة';
 
   @override
   String get daraa => 'درعا';
@@ -432,4 +438,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quneitra => 'القنيطرة';
+
+  @override
+  String get property_manager => 'إدارة العقارات';
+
+  @override
+  String get add_new => 'إضافة جديد';
+
+  @override
+  String get my_properties => 'عقاراتي';
+
+  @override
+  String get properties => 'العقارات';
+
+  @override
+  String get inbound => 'الواردة';
+
+  @override
+  String get history => 'الأرشيف';
+
+  @override
+  String get no_properties_found => 'لم يتم إضافة عقارات بعد.';
+
+  @override
+  String get guests => 'ضيوف';
+
+  @override
+  String get saved => 'المفضلة';
+
+  @override
+  String get title_hint => 'شقة الياسمين';
 }

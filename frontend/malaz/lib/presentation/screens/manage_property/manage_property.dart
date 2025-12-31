@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../../core/config/color/app_color.dart';
 import '../../cubits/property/property_cubit.dart';
@@ -18,7 +19,6 @@ class ManagePropertiesScreen extends StatefulWidget {
 
 class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
   final PageController _pageController = PageController();
-  // إضافة ScrollController خاص بقائمة عقاراتي لإدارة الـ Pagination
   final ScrollController _myApartmentsScrollController = ScrollController();
   int _currentPage = 0;
 
@@ -26,10 +26,8 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
   void initState() {
     super.initState();
 
-    // 1. جلب البيانات لأول مرة عند فتح الشاشة
     context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true);
 
-    // 2. إعداد مستمع التمرير للتحميل التلقائي عند الوصول للنهاية (Infinite Scroll)
     _myApartmentsScrollController.addListener(() {
       if (_myApartmentsScrollController.position.pixels >=
           _myApartmentsScrollController.position.maxScrollExtent * 0.9) {
@@ -48,13 +46,14 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-    _myApartmentsScrollController.dispose(); // تنظيف الذاكرة
+    _myApartmentsScrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final tr = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -69,7 +68,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
         backgroundColor: colorScheme.primary,
         elevation: 4,
         icon: Icon(Icons.add_home_work_rounded, color: colorScheme.onPrimary),
-        label: const Text("Add New",
+        label:  Text(tr.add_new,
             style: TextStyle(fontWeight: FontWeight.bold)),
       )
           : null,
@@ -82,7 +81,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
               backgroundColor: colorScheme.primary,
               elevation: 0,
               centerTitle: true,
-              title: Text('Property Manager',
+              title: Text(tr.property_manager,
                   style: TextStyle(fontWeight: FontWeight.w800, color: colorScheme.surface)),
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.pin,
@@ -95,7 +94,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                     ),
                   ),
                   child: Container(
-                    margin: const EdgeInsets.only(top: kToolbarHeight + 10),
+                    margin: const EdgeInsets.only(top: kToolbarHeight + 30),
                     decoration: BoxDecoration(
                       color: colorScheme.surface,
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(35)),
@@ -140,7 +139,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
         body: PageView(
           controller: _pageController,
           children: [
-            _buildPropertiesList(), // القائمة المعدلة
+            _buildPropertiesList(),
             _buildInboundRequestsList(),
             _buildPastRentalsList(),
           ],
@@ -149,7 +148,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     );
   }
 
-  // --- القائمة المعدلة مع RefreshIndicator و Infinite Scroll ---
   Widget _buildPropertiesList() {
     return BlocBuilder<MyApartmentsCubit, ApartmentState>(
       builder: (context, state) {
@@ -173,9 +171,8 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
           return RefreshIndicator(
             onRefresh: () => context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true),
             child: ListView.builder(
-              controller: _myApartmentsScrollController, // ربط متحكم التمرير
+              controller: _myApartmentsScrollController,
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
-              // زيادة الطول بمقدار 1 لعرض مؤشر التحميل بالأسفل
               itemCount: state.myApartments.length + (state.hasReachedMax ? 0 : 1),
               itemBuilder: (context, index) {
                 if (index < state.myApartments.length) {
@@ -187,7 +184,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                             builder: (_) => DetailsScreen(apartment: state.myApartments[index]))),
                   );
                 } else {
-                  // مؤشر تحميل يظهر عند سحب المزيد من البيانات (Cursor Pagination)
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: Center(child: CircularProgressIndicator.adaptive()),
@@ -219,7 +215,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     );
   }
 
-  // --- باقي الـ Widgets تظل كما هي في كودك الأصلي ---
 
   Widget _buildUserName() {
     return BlocBuilder<AuthCubit, AuthState>(

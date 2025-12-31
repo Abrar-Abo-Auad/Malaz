@@ -1,10 +1,15 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/errors/failures.dart';
+import '../../../data/utils/failure_mapper.dart';
 import '../../../domain/entities/apartment.dart';
 import '../../../domain/usecases/apartment/add_apartment_use_case.dart';
 import '../../../domain/usecases/apartment/my_apartment_use_case.dart';
+import '../../../l10n/app_localizations.dart';
 
 
 abstract class ApartmentState extends Equatable {
@@ -95,8 +100,8 @@ class AddApartmentCubit extends Cubit<ApartmentState> {
 
   String _mapFailureToMessage(Failure f) {
     if (f is ServerFailure) return f.message ?? "خطأ من السيرفر";
-    if (f is NetworkFailure) return "تأكد من الاتصال بالإنترنت";
-    return "حدث خطأ غير متوقع";
+    if (f is NetworkFailure) return "network falure";
+    return "unexpected error";
   }
 }
 
@@ -107,10 +112,14 @@ class MyApartmentsCubit extends Cubit<ApartmentState> {
   String? _nextCursor;
   bool _isFetching = false;
 
-  MyApartmentsCubit({required this.getMyApartmentsUseCase}) : super(ApartmentInitial());
+  MyApartmentsCubit({required this.getMyApartmentsUseCase})
+      : super(ApartmentInitial());
 
   Future<void> fetchMyApartments({bool isRefresh = false}) async {
     if (_isFetching) return;
+    if (!isRefresh && state is MyApartmentsLoaded &&
+        (state as MyApartmentsLoaded).hasReachedMax) return;
+
     _isFetching = true;
 
     try {
@@ -130,12 +139,20 @@ class MyApartmentsCubit extends Cubit<ApartmentState> {
 
       _nextCursor = result.nextCursor;
 
+      final bool reachedMax = _nextCursor == null || result.apartments.isEmpty;
+
       emit(MyApartmentsLoaded(
-        myApartments: currentList + result.apartments,
-        hasReachedMax: _nextCursor == null,
+        myApartments: isRefresh ? result.apartments : (currentList +
+            result.apartments),
+        hasReachedMax: reachedMax,
       ));
     } catch (e) {
-      emit(MyApartmentsError(message: "حدث خطأ أثناء تحميل عقاراتك"));
+      final Failure failure = FailureMapper.map(e);
+      String keyMessage = (failure is ServerFailure)
+          ? (failure.message ?? AppConstants.cancelledFailureKey)
+          : AppConstants.unknownFailureKey;
+
+      if (!isClosed) emit(MyApartmentsError(message: keyMessage));
     } finally {
       _isFetching = false;
     }

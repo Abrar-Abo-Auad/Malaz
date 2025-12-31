@@ -68,6 +68,7 @@
   "verified_host": "Hôte vérifié",
   "owner": "Propriétaire",
   "rooms": "Pièces",
+  "title": "Titre",
   "reviews": "Avis",
   "review": "Avis",
   "view_all": "Tout voir",
@@ -105,6 +106,13 @@
   "nights": "nuits",
   "confirm_booking": "Confirmer la réservation",
   "reviews_count": "({count} avis)",
+  "@reviews_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "no_description": "Aucune description fournie.",
   "baths": "Bains",
   "click_to_view": "Cliquez pour voir les messages",
@@ -126,17 +134,28 @@
   "edited": "Modifié",
   "no_favorites_yet": "Pas encore de favoris",
   "explore_and_save": "Commencez à explorer et enregistrez vos appartements ici.",
-  "damascus_countryside":"Damas rural",
-  "aleppo":"Alep",
-  "homs":"Homs",
-  "hama":"Hama",
-  "latakia":"Lattaquié",
-  "tartous":"Tartous",
-  "idlib":"Idlib",
-  "deir_alZor":"Deir ez-Zor",
-  "raqa":"Raqqa",
-  "al-hasakah":"Hassaké",
-  "daraa":"Daraa",
-  "sweida":"Sweida",
-  "quneitra":"Quneitra"
+  "damascus_countryside": "Damas rural",
+  "jaramana":"Jaramana",
+  "aleppo": "Alep",
+  "homs": "Homs",
+  "hama": "Hama",
+  "latakia": "Lattaquié",
+  "tartous": "Tartous",
+  "idlib": "Idlib",
+  "deir_alZor": "Deir ez-Zor",
+  "raqa": "Raqqa",
+  "al-hasakah": "Hassaké",
+  "daraa": "Daraa",
+  "sweida": "Sweida",
+  "quneitra": "Quneitra",
+  "property_manager": "Gestionnaire immobilier",
+  "add_new": "Ajouter",
+  "my_properties": "Mes propriétés",
+  "properties": "Propriétés",
+  "inbound": "Entrant",
+  "history": "Historique",
+  "no_properties_found": "Aucune propriété ajoutée.",
+  "guests": "Invités",
+  "saved":"sauvé",
+  "title_hint":"Appartement Jasmin"
 }

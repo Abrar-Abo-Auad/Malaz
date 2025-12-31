@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:malaz/domain/entities/apartment.dart';
 import 'package:path/path.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/exceptions.dart';
@@ -165,7 +166,6 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
       if (response.data['status'] == 200 || response.data['status'] == "success") {
         return unit;
       } else {
-// السيرفر رجع خطأ مثل 2027، ارمي Exception عشان يوصل للـ Cubit كـ Error
         throw ServerException(message: response.data['message']);
       }
     }

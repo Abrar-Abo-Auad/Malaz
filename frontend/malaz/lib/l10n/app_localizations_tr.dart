@@ -219,6 +219,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get rooms => 'Odalar';
 
   @override
+  String get title => 'Başlık';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override
@@ -404,6 +407,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get damascus_countryside => 'Şam Kırsalı';
 
   @override
+  String get jaramana => 'Jaramana';
+
+  @override
   String get aleppo => 'Halep';
 
   @override
@@ -438,4 +444,34 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get quneitra => 'Kuneytire';
+
+  @override
+  String get property_manager => 'Emlak Yöneticisi';
+
+  @override
+  String get add_new => 'Ekle';
+
+  @override
+  String get my_properties => 'Mülklerim';
+
+  @override
+  String get properties => 'Mülkler';
+
+  @override
+  String get inbound => 'Gelen';
+
+  @override
+  String get history => 'Geçmiş';
+
+  @override
+  String get no_properties_found => 'Mülk bulunamadı.';
+
+  @override
+  String get guests => 'Misafirler';
+
+  @override
+  String get saved => 'kaydedildi';
+
+  @override
+  String get title_hint => 'Yasemin Apartmanı';
 }

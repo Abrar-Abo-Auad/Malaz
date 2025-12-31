@@ -223,6 +223,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rooms => 'Pièces';
 
   @override
+  String get title => 'Titre';
+
+  @override
   String get reviews => 'Avis';
 
   @override
@@ -411,6 +414,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get damascus_countryside => 'Damas rural';
 
   @override
+  String get jaramana => 'Jaramana';
+
+  @override
   String get aleppo => 'Alep';
 
   @override
@@ -445,4 +451,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get quneitra => 'Quneitra';
+
+  @override
+  String get property_manager => 'Gestionnaire immobilier';
+
+  @override
+  String get add_new => 'Ajouter';
+
+  @override
+  String get my_properties => 'Mes propriétés';
+
+  @override
+  String get properties => 'Propriétés';
+
+  @override
+  String get inbound => 'Entrant';
+
+  @override
+  String get history => 'Historique';
+
+  @override
+  String get no_properties_found => 'Aucune propriété ajoutée.';
+
+  @override
+  String get guests => 'Invités';
+
+  @override
+  String get saved => 'sauvé';
+
+  @override
+  String get title_hint => 'Appartement Jasmin';
 }

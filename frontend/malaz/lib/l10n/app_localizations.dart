@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'Rooms'**
   String get rooms;
 
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:
@@ -872,6 +878,12 @@ abstract class AppLocalizations {
   /// **'Damascus Countryside'**
   String get damascus_countryside;
 
+  /// No description provided for @jaramana.
+  ///
+  /// In en, this message translates to:
+  /// **'Jaramana'**
+  String get jaramana;
+
   /// No description provided for @aleppo.
   ///
   /// In en, this message translates to:
@@ -943,6 +955,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quneitra'**
   String get quneitra;
+
+  /// No description provided for @property_manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Property Manager'**
+  String get property_manager;
+
+  /// No description provided for @add_new.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New'**
+  String get add_new;
+
+  /// No description provided for @my_properties.
+  ///
+  /// In en, this message translates to:
+  /// **'My Properties'**
+  String get my_properties;
+
+  /// No description provided for @properties.
+  ///
+  /// In en, this message translates to:
+  /// **'Properties'**
+  String get properties;
+
+  /// No description provided for @inbound.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbound'**
+  String get inbound;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @no_properties_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties added yet.'**
+  String get no_properties_found;
+
+  /// No description provided for @guests.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests'**
+  String get guests;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Jasmine Apartment'**
+  String get title_hint;
 }
 
 class _AppLocalizationsDelegate
