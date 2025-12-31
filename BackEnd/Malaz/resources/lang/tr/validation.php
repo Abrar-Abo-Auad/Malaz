@@ -29,14 +29,14 @@ return [
     'identity_card_image.file' => 'Kimlik kartı resmi bir dosya olmalıdır.',
     'identity_card_image.image' => 'Kimlik kartı resmi bir resim olmalıdır.',
     'identity_card_image.mimes' => 'Kimlik kartı resmi şu türlerden biri olmalıdır: jpeg, png, jpg, gif, svg.',
-    'identity_card_image.max' => 'Kimlik kartı resmi 2MB\'ı geçmemelidir.',
+    'identity_card_image.max' => 'Kimlik kartı resmi 10MB\'ı geçmemelidir.',
 
     // Profil resmi
     'profile_image.required' => 'Profil resmi gereklidir.',
     'profile_image.file' => 'Profil resmi bir dosya olmalıdır.',
     'profile_image.image' => 'Profil resmi bir resim olmalıdır.',
     'profile_image.mimes' => 'Profil resmi şu türlerden biri olmalıdır: jpeg, png, jpg, gif, svg.',
-    'profile_image.max' => 'Profil resmi 2MB\'ı geçmemelidir.',
+    'profile_image.max' => 'Profil resmi 10MB\'ı geçmemelidir.',
 
     // Doğum tarihi
     'date_of_birth.required' => 'Doğum tarihi gereklidir.',
@@ -81,7 +81,7 @@ return [
     'images.*.file' => 'Her resim geçerli bir dosya olmalıdır.',
     'images.*.image' => 'Her dosya bir resim olmalıdır.',
     'images.*.mimes' => 'Resimler şu türlerden biri olmalıdır: jpeg, png, jpg, gif, svg.',
-    'images.*.max' => 'Her resim 2MB\'ı geçmemelidir.',
+    'images.*.max' => 'Her resim 10MB\'ı geçmemelidir.',
 
     // Silme
     'erase.array' => 'Silme alanı bir dizi olmalıdır.',
@@ -126,7 +126,7 @@ return [
     'main_pic.file' => 'Ana resim geçerli bir dosya olmalıdır.',
     'main_pic.image' => 'Ana resim bir resim olmalıdır.',
     'main_pic.mimes' => 'Ana resim şu türlerden biri olmalıdır: jpeg, png, jpg, gif, svg.',
-    'main_pic.max' => 'Ana resim 2MB\'ı geçmemelidir.',
+    'main_pic.max' => 'Ana resim 10MB\'ı geçmemelidir.',
 
     'conversation' => [
         'self_start' => 'Kendi kendinizle sohbet başlatamazsınız',

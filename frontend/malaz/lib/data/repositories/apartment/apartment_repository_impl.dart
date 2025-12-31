@@ -12,6 +12,7 @@ import '../models/apartment_model.dart';
 
 class ApartmentRepositoryImpl implements ApartmentRepository {
   final ApartmentRemoteDataSource remoteDataSource;
+
   ApartmentRepositoryImpl({required this.remoteDataSource});
 
   @override

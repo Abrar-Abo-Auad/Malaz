@@ -318,6 +318,83 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otp_verified_success => 'تم التحقق من الرمز بنجاح';
 
   @override
+  String get booking_request_sent => 'تم إرسال طلب الحجز إلى المالك';
+
+  @override
+  String get nights => 'ليالي';
+
+  @override
+  String get confirm_booking => 'تأكيد الحجز';
+
+  @override
+  String reviews_count(int count) {
+    return '($count تقييم)';
+  }
+
+  @override
+  String get no_description => 'لا يوجد وصف متوفر.';
+
+  @override
+  String get baths => 'الحمامات';
+
+  @override
+  String get click_to_view => 'انقر لعرض الرسائل';
+
+  @override
+  String get active_partners => 'الشركاء النشطون';
+
+  @override
+  String get recent_messages => 'الرسائل الأخيرة';
+
+  @override
+  String get malaz_chat => 'دردشة ملاذ';
+
+  @override
+  String get no_conversations => 'لا توجد محادثات بعد';
+
+  @override
+  String get active => 'نشط';
+
+  @override
+  String get delete_chat_title => 'حذف الدردشة؟';
+
+  @override
+  String get delete_chat_confirm => 'سيؤدي هذا إلى إزالة المحادثة نهائيًا.';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get online_now => 'متصل الآن';
+
+  @override
+  String get editing_message_hint => 'تعديل الرسالة...';
+
+  @override
+  String get type_message_hint => 'اكتب رسالتك...';
+
+  @override
+  String get edit_message => 'تعديل الرسالة';
+
+  @override
+  String get copy_text => 'نسخ النص';
+
+  @override
+  String get text_copied => 'تم نسخ النص';
+
+  @override
+  String get delete_message => 'حذف الرسالة';
+
+  @override
+  String get edited => 'معدلة';
+
+  @override
+  String get no_favorites_yet => 'لا توجد مفضلات بعد';
+
+  @override
+  String get explore_and_save => 'ابدأ في الاستكشاف واحفظ شقق هنا.';
+
+  @override
   String get damascus_countryside => 'ريف دمشق';
 
   @override

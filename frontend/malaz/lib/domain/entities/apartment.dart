@@ -1,8 +1,7 @@
-import 'package:equatable/equatable.dart';
-
-class Apartment extends Equatable {
+class Apartment {
   final int id;
   final int ownerId;
+  final UserEntity owner;
   final String status;
   final String title;
   final int price;
@@ -23,6 +22,7 @@ class Apartment extends Equatable {
   Apartment({
     required this.id,
     required this.ownerId,
+    required this.owner,
     required this.status,
     required this.title,
     required this.price,
@@ -35,8 +35,8 @@ class Apartment extends Equatable {
     required this.bathrooms,
     required this.bedrooms,
     required this.area,
-    this.rating=0,
-    this.numberOfReviews=0,
+    required this.rating,
+    required this.numberOfReviews,
     required this.mainImageUrl,
     this.isFav = false,
   });

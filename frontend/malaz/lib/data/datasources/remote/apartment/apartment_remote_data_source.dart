@@ -37,7 +37,7 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
     final response = await networkService.get(
       '/properties/all',
       queryParameters: {
-        'per_page': 2, // ! do not make per_page = 1
+        'per_page': AppConstants.numberOfApartmentsEachRequest,
         'cursor': cursor,
       },
     );
@@ -62,7 +62,6 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
     } else {
       print('what happened ? meta is null and ${response.data['message']}');
     }
-
 
     print('apartments : $apartments');
     return ApartmentsList(

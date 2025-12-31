@@ -11,4 +11,6 @@ class AppConstants {
   static const String cancelledFailureKey = 'CANCELLED_FAILURE_KEY';
 
   static const numberOfApartmentsEachRequest = 2;
+
+  static String userProfileImage(int userId) => "$baseurl/users/$userId/profile_image";
 }

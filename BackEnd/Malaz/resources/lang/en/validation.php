@@ -24,13 +24,13 @@ return [
     'identity_card_image.file' => 'Identity card image must be a file.',
     'identity_card_image.image' => 'Identity card image must be an image.',
     'identity_card_image.mimes' => 'Identity card image must be one of: jpeg, png, jpg, gif, svg.',
-    'identity_card_image.max' => 'Identity card image must not exceed 2MB.',
+    'identity_card_image.max' => 'Identity card image must not exceed 10MB.',
 
     'profile_image.required' => 'Profile image is required.',
     'profile_image.file' => 'Profile image must be a file.',
     'profile_image.image' => 'Profile image must be an image.',
     'profile_image.mimes' => 'Profile image must be one of: jpeg, png, jpg, gif, svg.',
-    'profile_image.max' => 'Profile image must not exceed 2MB.',
+    'profile_image.max' => 'Profile image must not exceed 10MB.',
 
     'date_of_birth.required' => 'Date of birth is required.',
     'date_of_birth.date' => 'Date of birth must be a valid date.',
@@ -66,7 +66,7 @@ return [
     'images.*.file' => 'Each image must be a valid file.',
     'images.*.image' => 'Each file must be an image.',
     'images.*.mimes' => 'Images must be of type: jpeg, png, jpg, gif, svg.',
-    'images.*.max' => 'Each image may not be larger than 2MB.',
+    'images.*.max' => 'Each image may not be larger than 10MB.',
 
     'erase.array' => 'The erase field must be an array.',
     'erase.*.integer' => 'Each erase item must be an integer.',
@@ -102,7 +102,7 @@ return [
     'main_pic.file' => 'main_pic must be a valid file.',
     'main_pic.image' => 'main_pic must be an image.',
     'main_pic.mimes' => 'main_pic must be of type: jpeg, png, jpg, gif, svg.',
-    'main_pic.max' => 'main_pic may not be larger than 2MB.',
+    'main_pic.max' => 'main_pic may not be larger than 10MB.',
 
     'conversation' => [
         'self_start' => 'You cannot start a conversation with yourself',
