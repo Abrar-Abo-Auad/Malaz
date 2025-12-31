@@ -1,3 +1,5 @@
+import 'package:malaz/domain/entities/user_entity.dart';
+
 class Apartment {
   final int id;
   final int ownerId;

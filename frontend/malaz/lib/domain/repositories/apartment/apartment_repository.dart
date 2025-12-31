@@ -1,10 +1,7 @@
-
 import 'package:dartz/dartz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/domain/entities/apartments_list.dart';
-
-import '../entities/apartment.dart';
 
 abstract class ApartmentRepository {
   Future<ApartmentsList> getApartments({required String? cursor});

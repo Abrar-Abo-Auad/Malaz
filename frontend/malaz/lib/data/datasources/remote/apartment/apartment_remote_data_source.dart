@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:malaz/domain/entities/apartment.dart';
 import 'package:path/path.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/errors/exceptions.dart';
 import '../../../../core/network/network_service.dart';
-import '../../../core/errors/exceptions.dart';
-import '../../../domain/entities/apartments_list.dart';
-import '../../models/apartment_model.dart';
+import '../../../../domain/entities/apartments_list.dart';
+import '../../../models/apartment_model.dart';
 
 abstract class ApartmentRemoteDataSource {
   Future<ApartmentsList> getApartments({String? cursor});

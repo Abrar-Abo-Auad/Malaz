@@ -20,6 +20,8 @@ import '../../data/repositories/favorites/favorites_repository_impl.dart';
 import '../../domain/repositories/apartment/apartment_repository.dart';
 import '../../domain/repositories/chat/chat_repository.dart';
 import '../../domain/repositories/favorites/favorites_repository.dart';
+import '../../domain/usecases/apartment/add_apartment_use_case.dart';
+import '../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';

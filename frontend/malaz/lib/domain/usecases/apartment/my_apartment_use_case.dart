@@ -1,5 +1,5 @@
 import '../../entities/apartments_list.dart';
-import '../../repositories/apartment_repository.dart';
+import '../../repositories/apartment/apartment_repository.dart';
 
 class GetMyApartmentsUseCase {
   final ApartmentRepository repository;

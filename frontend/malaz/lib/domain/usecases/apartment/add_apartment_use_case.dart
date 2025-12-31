@@ -1,9 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
-
-import '../../entities/apartment.dart';
-import '../../repositories/apartment_repository.dart';
+import '../../repositories/apartment/apartment_repository.dart';
 
 class AddApartmentUseCase {
   final ApartmentRepository repository;

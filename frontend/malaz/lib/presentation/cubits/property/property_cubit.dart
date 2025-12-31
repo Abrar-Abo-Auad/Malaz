@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/errors/failures.dart';
 import '../../../domain/entities/apartment.dart';
 import '../../../domain/usecases/apartment/add_apartment_use_case.dart';
-import '../../../domain/usecases/apartment/home_apartments_use_case.dart';
 import '../../../domain/usecases/apartment/my_apartment_use_case.dart';
 
 

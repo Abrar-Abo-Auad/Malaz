@@ -4,7 +4,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../../core/config/color/app_color.dart';
 import '../../cubits/property/property_cubit.dart';
-import '../../global_widgets/apartment_card.dart';
 import '../../global_widgets/apartment_cards/apartment_card.dart';
 import '../auth/my_profile/my_profile_screen.dart';
 import '../details/details_screen.dart';
