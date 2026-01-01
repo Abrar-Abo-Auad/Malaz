@@ -29,14 +29,14 @@ return [
     'identity_card_image.file' => 'صورة الهوية يجب أن تكون ملفاً.',
     'identity_card_image.image' => 'صورة الهوية يجب أن تكون صورة.',
     'identity_card_image.mimes' => 'صورة الهوية يجب أن تكون من الأنواع: jpeg, png, jpg, gif, svg.',
-    'identity_card_image.max' => 'صورة الهوية يجب ألا تتجاوز 2MB.',
+    'identity_card_image.max' => 'صورة الهوية يجب ألا تتجاوز 10MB.',
 
     // الصورة الشخصية
     'profile_image.required' => 'الصورة الشخصية مطلوبة.',
     'profile_image.file' => 'الصورة الشخصية يجب أن تكون ملفاً.',
     'profile_image.image' => 'الصورة الشخصية يجب أن تكون صورة.',
     'profile_image.mimes' => 'الصورة الشخصية يجب أن تكون من الأنواع: jpeg, png, jpg, gif, svg.',
-    'profile_image.max' => 'الصورة الشخصية يجب ألا تتجاوز 2MB.',
+    'profile_image.max' => 'الصورة الشخصية يجب ألا تتجاوز 10MB.',
 
     // تاريخ الميلاد
     'date_of_birth.required' => 'تاريخ الميلاد مطلوب.',
@@ -81,7 +81,7 @@ return [
     'images.*.file' => 'كل صورة يجب أن تكون ملفاً صحيحاً.',
     'images.*.image' => 'كل ملف يجب أن يكون صورة.',
     'images.*.mimes' => 'الصور يجب أن تكون من الأنواع: jpeg, png, jpg, gif, svg.',
-    'images.*.max' => 'كل صورة يجب ألا تتجاوز 2MB.',
+    'images.*.max' => 'كل صورة يجب ألا تتجاوز 10MB.',
 
     // الحذف
     'erase.array' => 'حقل الحذف يجب أن يكون مصفوفة.',
@@ -126,7 +126,7 @@ return [
     'main_pic.file' => 'الصورة الرئيسية يجب أن تكون ملفاً صحيحاً.',
     'main_pic.image' => 'الصورة الرئيسية يجب أن تكون صورة.',
     'main_pic.mimes' => 'الصورة الرئيسية يجب أن تكون من الأنواع: jpeg, png, jpg, gif, svg.',
-    'main_pic.max' => 'الصورة الرئيسية يجب ألا تتجاوز 2MB.',
+    'main_pic.max' => 'الصورة الرئيسية يجب ألا تتجاوز 10MB.',
 
     'conversation' => [
         'self_start' => 'لا يمكنك بدء محادثة مع نفسك',
