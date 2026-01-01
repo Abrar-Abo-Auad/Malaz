@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:malaz/presentation/global_widgets/custom_button.dart';
+import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../../../../core/config/color/app_color.dart';
 import '../../../../l10n/app_localizations.dart';

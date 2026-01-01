@@ -181,19 +181,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get location_details => 'تفاصيل الموقع';
 
   @override
-  String get city => 'المدينة:';
+  String get city => 'المدينة';
 
   @override
   String get syria => 'سوريا';
 
   @override
-  String get governorate => 'المحافظة:';
+  String get governorate => 'المحافظة';
 
   @override
   String get damascus => 'دمشق';
 
   @override
-  String get address => 'العنوان:';
+  String get address => 'العنوان';
 
   @override
   String get address_loc => 'الهمك، بستان الدور';
@@ -215,6 +215,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rooms => 'الغرف';
+
+  @override
+  String get title => 'العنوان';
 
   @override
   String get reviews => 'التقييمات';
@@ -387,4 +390,82 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get edited => 'معدلة';
+
+  @override
+  String get no_favorites_yet => 'لا توجد مفضلات بعد';
+
+  @override
+  String get explore_and_save => 'ابدأ في الاستكشاف واحفظ شقق هنا.';
+
+  @override
+  String get damascus_countryside => 'ريف دمشق';
+
+  @override
+  String get jaramana => 'جرمانا';
+
+  @override
+  String get aleppo => 'حلب';
+
+  @override
+  String get homs => 'حمص';
+
+  @override
+  String get hama => 'حماة';
+
+  @override
+  String get latakia => 'اللاذقية';
+
+  @override
+  String get tartous => 'طرطوس';
+
+  @override
+  String get idlib => 'ادلب';
+
+  @override
+  String get deir_alZor => 'دير الزور';
+
+  @override
+  String get raqa => 'الرقة';
+
+  @override
+  String get al_hasakah => 'الحسكة';
+
+  @override
+  String get daraa => 'درعا';
+
+  @override
+  String get sweida => 'السويداء';
+
+  @override
+  String get quneitra => 'القنيطرة';
+
+  @override
+  String get property_manager => 'إدارة العقارات';
+
+  @override
+  String get add_new => 'إضافة جديد';
+
+  @override
+  String get my_properties => 'عقاراتي';
+
+  @override
+  String get properties => 'العقارات';
+
+  @override
+  String get inbound => 'الواردة';
+
+  @override
+  String get history => 'الأرشيف';
+
+  @override
+  String get no_properties_found => 'لم يتم إضافة عقارات بعد.';
+
+  @override
+  String get guests => 'ضيوف';
+
+  @override
+  String get saved => 'المفضلة';
+
+  @override
+  String get title_hint => 'شقة الياسمين';
 }

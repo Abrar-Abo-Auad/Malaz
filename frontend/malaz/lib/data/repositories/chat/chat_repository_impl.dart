@@ -63,6 +63,25 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
+  Future<Either<Failure, ConversationModel>> saveNewConversation(int partnerId) async {
+    try {
+      final result = await remoteDataSource.saveNewConversation(partnerId);
+
+      if (result != null && result['conversation'] != null) {
+        final Map<String, dynamic> conversationData = Map<String, dynamic>.from(result['conversation']);
+
+        final conversationModel = ConversationModel.fromJson(conversationData);
+
+        return Right(conversationModel);
+      }
+      return Left(ServerFailure("بيانات المحادثة غير موجودة في رد السيرفر"));
+    } catch (e) {
+      print("Mapping Error: $e");
+      return Left(ServerFailure("خطأ في معالجة البيانات: $e"));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> deleteConversation(int conversationId) async {
     try {
       await remoteDataSource.deleteConversation(conversationId);

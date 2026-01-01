@@ -40,21 +40,23 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
     return null;
   }
 
-  void _onSendMessage(BuildContext context, int myId) {
+  void _onSendMessage(BuildContext context, int myId, {int? overrideId}) {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    if (_editingMessage != null) {
-      context.read<ChatCubit>().editMessage(_editingMessage!.id, text);
-      setState(() {
-        _editingMessage = null;
-        _messageController.clear();
-      });
-    } else {
-      context.read<ChatCubit>().sendMessage(widget.conversationId, text, myId);
-      _messageController.clear();
+    final chatCubit = context.read<ChatCubit>();
+
+    int finalId = overrideId ?? -1;
+    if (finalId == -1 && chatCubit.state is ChatMessagesLoaded) {
+      finalId = (chatCubit.state as ChatMessagesLoaded).conversationId;
     }
-    _scrollToBottom();
+    if (finalId == -1) finalId = widget.conversationId;
+
+    if (finalId != -1) {
+      chatCubit.sendMessage(finalId, text, myId);
+      _messageController.clear();
+      _scrollToBottom();
+    }
   }
 
   void _scrollToBottom() {
@@ -62,6 +64,16 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
       _scrollController.animateTo(0.0,
           duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted && widget.conversationId > 0) {
+        context.read<ChatCubit>().getMessages(widget.conversationId);
+      }
+    });
   }
 
   @override
@@ -73,102 +85,109 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
 
     final screenSize = MediaQuery.of(context).size;
 
-    return BlocProvider(
-      create: (context) => sl<ChatCubit>()..getMessages(widget.conversationId),
-      child: Builder(
-        builder: (childContext) {
-          final tr = AppLocalizations.of(childContext)!;
-          return Scaffold(
-            backgroundColor: bgColor,
-            resizeToAvoidBottomInset: true,
-            body: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: SizedBox(
-                      width: screenSize.width,
-                      height: screenSize.height,
-                      child: Opacity(
-                        opacity: isDark ? 0.1 : 0.2,
-                        child: Transform.rotate(
-                          angle: 0.36,
-                          child: GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              mainAxisSpacing: 60,
-                              crossAxisSpacing: 60,
-                            ),
-                            itemBuilder: (context, index) {
-                              return Transform.rotate(
-                                angle: (index % 2 == 0) ? 0.3 : -0.3,
-                                child: Image.asset(
-                                  'assets/icons/key_logo.png',
-                                  color: isDark ? colorScheme.primary : const Color(0xFFAF895F),
-                                  fit: BoxFit.contain,
-                                ),
-                              );
-                            },
-                            itemCount: 60,
+    return Builder(
+      builder: (childContext) {
+        final tr = AppLocalizations.of(childContext)!;
+        return Scaffold(
+          backgroundColor: bgColor,
+          resizeToAvoidBottomInset: true,
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: SizedBox(
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    child: Opacity(
+                      opacity: isDark ? 0.1 : 0.2,
+                      child: Transform.rotate(
+                        angle: 0.36,
+                        child: GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 60,
+                            crossAxisSpacing: 60,
                           ),
+                          itemBuilder: (context, index) {
+                            return Transform.rotate(
+                              angle: (index % 2 == 0) ? 0.3 : -0.3,
+                              child: Image.asset(
+                                'assets/icons/key_logo.png',
+                                color: isDark ? colorScheme.primary : const Color(0xFFAF895F),
+                                fit: BoxFit.contain,
+                              ),
+                            );
+                          },
+                          itemCount: 60,
                         ),
                       ),
                     ),
                   ),
                 ),
+              ),
 
-                Column(
-                  children: [
-                    _buildAppBar(childContext, isDark),
-                    Expanded(
-                      child: BlocConsumer<ChatCubit, ChatState>(
-                        listener: (context, state) {
-                          if (state is ChatMessagesLoaded && state.messages.isNotEmpty) {
-                            final myId = _getMyId(context);
+              Column(
+                children: [
+                  _buildAppBar(childContext, isDark),
+                  Expanded(
+                    child: BlocConsumer<ChatCubit, ChatState>(
+                      listener: (context, state) {
+                        if (state is ChatMessagesLoaded && state.messages.isNotEmpty) {
+                          final myId = _getMyId(context);
 
-                            final unreadMessages = state.messages.where((msg) =>
-                            msg.senderId != myId && msg.readAt == null).toList();
+                          final unreadMessages = state.messages.where((msg) =>
+                          msg.senderId != myId && msg.readAt == null).toList();
 
-                            if (unreadMessages.isNotEmpty) {
-                              for (var msg in unreadMessages) {
-                                context.read<ChatCubit>().markMessageAsRead(msg.id);
-                              }
-
-                              // مثل: context.read<ChatCubit>().markAllAsRead(unreadMessages.map((e) => e.id).toList());
+                          if (unreadMessages.isNotEmpty) {
+                            for (var msg in unreadMessages) {
+                              context.read<ChatCubit>().markMessageAsRead(msg.id);
                             }
                           }
-                        },
+                        }
+                      },
                         builder: (context, state) {
-                          if (state is ChatMessagesInitialLoading) return _buildShimmerMessages(isDark);
+                          List<ChatMessageModel> messages = [];
+
                           if (state is ChatMessagesLoaded) {
+                            messages = state.messages;
+                          } else {
+                            messages = context.read<ChatCubit>().allMessages;
+                          }
+
+                          if (state is ChatMessagesInitialLoading && messages.isEmpty) {
+                            return _buildShimmerMessages(isDark);
+                          }
+
+                          if (messages.isNotEmpty) {
                             return ListView.builder(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                               controller: _scrollController,
                               reverse: true,
-                              itemCount: state.messages.length,
+                              itemCount: messages.length,
                               itemBuilder: (context, index) {
-                                final msg = state.messages[index];
+                                final msg = messages[index];
                                 return ChatBubble(
                                   message: msg,
                                   isMe: msg.senderId == myId,
                                   onLongPress: () => _showMessageActions(childContext, msg, msg.senderId == myId, tr),
-                                  isSameUser: index > 0 && state.messages[index].senderId == state.messages[index - 1].senderId,
+                                  isSameUser: index > 0 && messages[index].senderId == messages[index - 1].senderId,
                                 );
                               },
                             );
                           }
+
                           return const SizedBox();
-                        },
-                      ),
+                        }
                     ),
-                    _buildMessageInput(childContext, isDark, myId ?? 0, tr),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                  ),
+                  _buildMessageInput(childContext, isDark, myId ?? 0, tr),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -256,7 +275,45 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
               ),
               const SizedBox(width: 10),
               GestureDetector(
-                onTap: () => _onSendMessage(context, myId),
+                onTap: () async {
+                  final text = _messageController.text.trim();
+                  if (text.isEmpty) return;
+
+                  if (_editingMessage != null) {
+                    context.read<ChatCubit>().editMessage(_editingMessage!.id, text);
+                    setState(() => _editingMessage = null);
+                    _messageController.clear();
+                  } else {
+                    final myIdValue = myId ?? 0;
+                    final chatCubit = context.read<ChatCubit>();
+                    final text = _messageController.text.trim();
+
+                    if (text.isEmpty) return;
+
+                    int currentId = -1;
+                    if (chatCubit.state is ChatMessagesLoaded) {
+                      currentId = (chatCubit.state as ChatMessagesLoaded).conversationId;
+                    }
+
+                    if (currentId == -1) {
+                      final newId = await chatCubit.saveNewConversation(widget.otherUserId);
+
+                      if (newId != null && newId != -1) {
+                        _onSendMessage(context, myIdValue, overrideId: newId);
+                      } else {
+                        if (chatCubit.state is ChatMessagesLoaded) {
+                          final fallbackId = (chatCubit.state as ChatMessagesLoaded).conversationId;
+                          if (fallbackId != -1) {
+                            _onSendMessage(context, myIdValue, overrideId: fallbackId);
+                            return;
+                          }
+                        }
+                      }
+                    } else {
+                      _onSendMessage(context, myIdValue);
+                    }
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: const BoxDecoration(color: Color(0xFFAF895F), shape: BoxShape.circle),
@@ -369,7 +426,7 @@ class ChatBubble extends StatelessWidget {
                   if (message.isEdited)
                     Padding(
                       padding: EdgeInsets.only(left: 5),
-                      child: Text(tr.edited, style: TextStyle(fontSize: 9, fontStyle: FontStyle.italic, color: Colors.white70)),
+                      child: Text(' '+tr.edited+'   ', style: TextStyle(fontSize: 9, fontStyle: FontStyle.italic, color: Colors.white70)),
                     ),
                   Text(
                     DateFormat('hh:mm a').format(message.createdAt),

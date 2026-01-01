@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/config/color/app_color.dart';
-import 'package:malaz/presentation/global_widgets/custom_button.dart';
+import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../cubits/auth/auth_cubit.dart';
 import '../../../global_widgets/build_branding.dart';

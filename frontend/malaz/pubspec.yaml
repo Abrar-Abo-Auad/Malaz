@@ -49,5 +49,3 @@ flutter:
   generate: true
   assets:
     - assets/icons/key_logo.png
-    - assets/icons/ribbon.png
-    - assets/icons/card_box.png

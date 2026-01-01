@@ -91,6 +91,9 @@ Route::prefix('edit-requests')->middleware(['auth:sanctum', 'role:ADMIN'])->cont
 
 Route::prefix('bookings')->middleware(['auth:sanctum', 'role:ADMIN,USER'])->controller(BookingController::class)->group(function () {
     Route::get('/', 'index')->name('bookings.index');
+    Route::get('user/{userId}', 'userBookings')->name('bookings.by_user');
+    Route::get('property/{propertyId}', 'propertyBookings')->name('bookings.by_property');
+    Route::get('owner/{ownerId}', 'ownerBookings')->name('bookings.by_owner');
     Route::post('store', 'store')->name('bookings.store');
     Route::get('show/{booking}', 'show')->name('bookings.show');
     Route::delete('cancel/{booking}', 'destroy')->name('bookings.cancel');

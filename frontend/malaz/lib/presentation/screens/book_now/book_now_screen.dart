@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:malaz/l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
-import '../../../../core/config/color/app_color.dart';
-import '../../global_widgets/custom_button.dart';
+
+import '../../global_widgets/buttons/custom_button.dart';
 
 /// ============================================================================
 /// [BookingBottomSheet]

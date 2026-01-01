@@ -223,6 +223,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rooms => 'Pièces';
 
   @override
+  String get title => 'Titre';
+
+  @override
   String get reviews => 'Avis';
 
   @override
@@ -399,4 +402,83 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get edited => 'Modifié';
+
+  @override
+  String get no_favorites_yet => 'Pas encore de favoris';
+
+  @override
+  String get explore_and_save =>
+      'Commencez à explorer et enregistrez vos appartements ici.';
+
+  @override
+  String get damascus_countryside => 'Damas rural';
+
+  @override
+  String get jaramana => 'Jaramana';
+
+  @override
+  String get aleppo => 'Alep';
+
+  @override
+  String get homs => 'Homs';
+
+  @override
+  String get hama => 'Hama';
+
+  @override
+  String get latakia => 'Lattaquié';
+
+  @override
+  String get tartous => 'Tartous';
+
+  @override
+  String get idlib => 'Idlib';
+
+  @override
+  String get deir_alZor => 'Deir ez-Zor';
+
+  @override
+  String get raqa => 'Raqqa';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'Daraa';
+
+  @override
+  String get sweida => 'Sweida';
+
+  @override
+  String get quneitra => 'Quneitra';
+
+  @override
+  String get property_manager => 'Gestionnaire immobilier';
+
+  @override
+  String get add_new => 'Ajouter';
+
+  @override
+  String get my_properties => 'Mes propriétés';
+
+  @override
+  String get properties => 'Propriétés';
+
+  @override
+  String get inbound => 'Entrant';
+
+  @override
+  String get history => 'Historique';
+
+  @override
+  String get no_properties_found => 'Aucune propriété ajoutée.';
+
+  @override
+  String get guests => 'Invités';
+
+  @override
+  String get saved => 'sauvé';
+
+  @override
+  String get title_hint => 'Appartement Jasmin';
 }
