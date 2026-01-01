@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:malaz/presentation/screens/home/home_screen.dart';
+import '../../../l10n/app_localizations.dart';
 import '../booking/booking_screen.dart';
 import '../chats/chats_screen.dart';
 import '../favorites/favorites_screen.dart';
@@ -59,6 +60,8 @@ class _BuildModernNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tr = AppLocalizations.of(context)!;
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isSmallScreen = screenWidth < 400;
 
@@ -99,26 +102,26 @@ class _BuildModernNavBar extends StatelessWidget {
 
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-            tabs: const [
+            tabs:  [
               GButton(
                 icon: Icons.home_rounded,
-                text: 'Home',
+                text: tr.home,
               ),
               GButton(
                 icon: Icons.chat_bubble,
-                text: 'Chats',
+                text: tr.chats,
               ),
               GButton(
                 icon: Icons.favorite_border_rounded,
-                text: 'Saved',
+                text: tr.saved,
               ),
               GButton(
                 icon: Icons.edit_calendar_sharp,
-                text: 'Booking',
+                text: tr.bookings,
               ),
               GButton(
                 icon: Icons.paid_outlined,
-                text: 'My Properties',
+                text: tr.my_properties,
               ),
             ],
             selectedIndex: selectedIndex,

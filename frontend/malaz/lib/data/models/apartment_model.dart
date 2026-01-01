@@ -53,4 +53,26 @@ class ApartmentModel extends Apartment {
       isFav: json['is_favorite'] ?? false,
     );
   }
+  Map<String, dynamic> toJson(){
+    return {
+      'id': id,
+      'ownerId': ownerId,
+      'status': status,
+      'title': title,
+      'price': price,
+      'city': city,
+      'governorate': governorate,
+      'address': address,
+      'description': description,
+      'type': type,
+      'rooms': rooms,
+      'bathrooms': bathrooms,
+      'bedrooms': bedrooms,
+      'area': area,
+      'rating': rating,
+      'numberOfReviews': numberOfReviews,
+      'mainImageUrl': mainImageUrl,
+      'isFav': isFav
+    };
+  }
 }

@@ -219,6 +219,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get rooms => 'Комнаты';
 
   @override
+  String get title => 'Заголовок';
+
+  @override
   String get reviews => 'Отзывы';
 
   @override
@@ -399,4 +402,76 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get explore_and_save =>
       'Начните поиск и сохраняйте понравившиеся квартиры здесь.';
+
+  @override
+  String get damascus_countryside => 'Дамаск (сельская местность)';
+
+  @override
+  String get jaramana => 'Джарамана';
+
+  @override
+  String get aleppo => 'Алеппо';
+
+  @override
+  String get homs => 'Хомс';
+
+  @override
+  String get hama => 'Хама';
+
+  @override
+  String get latakia => 'Латакия';
+
+  @override
+  String get tartous => 'Тартус';
+
+  @override
+  String get idlib => 'Идлиб';
+
+  @override
+  String get deir_alZor => 'Дейр-эз-Зор';
+
+  @override
+  String get raqa => 'Ракка';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'Деръа';
+
+  @override
+  String get sweida => 'Эс-Сувейда';
+
+  @override
+  String get quneitra => 'Эль-Кунейтра';
+
+  @override
+  String get property_manager => 'Управляющий недвижимостью';
+
+  @override
+  String get add_new => 'Добавить';
+
+  @override
+  String get my_properties => 'Моя недвижимость';
+
+  @override
+  String get properties => 'Объекты';
+
+  @override
+  String get inbound => 'Входящие';
+
+  @override
+  String get history => 'История';
+
+  @override
+  String get no_properties_found => 'Объекты не найдены.';
+
+  @override
+  String get guests => 'Гости';
+
+  @override
+  String get saved => 'сохранено';
+
+  @override
+  String get title_hint => 'Апартаменты Жасмин';
 }

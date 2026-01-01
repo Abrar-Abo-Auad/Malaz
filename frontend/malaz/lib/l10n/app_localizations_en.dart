@@ -218,6 +218,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rooms => 'Rooms';
 
   @override
+  String get title => 'Title';
+
+  @override
   String get reviews => 'Reviews';
 
   @override
@@ -396,4 +399,76 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get explore_and_save =>
       'Start exploring and save your apartments here.';
+
+  @override
+  String get damascus_countryside => 'Damascus Countryside';
+
+  @override
+  String get jaramana => 'Jaramana';
+
+  @override
+  String get aleppo => 'Aleppo';
+
+  @override
+  String get homs => 'Homs';
+
+  @override
+  String get hama => 'Hama';
+
+  @override
+  String get latakia => 'Latakia';
+
+  @override
+  String get tartous => 'Tartous';
+
+  @override
+  String get idlib => 'Idlib';
+
+  @override
+  String get deir_alZor => 'Deir ez-Zor';
+
+  @override
+  String get raqa => 'Alraqa';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'Daraa';
+
+  @override
+  String get sweida => 'Aweida';
+
+  @override
+  String get quneitra => 'Quneitra';
+
+  @override
+  String get property_manager => 'Property Manager';
+
+  @override
+  String get add_new => 'Add New';
+
+  @override
+  String get my_properties => 'My Properties';
+
+  @override
+  String get properties => 'Properties';
+
+  @override
+  String get inbound => 'Inbound';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get no_properties_found => 'No properties added yet.';
+
+  @override
+  String get guests => 'Guests';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get title_hint => 'Jasmine Apartment';
 }

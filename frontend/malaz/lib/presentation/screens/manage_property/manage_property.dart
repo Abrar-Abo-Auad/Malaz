@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:malaz/presentation/cubits/home/home_cubit.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../../core/config/color/app_color.dart';
+import '../../cubits/property/property_cubit.dart';
 import '../../global_widgets/apartment_cards/apartment_card.dart';
 import '../auth/my_profile/my_profile_screen.dart';
 import '../details/details_screen.dart';
@@ -18,11 +19,22 @@ class ManagePropertiesScreen extends StatefulWidget {
 
 class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
   final PageController _pageController = PageController();
+  final ScrollController _myApartmentsScrollController = ScrollController();
   int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
+
+    context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true);
+
+    _myApartmentsScrollController.addListener(() {
+      if (_myApartmentsScrollController.position.pixels >=
+          _myApartmentsScrollController.position.maxScrollExtent * 0.9) {
+        context.read<MyApartmentsCubit>().fetchMyApartments();
+      }
+    });
+
     _pageController.addListener(() {
       int next = _pageController.page!.round();
       if (_currentPage != next) {
@@ -34,12 +46,14 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
   @override
   void dispose() {
     _pageController.dispose();
+    _myApartmentsScrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final tr = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -54,9 +68,8 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
         backgroundColor: colorScheme.primary,
         elevation: 4,
         icon: Icon(Icons.add_home_work_rounded, color: colorScheme.onPrimary),
-        label: Text("Add New",
-            style: TextStyle(
-                color: colorScheme.onPrimary, fontWeight: FontWeight.bold)),
+        label:  Text(tr.add_new,
+            style: TextStyle(fontWeight: FontWeight.bold)),
       )
           : null,
       body: NestedScrollView(
@@ -68,8 +81,8 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
               backgroundColor: colorScheme.primary,
               elevation: 0,
               centerTitle: true,
-              title: Text('Property Manager',
-                  style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1, color: colorScheme.surface)),
+              title: Text(tr.property_manager,
+                  style: TextStyle(fontWeight: FontWeight.w800, color: colorScheme.surface)),
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.pin,
                 background: Container(
@@ -77,27 +90,21 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
-                        colorScheme.primary,
-                        colorScheme.primary.withOpacity(0.8)
-                      ],
+                      colors: [colorScheme.primary, colorScheme.primary.withOpacity(0.8)],
                     ),
                   ),
                   child: Container(
-                    margin: const EdgeInsets.only(top: kToolbarHeight + 10),
+                    margin: const EdgeInsets.only(top: kToolbarHeight + 30),
                     decoration: BoxDecoration(
                       color: colorScheme.surface,
-                      borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(35)),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(35)),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const SizedBox(height: 25),
                         _buildProfileImage(),
                         const SizedBox(height: 12),
                         _buildUserName(),
-                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -106,24 +113,13 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(100),
                 child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
+                  color: colorScheme.surface,
                   child: Column(
                     children: [
                       _buildGradientIndicator(),
                       const SizedBox(height: 12),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -152,28 +148,89 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     );
   }
 
+  Widget _buildPropertiesList() {
+    return BlocBuilder<MyApartmentsCubit, ApartmentState>(
+      builder: (context, state) {
+        if (state is MyApartmentsLoading) {
+          return const Center(child: CircularProgressIndicator.adaptive());
+        }
+
+        if (state is MyApartmentsLoaded) {
+          if (state.myApartments.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: () => context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true),
+              child: ListView(
+                children: const [
+                  SizedBox(height: 100),
+                  Center(child: Text("No properties added yet.", style: TextStyle(color: Colors.grey))),
+                ],
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () => context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true),
+            child: ListView.builder(
+              controller: _myApartmentsScrollController,
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
+              itemCount: state.myApartments.length + (state.hasReachedMax ? 0 : 1),
+              itemBuilder: (context, index) {
+                if (index < state.myApartments.length) {
+                  return ApartmentCard(
+                    apartment: state.myApartments[index],
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => DetailsScreen(apartment: state.myApartments[index]))),
+                  );
+                } else {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(child: CircularProgressIndicator.adaptive()),
+                  );
+                }
+              },
+            ),
+          );
+        }
+
+        if (state is MyApartmentsError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(state.message),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () => context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true),
+                  child: const Text("Retry"),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+
   Widget _buildUserName() {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
-        String name = "Premium Member";
+        String name = "User";
         if (state is AuthAuthenticated) {
           name = "${state.user.first_name} ${state.user.last_name}";
         }
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: ShaderMask(
-            shaderCallback: (bounds) =>
-                AppColors.premiumGoldGradient.createShader(bounds),
+            shaderCallback: (bounds) => AppColors.premiumGoldGradient.createShader(bounds),
             child: Text(
               name,
               textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.visible,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5),
+              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
             ),
           ),
         );
@@ -191,9 +248,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withOpacity(0.08)
-              : Colors.transparent,
+          color: isSelected ? colorScheme.primary.withOpacity(0.08) : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Text(
@@ -201,9 +256,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-            color: isSelected
-                ? colorScheme.primary
-                : colorScheme.onSurface.withOpacity(0.5),
+            color: isSelected ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.5),
           ),
         ),
       ),
@@ -216,38 +269,23 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
       builder: (context, state) {
         String? img;
         if (state is AuthAuthenticated) img = state.user.profile_image_url;
-
         return Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.15),
-                  blurRadius: 15,
-                  spreadRadius: 1)
-            ],
-          ),
+          decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+            BoxShadow(color: colorScheme.primary.withOpacity(0.15), blurRadius: 15)
+          ]),
           child: Stack(
             alignment: Alignment.center,
             children: [
               ShaderMask(
-                shaderCallback: (Rect bounds) =>
-                    AppColors.premiumGoldGradient.createShader(bounds),
-                child: Container(
-                  width: 140,
-                  height: 140,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.white),
-                ),
+                shaderCallback: (Rect bounds) => AppColors.premiumGoldGradient.createShader(bounds),
+                child: Container(width: 140, height: 140, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white)),
               ),
               CircleAvatar(
                 radius: 66,
                 backgroundColor: colorScheme.surfaceVariant,
                 child: (img == null || img.isEmpty)
-                    ? Icon(Icons.person_rounded,
-                    size: 55, color: colorScheme.primary.withOpacity(0.5))
-                    : ClipOval(
-                    child: UserProfileImage(imageUrl: img, size: 132.0)),
+                    ? Icon(Icons.person_rounded, size: 55, color: colorScheme.primary.withOpacity(0.5))
+                    : ClipOval(child: UserProfileImage(imageUrl: img, size: 132.0)),
               ),
             ],
           ),
@@ -274,34 +312,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     );
   }
 
-  Widget _buildPropertiesList() {
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) {
-        if (state is HomeLoading) {
-          return const Center(child: CircularProgressIndicator.adaptive());
-        }
-        if (state is HomeLoaded) {
-          if (state.apartments.isEmpty) {
-            return const Center(child: Text("No Properties Found"));
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
-            itemCount: state.apartments.length,
-            itemBuilder: (context, index) => ApartmentCard(
-              apartment: state.apartments[index],
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) =>
-                          DetailsScreen(apartment: state.apartments[index]))),
-            ),
-          );
-        }
-        return const Center(child: Text("Something went wrong"));
-      },
-    );
-  }
-
   Widget _buildInboundRequestsList() {
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -310,8 +320,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
           tenantName: 'Samer Issa',
           dateRange: '22 Dec - 28 Dec',
           peopleCount: 3,
-          apartmentImageUrl:
-          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500',
+          apartmentImageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500',
           status: 'pending',
         ),
       ],
@@ -326,15 +335,14 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
           tenantName: 'Omar Khaled',
           dateRange: '01 Nov - 10 Nov',
           peopleCount: 2,
-          apartmentImageUrl:
-          'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=500',
+          apartmentImageUrl: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=500',
           status: 'completed',
         ),
       ],
     );
   }
 }
-
+// ... (كلاس InboundRequestCard يظل كما هو دون تغيير)
 class InboundRequestCard extends StatefulWidget {
   final String tenantName;
   final String dateRange;

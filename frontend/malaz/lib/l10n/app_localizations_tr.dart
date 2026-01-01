@@ -219,6 +219,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get rooms => 'Odalar';
 
   @override
+  String get title => 'Başlık';
+
+  @override
   String get reviews => 'Değerlendirmeler';
 
   @override
@@ -399,4 +402,76 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get explore_and_save =>
       'Keşfetmeye başlayın ve beğendiğiniz daireleri buraya kaydedin.';
+
+  @override
+  String get damascus_countryside => 'Şam Kırsalı';
+
+  @override
+  String get jaramana => 'Jaramana';
+
+  @override
+  String get aleppo => 'Halep';
+
+  @override
+  String get homs => 'Humus';
+
+  @override
+  String get hama => 'Hama';
+
+  @override
+  String get latakia => 'Lazkiye';
+
+  @override
+  String get tartous => 'Tartus';
+
+  @override
+  String get idlib => 'İdlib';
+
+  @override
+  String get deir_alZor => 'Deyrizor';
+
+  @override
+  String get raqa => 'Rakka';
+
+  @override
+  String get al_hasakah => 'AL_Hasaka';
+
+  @override
+  String get daraa => 'Dera';
+
+  @override
+  String get sweida => 'Süveyda';
+
+  @override
+  String get quneitra => 'Kuneytire';
+
+  @override
+  String get property_manager => 'Emlak Yöneticisi';
+
+  @override
+  String get add_new => 'Ekle';
+
+  @override
+  String get my_properties => 'Mülklerim';
+
+  @override
+  String get properties => 'Mülkler';
+
+  @override
+  String get inbound => 'Gelen';
+
+  @override
+  String get history => 'Geçmiş';
+
+  @override
+  String get no_properties_found => 'Mülk bulunamadı.';
+
+  @override
+  String get guests => 'Misafirler';
+
+  @override
+  String get saved => 'kaydedildi';
+
+  @override
+  String get title_hint => 'Yasemin Apartmanı';
 }

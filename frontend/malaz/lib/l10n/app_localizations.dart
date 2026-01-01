@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'Rooms'**
   String get rooms;
 
+  /// No description provided for @title.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
   /// No description provided for @reviews.
   ///
   /// In en, this message translates to:
@@ -865,6 +871,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start exploring and save your apartments here.'**
   String get explore_and_save;
+
+  /// No description provided for @damascus_countryside.
+  ///
+  /// In en, this message translates to:
+  /// **'Damascus Countryside'**
+  String get damascus_countryside;
+
+  /// No description provided for @jaramana.
+  ///
+  /// In en, this message translates to:
+  /// **'Jaramana'**
+  String get jaramana;
+
+  /// No description provided for @aleppo.
+  ///
+  /// In en, this message translates to:
+  /// **'Aleppo'**
+  String get aleppo;
+
+  /// No description provided for @homs.
+  ///
+  /// In en, this message translates to:
+  /// **'Homs'**
+  String get homs;
+
+  /// No description provided for @hama.
+  ///
+  /// In en, this message translates to:
+  /// **'Hama'**
+  String get hama;
+
+  /// No description provided for @latakia.
+  ///
+  /// In en, this message translates to:
+  /// **'Latakia'**
+  String get latakia;
+
+  /// No description provided for @tartous.
+  ///
+  /// In en, this message translates to:
+  /// **'Tartous'**
+  String get tartous;
+
+  /// No description provided for @idlib.
+  ///
+  /// In en, this message translates to:
+  /// **'Idlib'**
+  String get idlib;
+
+  /// No description provided for @deir_alZor.
+  ///
+  /// In en, this message translates to:
+  /// **'Deir ez-Zor'**
+  String get deir_alZor;
+
+  /// No description provided for @raqa.
+  ///
+  /// In en, this message translates to:
+  /// **'Alraqa'**
+  String get raqa;
+
+  /// No description provided for @al_hasakah.
+  ///
+  /// In en, this message translates to:
+  /// **'AL_Hasaka'**
+  String get al_hasakah;
+
+  /// No description provided for @daraa.
+  ///
+  /// In en, this message translates to:
+  /// **'Daraa'**
+  String get daraa;
+
+  /// No description provided for @sweida.
+  ///
+  /// In en, this message translates to:
+  /// **'Aweida'**
+  String get sweida;
+
+  /// No description provided for @quneitra.
+  ///
+  /// In en, this message translates to:
+  /// **'Quneitra'**
+  String get quneitra;
+
+  /// No description provided for @property_manager.
+  ///
+  /// In en, this message translates to:
+  /// **'Property Manager'**
+  String get property_manager;
+
+  /// No description provided for @add_new.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New'**
+  String get add_new;
+
+  /// No description provided for @my_properties.
+  ///
+  /// In en, this message translates to:
+  /// **'My Properties'**
+  String get my_properties;
+
+  /// No description provided for @properties.
+  ///
+  /// In en, this message translates to:
+  /// **'Properties'**
+  String get properties;
+
+  /// No description provided for @inbound.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbound'**
+  String get inbound;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @no_properties_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties added yet.'**
+  String get no_properties_found;
+
+  /// No description provided for @guests.
+  ///
+  /// In en, this message translates to:
+  /// **'Guests'**
+  String get guests;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @title_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Jasmine Apartment'**
+  String get title_hint;
 }
 
 class _AppLocalizationsDelegate

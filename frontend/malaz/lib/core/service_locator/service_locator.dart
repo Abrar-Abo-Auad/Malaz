@@ -20,6 +20,8 @@ import '../../data/repositories/favorites/favorites_repository_impl.dart';
 import '../../domain/repositories/apartment/apartment_repository.dart';
 import '../../domain/repositories/chat/chat_repository.dart';
 import '../../domain/repositories/favorites/favorites_repository.dart';
+import '../../domain/usecases/apartment/add_apartment_use_case.dart';
+import '../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
@@ -32,6 +34,7 @@ import '../../presentation/cubits/chat/chat_cubit.dart';
 import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
+import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
@@ -76,7 +79,8 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
 
 
-  sl.registerLazySingleton<InternetConnectionChecker>(() => InternetConnectionChecker());
+  sl.registerLazySingleton<InternetConnectionChecker>(
+      () => InternetConnectionChecker());
 
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
 
@@ -87,10 +91,18 @@ Future<void> setUpServices() async {
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
   sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
 
+  sl.registerLazySingleton(() => AddApartmentUseCase(sl()));
+
+  sl.registerLazySingleton(() => GetMyApartmentsUseCase(sl()));
+
   sl.registerLazySingleton(() => GetApartmentsUseCase(sl()));
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
   sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
+
+  sl.registerFactory(() => AddApartmentCubit(addApartmentUseCase: sl()));
+
+  sl.registerFactory(() => MyApartmentsCubit(getMyApartmentsUseCase: sl()));
 
   sl.registerLazySingleton<ApartmentRemoteDataSource>(() => ApartmentRemoteDataSourceImpl(networkService: sl()));
 
