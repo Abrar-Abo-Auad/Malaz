@@ -344,7 +344,7 @@ class _BuildOwnerCard extends StatelessWidget {
               color: theme.colorScheme.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: UserProfileImage(userId: owner.id),
+            child: UserProfileImage(userId: owner.id, firstName: owner.first_name, lastName: owner.last_name,),
             //Icon(Icons.person, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: 16),
@@ -373,7 +373,8 @@ class _BuildOwnerCard extends StatelessWidget {
               if (newId != null) {
                 context.pushNamed('one_chat', extra: {
                   'id': newId,
-                  'name': '${owner.first_name} ${owner.last_name}',
+                  'firstName': owner.first_name,
+                  'lastName': owner.last_name,
                   'otherUserId': owner.id,
                 });
               }

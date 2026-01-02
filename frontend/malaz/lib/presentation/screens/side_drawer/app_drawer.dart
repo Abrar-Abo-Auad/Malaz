@@ -1,13 +1,17 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/color/app_color.dart';
+import '../../../core/location_service/location_service.dart';
 import '../../../core/service_locator/service_locator.dart';
 import '../../../data/datasources/local/auth_local_datasource.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/language/language_cubit.dart';
 import '../../cubits/theme/theme_cubit.dart';
+import '../../global_widgets/user_profile_image/user_profile_image.dart';
 
 enum ThemeOption { light, dark, system }
 
@@ -34,38 +38,41 @@ class _AppDrawerState extends State<AppDrawer> {
         width: MediaQuery.of(context).size.width * 0.82,
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        child: Column(
-          children: [
-            _buildUserHeader(context, tr, colorScheme, isDark),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.black.withOpacity(0.2) : Colors.grey.shade50.withOpacity(0.5),
-                ),
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-                  children: [
-                    _buildDrawerItem(context, Icons.person_outline_rounded, tr.my_profile, () => context.push('/profile')),
-                    _buildDrawerItem(context, Icons.palette_outlined, tr.theme, () {
-                      Navigator.pop(context);
-                      _showThemeBottomSheet(context);
-                    }),
-                    _buildDrawerItem(context, Icons.language_rounded, tr.language, () {
-                      Navigator.pop(context);
-                      _showLanguageBottomSheet(context);
-                    }),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Divider(color: colorScheme.outlineVariant.withOpacity(0.3), thickness: 0.5),
-                    ),
-                    _buildDrawerItem(context, Icons.apartment_rounded, tr.become_a_renter, () {}),
-                    _buildDrawerItem(context, Icons.settings_outlined, tr.settings, () => context.push('/settings')),
-                  ],
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Column(
+            children: [
+              _buildUserHeader(context, tr, colorScheme, isDark),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.black.withOpacity(0.2) : Colors.grey.shade50.withOpacity(0.5),
+                  ),
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                    children: [
+                      _buildDrawerItem(context, Icons.person_outline_rounded, tr.my_profile, () => context.push('/profile')),
+                      _buildDrawerItem(context, Icons.palette_outlined, tr.theme, () {
+                        Navigator.pop(context);
+                        _showThemeBottomSheet(context);
+                      }),
+                      _buildDrawerItem(context, Icons.language_rounded, tr.language, () {
+                        Navigator.pop(context);
+                        _showLanguageBottomSheet(context);
+                      }),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        child: Divider(color: colorScheme.outlineVariant.withOpacity(0.3), thickness: 0.5),
+                      ),
+                      _buildDrawerItem(context, Icons.apartment_rounded, tr.become_a_renter, () {}),
+                      _buildDrawerItem(context, Icons.settings_outlined, tr.settings, () => context.push('/settings')),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildLogoutButton(context, colorScheme, tr),
-          ],
+              _buildLogoutButton(context, colorScheme, tr),
+            ],
+          ),
         ),
       ),
     );
@@ -75,35 +82,57 @@ class _AppDrawerState extends State<AppDrawer> {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         String name = 'Guest User';
+        String firstName = '';
+        String lastName = '';
         String? img;
-        if (state is AuthAuthenticated) {
-          name = "${state.user.first_name} ${state.user.last_name}";
-          img = state.user.profile_image_url;
+        int? userId;
+        if (state is !AuthAuthenticated) {
+          return const SizedBox(height: 100);
         }
+
+        name = "${state.user.first_name} ${state.user.last_name}";
+        img = state.user.profile_image_url;
+        userId = state.user.id;
+        firstName = state.user.first_name;
+        lastName = state.user.last_name;
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(24, 60, 24, 30),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: AppColors.premiumGoldGradient2,
-            borderRadius: const BorderRadius.only(bottomRight: Radius.circular(40)),
+            borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(50)),
+            boxShadow: [
+              BoxShadow(color: Colors.black12, blurRadius: 20, offset: Offset(0, 10))
+            ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              _buildModernAvatar(img, colorScheme, isDark),
-              const SizedBox(height: 20),
-              Text(
-                name,
-                style: TextStyle(
-                  color: colorScheme.surface,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+              _buildHeaderBubble(top: -20, left: -20, size: 120, opacity: 0.1),
+              _buildHeaderBubble(bottom: 20, right: -10, size: 80, opacity: 0.05),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 70, 24, 40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildModernAvatar(userId, colorScheme, isDark, firstName, lastName),
+                    const SizedBox(height: 25),
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        shadows: [Shadow(color: Colors.black26, blurRadius: 12, offset: Offset(0, 4))],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDrawerLocation(context, colorScheme, tr),
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              //_buildEditButton(context, tr, colorScheme),
             ],
           ),
         );
@@ -111,7 +140,103 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget _buildModernAvatar(String? img, ColorScheme colorScheme, bool isDark) {
+  Widget _buildHeaderBubble({double? top, double? left, double? right, double? bottom, required double size, required double opacity}) {
+    return Positioned(
+      top: top, left: left, right: right, bottom: bottom,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white.withOpacity(opacity),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerLocation(BuildContext context, ColorScheme colorScheme, AppLocalizations tr) {
+    final currentLang = Localizations.localeOf(context).languageCode;
+
+    return FutureBuilder<Map<String, double?>>(
+      future: sl<AuthLocalDatasource>().getCachedCoordinates(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!['lat'] == null){
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PulsingLocationIcon(color: Colors.white),
+                const SizedBox(width: 8),
+                Text(
+                  tr.unknown_location,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        else {
+          return FutureBuilder<String>(
+            future: LocationService().getAddressFromCoords(
+                snapshot.data!['lat']!, snapshot.data!['lng']!, currentLang),
+            builder: (context, addrSnapshot) {
+              final address = addrSnapshot.data ?? "...";
+
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PulsingLocationIcon(color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      address,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildModernAvatar(int? userId, ColorScheme colorScheme, bool isDark, String firstName, String lastName) {
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
@@ -127,36 +252,12 @@ class _AppDrawerState extends State<AppDrawer> {
         child: CircleAvatar(
           radius: 42,
           backgroundColor: isDark ? Colors.white10 : Colors.white24,
-          child: (img == null || img.isEmpty)
-              ? Icon(Icons.person, size: 45, color: colorScheme.surface)
-              : ClipOval(child: UserProfileImage(imageUrl: img, size: 84)),
+          child: ClipOval(child: UserProfileImage(userId: userId!,firstName: firstName, lastName: lastName, radius: 45,)
+          ),
         ),
       ),
     );
   }
-
-  // Widget _buildEditButton(BuildContext context, AppLocalizations tr, ColorScheme colorScheme) {
-  //   return InkWell(
-  //     onTap: () => context.push('/profile'),
-  //     borderRadius: BorderRadius.circular(20),
-  //     child: Container(
-  //       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-  //       decoration: BoxDecoration(
-  //         color: Colors.white.withOpacity(0.12),
-  //         borderRadius: BorderRadius.circular(20),
-  //         border: Border.all(color: Colors.white.withOpacity(0.2)),
-  //       ),
-  //       child: Row(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           Icon(Icons.edit_note_rounded, color: colorScheme.surface, size: 18),
-  //           const SizedBox(width: 6),
-  //           Text(tr.edit_profile, style: TextStyle(color: colorScheme.surface, fontSize: 12, fontWeight: FontWeight.w500)),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildDrawerItem(BuildContext context, IconData icon, String title, VoidCallback onTap) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -169,13 +270,33 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget _buildLogoutButton(BuildContext context, ColorScheme colorScheme, AppLocalizations tr) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colorScheme.error.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.error.withOpacity(0.1)),
+      ),
       child: ListTile(
-        leading: Icon(Icons.logout_rounded, color: colorScheme.error.withOpacity(0.7)),
-        title: Text(tr.logout, style: TextStyle(color: colorScheme.error.withOpacity(0.7), fontWeight: FontWeight.bold)),
-        onTap: () => context.read<AuthCubit>().logout(),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: colorScheme.error.withOpacity(0.1), shape: BoxShape.circle),
+          child: Icon(Icons.logout_rounded, color: colorScheme.error, size: 20),
+        ),
+        title: Text(
+          tr.logout,
+          style: TextStyle(color: colorScheme.error, fontWeight: FontWeight.w800, fontSize: 15),
+        ),
+        onTap: () async {
+          Navigator.pop(context);
+
+          await Future.delayed(const Duration(milliseconds: 210));
+
+          if (context.mounted) {
+            context.read<AuthCubit>().logout();
+          }
+        },
       ),
     );
   }
@@ -258,14 +379,12 @@ class _AppDrawerState extends State<AppDrawer> {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          // استخدام لون الثيم الأساسي بشفافية خفيفة جداً بدلاً من البرتقالي
           color: isSelected ? colorScheme.primary.withOpacity(0.08) : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
           children: [
             Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? colorScheme.primary : colorScheme.onSurface)),
-            const Spacer(),
             if (isSelected) Icon(Icons.check_circle_rounded, color: colorScheme.primary, size: 20),
           ],
         ),
@@ -278,34 +397,6 @@ class _AppDrawerState extends State<AppDrawer> {
       context.read<LanguageCubit>().updateLanguage(value);
       Navigator.pop(context);
     }
-  }
-}
-
-class UserProfileImage extends StatelessWidget {
-  final String imageUrl;
-  final double size;
-  const UserProfileImage({super.key, required this.imageUrl, this.size = 50.0});
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: sl<AuthLocalDatasource>().getCachedToken(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(width: size, height: size);
-        final token = snapshot.data;
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(size / 2),
-          child: Image.network(
-            imageUrl,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            headers: {'Authorization': 'Bearer ${token?.trim()}', 'Accept': 'application/json'},
-            errorBuilder: (context, error, stackTrace) => Icon(Icons.person, color: Colors.grey.shade400, size: size * 0.6),
-          ),
-        );
-      },
-    );
   }
 }
 
@@ -357,6 +448,45 @@ class _ThemeSwitcher extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class PulsingLocationIcon extends StatefulWidget {
+  final Color color;
+  const PulsingLocationIcon({super.key, required this.color});
+
+  @override
+  State<PulsingLocationIcon> createState() => _PulsingLocationIconState();
+}
+
+class _PulsingLocationIconState extends State<PulsingLocationIcon> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 1.0, end: 1.4).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _animation,
+      child: Icon(Icons.location_on_rounded, color: widget.color, size: 14),
     );
   }
 }

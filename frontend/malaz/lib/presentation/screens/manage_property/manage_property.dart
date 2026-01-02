@@ -286,7 +286,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                 backgroundColor: colorScheme.surfaceVariant,
                 child: (img == null || img.isEmpty)
                     ? Icon(Icons.person_rounded, size: 55, color: colorScheme.primary.withOpacity(0.5))
-                    : ClipOval(child: UserProfileImage(userId: id!)),//UserProfileImage(imageUrl: img, size: 132.0)),
+                    : ClipOval(child: UserProfileImage(userId: id!, radius: 66,)),//UserProfileImage(imageUrl: img, size: 132.0)),
               ),
             ],
           ),
