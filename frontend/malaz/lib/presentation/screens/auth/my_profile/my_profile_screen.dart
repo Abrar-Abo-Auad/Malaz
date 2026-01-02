@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 import '../../../../core/config/color/app_color.dart';
+import '../../../../core/location_service/location_service.dart';
 import '../../../../core/service_locator/service_locator.dart';
 import '../../../../data/datasources/local/auth_local_datasource.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -21,12 +23,16 @@ class MyProfileScreen extends StatefulWidget {
 class _MyProfileScreenState  extends State<MyProfileScreen> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
+  String _currentAddress = "";
+  bool _isLocationLoading = false;
   bool _isEditable = false;
   String? _tempLocalImagePath;
 
   @override
   void initState() {
     super.initState();
+    _currentAddress = "Unknown";
+    _loadCachedAddress();
     _firstNameController = TextEditingController();
     _lastNameController = TextEditingController();
 
@@ -88,7 +94,7 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
                       color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.arrow_back_ios_new, color: colorScheme.surface, size: 18),
+                    child: Icon(Icons.arrow_back, color: colorScheme.surface, size: 18),
                   ),
                   onPressed: () => context.go('/home'),
                 ),
@@ -256,10 +262,8 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
             _verticalDivider(),
             _actionButton(
               icon: Icons.location_on_outlined,
-              label: "Location",//tr.location,
-              onTap: () {
-                // TODO: open location picker
-              },
+              label: tr.location,
+              onTap: () => _handleLocationUpdate(),
               colorScheme: colorScheme,
             ),
             _verticalDivider(),
@@ -357,7 +361,7 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
       children: [
         Text(
           "${_firstNameController.text} ${_lastNameController.text}",
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w900,
             color: Colors.white,
@@ -365,7 +369,15 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        _buildMyLocation(colorScheme: colorScheme),
+        _isLocationLoading
+            ? const SizedBox(
+            width: 12,
+            height: 12,
+            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+            : _buildMyLocation(
+            colorScheme: colorScheme,
+            address: _currentAddress == "Unknown" ? tr.unknown_location : _currentAddress
+        ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -377,10 +389,10 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.auto_awesome, size: 12, color: Colors.amberAccent),
+              Icon(Icons.verified, size: 12, color: colorScheme.tertiary),
               const SizedBox(width: 6),
               Text(
-                "PREMIUM MEMBER",
+                tr.verified_account,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 10,
@@ -543,6 +555,7 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
               children: [
                 Text(label, style: TextStyle(color: Colors.grey.shade400, fontSize: 10, fontWeight: FontWeight.w800)),
                 TextField(
+                  textAlign: TextAlign.start,
                   controller: controller,
                   enabled: _isEditable,
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -728,25 +741,65 @@ class _MyProfileScreenState  extends State<MyProfileScreen> {
       ),
     );
   }
+
+  Future<void> _handleLocationUpdate() async {
+    setState(() => _isLocationLoading = true);
+    HapticFeedback.mediumImpact();
+
+    try {
+      String currentLanguage = Localizations.localeOf(context).languageCode;
+      LocationService locationService = LocationService();
+      LocationData? data = await locationService.getCurrentLocation();
+
+      if (data != null && data.latitude != null && data.longitude != null) {
+        String address = await locationService.getAddressFromCoords(
+            data.latitude!, data.longitude!, currentLanguage);
+
+        setState(() {
+          _currentAddress = address;
+          _isLocationLoading = false;
+        });
+
+        await sl<AuthLocalDatasource>().cacheUserAddress(address);
+        await sl<AuthLocalDatasource>().cacheCoordinates(data.latitude!, data.longitude!);
+
+      } else {
+        setState(() => _isLocationLoading = false);
+      }
+    } catch (e) {
+      setState(() => _isLocationLoading = false);
+    }
+  }
+
+  Future<void> _loadCachedAddress() async {
+    final cachedAddr = await sl<AuthLocalDatasource>().getCachedAddress();
+    if (mounted && cachedAddr != null) {
+      setState(() {
+        _currentAddress = cachedAddr;
+      });
+    }
+  }
 }
 
 class _buildMyLocation extends StatelessWidget {
   final ColorScheme colorScheme;
+  final String address;
 
   const _buildMyLocation({
     super.key,
     required this.colorScheme,
+    required this.address,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.location_on, size: 14, color: colorScheme.surface,),
+        Icon(Icons.location_on, size: 14, color: Colors.white),
         const SizedBox(width: 4),
         Text(
-          "Dubai, UAE",
-          style: TextStyle(color: colorScheme.surface, fontSize: 13),
+          address,
+          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -756,37 +809,30 @@ class _buildMyLocation extends StatelessWidget {
 class ProfileStats extends StatelessWidget {
   const ProfileStats({super.key});
 
-  Widget _item(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _item("24", "Favorites"),
-          _item("12", "Bookings"),
-          _item("5", "Reviews"),
+          _item("24", tr.favorites),
+          _item("12", tr.bookings),
+          _item("5", tr.reviews),
         ],
       ),
+    );
+  }
+
+  Widget _item(String value, String label) {
+    return Column(
+      children: [
+        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+      ],
     );
   }
 }
