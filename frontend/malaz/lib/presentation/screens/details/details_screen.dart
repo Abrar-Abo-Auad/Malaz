@@ -25,7 +25,7 @@ class DetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      bottomNavigationBar: _BuildBottomBookingBar(price: apartment.price),
+      bottomNavigationBar: _BuildBottomBookingBar(apartment: apartment),
       body: CustomScrollView(
         slivers: [
           _BuildSliverAppBar(apartment: apartment),
@@ -545,9 +545,9 @@ class _BuildReviewSection extends StatelessWidget {
 /// [_BuildBottomBookingBar]
 /// The fixed bottom bar containing Price and Book Button.
 class _BuildBottomBookingBar extends StatelessWidget {
-  final int price;
+  final Apartment apartment;
 
-  const _BuildBottomBookingBar({required this.price});
+  const _BuildBottomBookingBar({required this.apartment});
 
   @override
   Widget build(BuildContext context) {
@@ -574,7 +574,7 @@ class _BuildBottomBookingBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '\$$price',
+                  '\$${apartment.price}',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
@@ -596,7 +596,7 @@ class _BuildBottomBookingBar extends StatelessWidget {
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
                   builder: (context) => BookingBottomSheet(
-                    pricePerNight: price.toDouble(),
+                    apartment: apartment,
                   ),
                 );
               },

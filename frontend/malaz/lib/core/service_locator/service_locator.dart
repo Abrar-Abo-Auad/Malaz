@@ -1,13 +1,18 @@
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:malaz/data/datasources/local/auth_local_datasource.dart';
+import 'package:malaz/data/datasources/remote/booking/booking_remote_data_source.dart';
 import 'package:malaz/data/datasources/remote/favorites/favorites_remote_datasource.dart';
 import 'package:malaz/data/repositories/auth/auth_repository_impl.dart';
+import 'package:malaz/data/repositories/booking/booking_repository_impl.dart';
 import 'package:malaz/domain/repositories/auth/auth_repository.dart';
+import 'package:malaz/domain/repositories/booking/booking_repository.dart';
 import 'package:malaz/domain/usecases/auth/check_auth_usecase.dart';
 import 'package:malaz/domain/usecases/auth/get_current_user_usecase.dart';
 import 'package:malaz/domain/usecases/auth/login_usecase.dart';
 import 'package:malaz/domain/usecases/auth/logout_usecase.dart';
+import 'package:malaz/domain/usecases/booking/Get_Booked_Dates_Use_Case.dart';
+import 'package:malaz/domain/usecases/booking/make_book_use_case.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
@@ -30,6 +35,7 @@ import '../../domain/usecases/favorites/delete_favorites_use_case.dart';
 import '../../domain/usecases/favorites/get_favorites_use_case.dart';
 import '../../domain/usecases/home/apartments_use_case.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
+import '../../presentation/cubits/booking/booking_cubit.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
 import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
@@ -88,6 +94,8 @@ Future<void> setUpServices() async {
 
   sl.registerFactory(() => LanguageCubit(sl()));
 
+  sl.registerFactory(() => BookingCubit(sl(), sl()));
+
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
   sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
 
@@ -99,6 +107,7 @@ Future<void> setUpServices() async {
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
   sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
+  sl.registerLazySingleton<BookingRepository>(() => BookingRepositoryImpl(sl()));
 
   sl.registerFactory(() => AddApartmentCubit(addApartmentUseCase: sl()));
 
@@ -115,6 +124,7 @@ Future<void> setUpServices() async {
   ));
 
   sl.registerLazySingleton<FavoritesRemoteDataSource>(() => FavoritesRemoteDataSourceImpl(sl()));
+  sl.registerLazySingleton<BookingRemoteDataSource>(() => BookingRemoteDataSourceImpl(networkService: sl()));
 
   sl.registerLazySingleton(() => RegisterUsecase(repository: sl()));
   sl.registerLazySingleton(() => LoginUsecase(repository: sl()));
@@ -126,6 +136,8 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton(() => GetFavoritesUseCase(sl()));
   sl.registerLazySingleton(() => AddFavoriteUseCase(sl()));
   sl.registerLazySingleton(() => DeleteFavoriteUseCase(sl()));
+  sl.registerLazySingleton(() => GetBookedDatesUseCase(sl()));
+  sl.registerLazySingleton(() => MakeBookUseCase(sl()));
 
   sl.registerLazySingleton(() => AuthInterceptor(localDatasource: sl()));
 

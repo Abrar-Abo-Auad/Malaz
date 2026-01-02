@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:malaz/presentation/screens/home/home_screen.dart';
 import '../../../l10n/app_localizations.dart';
-import '../booking/booking_screen.dart';
 import '../chats/chats_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../manage_property/manage_property.dart';
@@ -21,7 +20,8 @@ class _MainWrapperScreenState extends State<MainWrapper> {
     const HomeScreen(),
     const ChatsScreen(),
     const FavoritesScreen(),
-    const BookingsScreen(),
+    const SizedBox.shrink(),
+    // const BookingsScreen(),
     const ManagePropertiesScreen(),
   ];
 
