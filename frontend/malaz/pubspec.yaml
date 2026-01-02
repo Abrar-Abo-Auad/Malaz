@@ -38,6 +38,7 @@ dependencies:
   #cached_network_image: ^3.4.1
   table_calendar: ^3.0.9
   google_nav_bar: any
+  lottie: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -49,3 +50,4 @@ flutter:
   generate: true
   assets:
     - assets/icons/key_logo.png
+    - assets/lottie/sending_booking.json
