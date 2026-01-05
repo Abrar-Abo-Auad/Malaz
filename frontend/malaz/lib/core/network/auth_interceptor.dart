@@ -1,6 +1,6 @@
 // core/network/auth_interceptor.dart
 import 'package:dio/dio.dart';
-import 'package:malaz/data/datasources/local/auth_local_datasource.dart';
+import 'package:malaz/data/datasources/local/auth_local_data_source.dart';
 
 class AuthInterceptor extends Interceptor {
   final AuthLocalDatasource localDatasource;

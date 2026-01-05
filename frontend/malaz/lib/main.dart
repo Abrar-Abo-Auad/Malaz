@@ -9,6 +9,7 @@ import 'package:malaz/presentation/cubits/chat/chat_cubit.dart';
 
 import 'package:malaz/presentation/cubits/home/home_cubit.dart';
 import 'package:malaz/presentation/cubits/language/language_cubit.dart';
+import 'package:malaz/presentation/cubits/location/location_cubit.dart';
 import 'package:malaz/presentation/cubits/property/property_cubit.dart';
 import 'package:malaz/presentation/cubits/theme/theme_cubit.dart';
 
@@ -86,8 +87,8 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<ChatCubit>()),
         BlocProvider(create: (context) => sl<AddApartmentCubit>()),
         BlocProvider(create: (context) => sl<MyApartmentsCubit>()),
-        BlocProvider(create: (context) => sl<BookingCubit>())
-        //BlocProvider(create: (context) => sl<AuthCubit>()),// ..checkAuth()
+        BlocProvider(create: (context) => sl<BookingCubit>()),
+        BlocProvider(create: (context) => sl<LocationCubit>()),
       ],
       child: const RentalAppView(),
     );

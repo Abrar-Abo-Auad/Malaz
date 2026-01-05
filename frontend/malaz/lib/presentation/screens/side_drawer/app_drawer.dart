@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/color/app_color.dart';
-import '../../../core/location_service/location_service.dart';
-import '../../../core/service_locator/service_locator.dart';
-import '../../../data/datasources/local/auth_local_datasource.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/language/language_cubit.dart';
+import '../../cubits/location/location_cubit.dart';
 import '../../cubits/theme/theme_cubit.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
 
@@ -23,6 +21,13 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<LocationCubit>().loadSavedLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -155,83 +160,50 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget _buildDrawerLocation(BuildContext context, ColorScheme colorScheme, AppLocalizations tr) {
-    final currentLang = Localizations.localeOf(context).languageCode;
+    return BlocBuilder<LocationCubit, LocationState>(
+      builder: (context, state) {
+        String address = tr.unknown_location;
 
-    return FutureBuilder<Map<String, double?>>(
-      future: sl<AuthLocalDatasource>().getCachedCoordinates(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!['lat'] == null){
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PulsingLocationIcon(color: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  tr.unknown_location,
+        if (state is LocationLoaded) {
+          address = state.address;
+        } else if (state is LocationLoading) {
+          address = "...";
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PulsingLocationIcon(color: Colors.white),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  address,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
-          );
-        }
-        else {
-          return FutureBuilder<String>(
-            future: LocationService().getAddressFromCoords(
-                snapshot.data!['lat']!, snapshot.data!['lng']!, currentLang),
-            builder: (context, addrSnapshot) {
-              final address = addrSnapshot.data ?? "...";
-
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PulsingLocationIcon(color: Colors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      address,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        }
+              ),
+            ],
+          ),
+        );
       },
     );
   }

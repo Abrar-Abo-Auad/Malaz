@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:malaz/data/datasources/local/auth_local_datasource.dart';
+import 'package:malaz/data/datasources/local/auth_local_data_source.dart';
 import 'package:malaz/data/datasources/remote/booking/booking_remote_data_source.dart';
 import 'package:malaz/data/datasources/remote/favorites/favorites_remote_datasource.dart';
 import 'package:malaz/data/repositories/auth/auth_repository_impl.dart';
@@ -16,6 +16,7 @@ import 'package:malaz/domain/usecases/booking/make_book_use_case.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
+import '../../data/datasources/local/location_local_data_source.dart';
 import '../../data/datasources/remote/apartment/apartment_remote_data_source.dart';
 import '../../data/datasources/remote/auth/auth_remote_datasource.dart';
 import '../../data/datasources/remote/chat/chat_remote_datasource.dart';
@@ -40,8 +41,10 @@ import '../../presentation/cubits/chat/chat_cubit.dart';
 import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
 import '../../presentation/cubits/language/language_cubit.dart';
+import '../../presentation/cubits/location/location_cubit.dart';
 import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
+import '../location_service/location_service.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
 import '../network/network_service.dart';
@@ -156,6 +159,14 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<ChatRemoteDataSource>(() => ChatRemoteDataSourceImpl(networkService: sl()),);
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(remoteDataSource: sl()),);
   sl.registerFactory(() => ChatCubit(repository: sl()));
+
+  sl.registerLazySingleton<LocationLocalDataSource>(() => LocationLocalDataSourceImpl(sl()),);
+
+  sl.registerLazySingleton<LocationService>(() => LocationService());
+  sl.registerFactory(() => LocationCubit(
+    locationService: sl(),
+    localDataSource: sl(),
+  ));
 
 
 }

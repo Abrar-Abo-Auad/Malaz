@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart'; // تأكد من إضافة shimmer في pubspec.yaml
 import '../../../core/constants/app_constants.dart';
 import '../../../core/service_locator/service_locator.dart';
-import '../../../data/datasources/local/auth_local_datasource.dart';
+import '../../../data/datasources/local/auth_local_data_source.dart';
+import '../../../core/config/color/app_color.dart';
 
 class UserProfileImage extends StatelessWidget {
   final int userId;
@@ -20,7 +22,6 @@ class UserProfileImage extends StatelessWidget {
   Future<Map<String, String>> _getHeaders() async {
     final authLocal = sl<AuthLocalDatasource>();
     final token = await authLocal.getCachedToken();
-
     return {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
@@ -33,19 +34,14 @@ class UserProfileImage extends StatelessWidget {
     return '$f$l';
   }
 
-  Widget _buildInitialsPlaceholder(BuildContext context) {
+  Widget _buildInitialsPlaceholder() {
     final initials = _getInitials();
-
     return Container(
       width: radius * 2,
       height: radius * 2,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [Color(0xFFE6BE6A), Color(0xFFB38B3F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.premiumGoldGradient2,
       ),
       alignment: Alignment.center,
       child: initials.isEmpty
@@ -55,7 +51,22 @@ class UserProfileImage extends StatelessWidget {
         style: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
-          fontSize: radius * 0.8,
+          fontSize: radius * 0.7,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: radius * 2,
+        height: radius * 2,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
         ),
       ),
     );
@@ -68,12 +79,7 @@ class UserProfileImage extends StatelessWidget {
     return FutureBuilder<Map<String, String>>(
       future: _getHeaders(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return CircleAvatar(
-            radius: radius,
-            backgroundColor: Colors.grey[200],
-          );
-        }
+        if (!snapshot.hasData) return _buildShimmerLoading();
 
         return ClipOval(
           child: Image.network(
@@ -84,16 +90,9 @@ class UserProfileImage extends StatelessWidget {
             fit: BoxFit.cover,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
-              return Container(
-                width: radius * 2,
-                height: radius * 2,
-                color: Colors.grey[100],
-                child: const Center(
-                  child: CircularProgressIndicator(strokeWidth: 1),
-                ),
-              );
+              return _buildShimmerLoading();
             },
-            errorBuilder: (context, error, stackTrace) => _buildInitialsPlaceholder(context),
+            errorBuilder: (context, error, stackTrace) => _buildInitialsPlaceholder(),
           ),
         );
       },

@@ -15,7 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/service_locator/service_locator.dart';
 import '../../../core/usecases/usecase.dart';
-import '../../../data/datasources/local/auth_local_datasource.dart';
+import '../../../data/datasources/local/auth_local_data_source.dart';
 import '../../../domain/repositories/auth/auth_repository.dart';
 import '../../../domain/usecases/auth/register_usecase.dart';
 import '../../../domain/usecases/auth/send_otp_usecase.dart';
@@ -401,10 +401,6 @@ class AuthCubit extends Cubit<AuthState> {
       print("Download error in _downloadFile: $e");
       return null;
     }
-  }
-
-  Future<void> saveAddressLocally(String address) async {
-    await sl<AuthLocalDatasource>().cacheUserAddress(address);
   }
 
   String _mapFailureToMessage(Failure f) {
