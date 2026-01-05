@@ -163,11 +163,14 @@ class _AppDrawerState extends State<AppDrawer> {
     return BlocBuilder<LocationCubit, LocationState>(
       builder: (context, state) {
         String address = tr.unknown_location;
+        bool isLoading = state is LocationLoading;
+
+        if (state is LocationLoading) {
+          address = '...';
+        }
 
         if (state is LocationLoaded) {
-          address = state.address;
-        } else if (state is LocationLoading) {
-          address = "...";
+          address = state.location.address;
         }
 
         return Container(
@@ -187,7 +190,14 @@ class _AppDrawerState extends State<AppDrawer> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PulsingLocationIcon(color: Colors.white),
+              if (isLoading)
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              else
+                PulsingLocationIcon(color: Colors.white),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
@@ -266,6 +276,7 @@ class _AppDrawerState extends State<AppDrawer> {
           await Future.delayed(const Duration(milliseconds: 210));
 
           if (context.mounted) {
+            context.read<LocationCubit>().clearLocation();
             context.read<AuthCubit>().logout();
           }
         },

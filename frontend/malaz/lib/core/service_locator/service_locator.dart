@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:location/location.dart';
 import 'package:malaz/data/datasources/local/auth_local_data_source.dart';
 import 'package:malaz/data/datasources/remote/booking/booking_remote_data_source.dart';
 import 'package:malaz/data/datasources/remote/favorites/favorites_remote_datasource.dart';
@@ -20,12 +21,15 @@ import '../../data/datasources/local/location_local_data_source.dart';
 import '../../data/datasources/remote/apartment/apartment_remote_data_source.dart';
 import '../../data/datasources/remote/auth/auth_remote_datasource.dart';
 import '../../data/datasources/remote/chat/chat_remote_datasource.dart';
+import '../../data/datasources/remote/location/location_remote_data_source.dart';
 import '../../data/repositories/apartment/apartment_repository_impl.dart';
 import '../../data/repositories/chat/chat_repository_impl.dart';
 import '../../data/repositories/favorites/favorites_repository_impl.dart';
+import '../../data/repositories/location/location_repository_impl.dart';
 import '../../domain/repositories/apartment/apartment_repository.dart';
 import '../../domain/repositories/chat/chat_repository.dart';
 import '../../domain/repositories/favorites/favorites_repository.dart';
+import '../../domain/repositories/location/location_repository.dart';
 import '../../domain/usecases/apartment/add_apartment_use_case.dart';
 import '../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
@@ -35,6 +39,9 @@ import '../../domain/usecases/favorites/add_favorites_use_case.dart';
 import '../../domain/usecases/favorites/delete_favorites_use_case.dart';
 import '../../domain/usecases/favorites/get_favorites_use_case.dart';
 import '../../domain/usecases/home/apartments_use_case.dart';
+import '../../domain/usecases/location/get_current_location_usecase.dart';
+import '../../domain/usecases/location/load_saved_location_usecase.dart';
+import '../../domain/usecases/location/update_manual_location_usecase.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
 import '../../presentation/cubits/booking/booking_cubit.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
@@ -44,10 +51,10 @@ import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/location/location_cubit.dart';
 import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
-import '../location_service/location_service.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
 import '../network/network_service.dart';
+import 'package:http/http.dart' as http;
 
 /// [GetIt] / [service_locator]
 ///
@@ -84,6 +91,8 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   sl.registerLazySingleton<Dio>(() => Dio());
+  sl.registerLazySingleton<http.Client>(() => http.Client());
+  sl.registerLazySingleton<Location>(() => Location());
 
   sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
 
@@ -160,13 +169,24 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(remoteDataSource: sl()),);
   sl.registerFactory(() => ChatCubit(repository: sl()));
 
-  sl.registerLazySingleton<LocationLocalDataSource>(() => LocationLocalDataSourceImpl(sl()),);
-
-  sl.registerLazySingleton<LocationService>(() => LocationService());
-  sl.registerFactory(() => LocationCubit(
-    locationService: sl(),
+  sl.registerLazySingleton<LocationLocalDataSource>(() => LocationLocalDataSourceImpl(sharedPreferences: sl()));
+  sl.registerLazySingleton<LocationRemoteDataSource>(
+        () => LocationRemoteDataSourceImpl(
+      location: sl<Location>(),
+      client: sl<http.Client>(),
+    ),
+  );
+  sl.registerLazySingleton<LocationRepository>(() => LocationRepositoryImpl(
+    remoteDataSource: sl(),
     localDataSource: sl(),
   ));
 
-
+  sl.registerLazySingleton(() => GetCurrentLocationUseCase(sl()));
+  sl.registerLazySingleton(() => LoadSavedLocationUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateManualLocationUseCase(sl()));
+  sl.registerFactory(() => LocationCubit(
+    getCurrentLocationUseCase: sl(),
+    loadSavedLocationUseCase: sl(),
+    updateManualLocationUseCase: sl(),
+  ));
 }

@@ -338,7 +338,7 @@ class AppTheme {
 // =======================================================
 
 class AppConstants {
-  static const baseurl = 'http://192.168.1.101:8000/api';
+  static const baseurl = 'http://192.168.1.100:8000/api';
   /// [SharedPreferences] Keys
   static const String themeKey = 'theme_mode';
   static const String languageKey = 'language_code';
@@ -353,10 +353,8 @@ class AppConstants {
   static const String userKey = 'CACHED_USER';
   static const String pendingKey = 'IS_PENDING';
 
-  /// Location & Address Keys
-  static const String addressKey = 'USER_CASHED_ADDRESS';
-  static const String latKey = 'LAST_CACHED_LAT';
-  static const String lngKey = 'LAST_CACHED_LNG';
+  /// Location Key
+  static const String locationKey = 'CACHED_LOCATION';
 
   static const numberOfApartmentsEachRequest = 2;
 
@@ -627,8 +625,7 @@ class LocationService {
 
   Future<String> getAddressFromCoords(double lat, double lng, String languageCode) async {
     try {
-      final url = Uri.parse(
-          'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=10');
+      final url = Uri.parse('https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=10');
 
       final response = await http.get(url, headers: {
         'User-Agent': 'MalazApp_Development',
@@ -797,6 +794,7 @@ class NetworkServiceImpl implements NetworkService {
 
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:location/location.dart';
 import 'package:malaz/data/datasources/local/auth_local_data_source.dart';
 import 'package:malaz/data/datasources/remote/booking/booking_remote_data_source.dart';
 import 'package:malaz/data/datasources/remote/favorites/favorites_remote_datasource.dart';
@@ -817,12 +815,15 @@ import '../../data/datasources/local/location_local_data_source.dart';
 import '../../data/datasources/remote/apartment/apartment_remote_data_source.dart';
 import '../../data/datasources/remote/auth/auth_remote_datasource.dart';
 import '../../data/datasources/remote/chat/chat_remote_datasource.dart';
+import '../../data/datasources/remote/location/location_remote_data_source.dart';
 import '../../data/repositories/apartment/apartment_repository_impl.dart';
 import '../../data/repositories/chat/chat_repository_impl.dart';
 import '../../data/repositories/favorites/favorites_repository_impl.dart';
+import '../../data/repositories/location/location_repository_impl.dart';
 import '../../domain/repositories/apartment/apartment_repository.dart';
 import '../../domain/repositories/chat/chat_repository.dart';
 import '../../domain/repositories/favorites/favorites_repository.dart';
+import '../../domain/repositories/location/location_repository.dart';
 import '../../domain/usecases/apartment/add_apartment_use_case.dart';
 import '../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
@@ -832,6 +833,9 @@ import '../../domain/usecases/favorites/add_favorites_use_case.dart';
 import '../../domain/usecases/favorites/delete_favorites_use_case.dart';
 import '../../domain/usecases/favorites/get_favorites_use_case.dart';
 import '../../domain/usecases/home/apartments_use_case.dart';
+import '../../domain/usecases/location/get_current_location_usecase.dart';
+import '../../domain/usecases/location/load_saved_location_usecase.dart';
+import '../../domain/usecases/location/update_manual_location_usecase.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
 import '../../presentation/cubits/booking/booking_cubit.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
@@ -841,10 +845,10 @@ import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/location/location_cubit.dart';
 import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
-import '../location_service/location_service.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
 import '../network/network_service.dart';
+import 'package:http/http.dart' as http;
 
 /// [GetIt] / [service_locator]
 ///
@@ -881,6 +885,8 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   sl.registerLazySingleton<Dio>(() => Dio());
+  sl.registerLazySingleton<http.Client>(() => http.Client());
+  sl.registerLazySingleton<Location>(() => Location());
 
   sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
 
@@ -957,15 +963,26 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(remoteDataSource: sl()),);
   sl.registerFactory(() => ChatCubit(repository: sl()));
 
-  sl.registerLazySingleton<LocationLocalDataSource>(() => LocationLocalDataSourceImpl(sl()),);
-
-  sl.registerLazySingleton<LocationService>(() => LocationService());
-  sl.registerFactory(() => LocationCubit(
-    locationService: sl(),
+  sl.registerLazySingleton<LocationLocalDataSource>(() => LocationLocalDataSourceImpl(sharedPreferences: sl()));
+  sl.registerLazySingleton<LocationRemoteDataSource>(
+        () => LocationRemoteDataSourceImpl(
+      location: sl<Location>(),
+      client: sl<http.Client>(),
+    ),
+  );
+  sl.registerLazySingleton<LocationRepository>(() => LocationRepositoryImpl(
+    remoteDataSource: sl(),
     localDataSource: sl(),
   ));
 
-
+  sl.registerLazySingleton(() => GetCurrentLocationUseCase(sl()));
+  sl.registerLazySingleton(() => LoadSavedLocationUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateManualLocationUseCase(sl()));
+  sl.registerFactory(() => LocationCubit(
+    getCurrentLocationUseCase: sl(),
+    loadSavedLocationUseCase: sl(),
+    updateManualLocationUseCase: sl(),
+  ));
 }
 // =======================================================
 // FILE PATH: lib\core\usecases\usecase.dart
@@ -1073,9 +1090,7 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
     await Future.wait([
       _prefs.remove(AppConstants.tokenKey),
       _prefs.remove(AppConstants.userKey),
-      _prefs.remove(AppConstants.addressKey),
-      _prefs.remove(AppConstants.latKey),
-      _prefs.remove(AppConstants.lngKey),
+      _prefs.remove(AppConstants.locationKey),
       _prefs.setBool(AppConstants.pendingKey, false),
     ]);
   }
@@ -1084,55 +1099,44 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
 // FILE PATH: lib\data\datasources\local\location_local_data_source.dart
 // =======================================================
 
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../domain/entities/location_entity.dart';
+import '../../models/location_model.dart';
 
 abstract class LocationLocalDataSource {
-  Future<void> cacheCoordinates(double lat, double lng);
-  Future<void> cacheUserAddress(String address);
-  Future<Map<String, double?>> getCachedCoordinates();
-  Future<String?> getCachedAddress();
-  Future<void> clearLocationAndAddress();
+  Future<void> cacheLocation(LocationModel location);
+
+  Future<LocationEntity?> getCachedLocation();
 }
 
 class LocationLocalDataSourceImpl implements LocationLocalDataSource {
-  final SharedPreferences _prefs;
+  final SharedPreferences sharedPreferences;
 
-  LocationLocalDataSourceImpl(this._prefs);
+  LocationLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<void> cacheCoordinates(double lat, double lng) async {
-    await Future.wait([
-      _prefs.setDouble(AppConstants.latKey, lat),
-      _prefs.setDouble(AppConstants.lngKey, lng),
-    ]);
+  Future<void> cacheLocation(LocationModel location) async {
+    final jsonString = json.encode(location.toJson());
+    await sharedPreferences.setString(AppConstants.locationKey, jsonString);
   }
 
   @override
-  Future<Map<String, double?>> getCachedCoordinates() async {
-    final lat = _prefs.getDouble(AppConstants.latKey);
-    final lng = _prefs.getDouble(AppConstants.lngKey);
+  Future<LocationEntity?> getCachedLocation() async {
+    final jsonString = sharedPreferences.getString(AppConstants.locationKey);
 
-    return {'lat': lat, 'lng': lng};
-  }
+    print('>>>>>>>>>>${jsonString}');
+    if (jsonString != null) {
+      try {
+        final Map<String, dynamic> jsonMap = json.decode(jsonString);
 
-  @override
-  Future<void> cacheUserAddress(String address) async {
-    await _prefs.setString(AppConstants.addressKey, address);
-  }
-
-  @override
-  Future<String?> getCachedAddress() async {
-    return _prefs.getString(AppConstants.addressKey);
-  }
-
-  @override
-  Future<void> clearLocationAndAddress() async {
-    await Future.wait([
-      _prefs.remove(AppConstants.addressKey),
-      _prefs.remove(AppConstants.latKey),
-      _prefs.remove(AppConstants.lngKey),
-    ]);
+        return LocationModel.fromJson(jsonMap);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 }
 // =======================================================
@@ -1703,6 +1707,67 @@ class FavoritesRemoteDataSourceImpl implements FavoritesRemoteDataSource {
   }
 }
 // =======================================================
+// FILE PATH: lib\data\datasources\remote\location\location_remote_data_source.dart
+// =======================================================
+
+import 'dart:convert';
+import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
+
+abstract class LocationRemoteDataSource {
+  Future<LocationData?> getRawLocation();
+  Future<String> getAddressFromCoords(double lat, double lng, String lang);
+}
+
+class LocationRemoteDataSourceImpl implements LocationRemoteDataSource {
+  final Location location;
+  final http.Client client;
+  LocationRemoteDataSourceImpl({required this.location, required this.client});
+
+  @override
+  Future<LocationData?> getRawLocation() async {
+    bool s = await location.serviceEnabled();
+    if (!s) s = await location.requestService();
+    if (!s) return null;
+    PermissionStatus p = await location.hasPermission();
+    if (p == PermissionStatus.denied) p = await location.requestPermission();
+    if (p != PermissionStatus.granted) return null;
+    return await location.getLocation();
+  }
+
+  @override
+  Future<String> getAddressFromCoords(double lat, double lng, String lang) async {
+    final url = Uri.parse('https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng');
+
+    try {
+      final response = await client.get(
+        url,
+        headers: {
+          'Accept-Language': lang,
+          'User-Agent': 'Malaz_App',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final addr = data['address'];
+
+        if (addr == null) return "Unknown Address";
+
+        final city = addr['city'] ?? addr['town'] ?? addr['village'] ?? addr['suburb'] ?? '';
+        final country = addr['country'] ?? '';
+
+        if (city.isEmpty && country.isEmpty) return "Location found, Address not resolved";
+
+        return city.isNotEmpty ? "$city, $country" : country;
+      }
+      return "API Error (${response.statusCode})";
+    } catch (e) {
+      return "Connection Error";
+    }
+  }
+}
+// =======================================================
 // FILE PATH: lib\data\models\apartment_model.dart
 // =======================================================
 
@@ -1925,6 +1990,25 @@ class ConversationModel {
       userTwo: json['user_two'] != null
           ? UserModel.fromJson(json['user_two'] as Map<String, dynamic>)
           : null,
+    );
+  }
+}
+// =======================================================
+// FILE PATH: lib\data\models\location_model.dart
+// =======================================================
+
+import '../../domain/entities/location_entity.dart';
+
+class LocationModel extends LocationEntity {
+  const LocationModel({required super.lat, required super.lng, required super.address});
+
+  Map<String, dynamic> toJson() => {'lat': lat, 'lng': lng, 'address': address};
+
+  factory LocationModel.fromJson(Map<String, dynamic> json) {
+    return LocationModel(
+      lat: json['lat'],
+      lng: json['lng'],
+      address: json['address'],
     );
   }
 }
@@ -2561,6 +2645,65 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 }
 // =======================================================
+// FILE PATH: lib\data\repositories\location\location_repository_impl.dart
+// =======================================================
+
+import '../../../domain/entities/location_entity.dart';
+import '../../../domain/repositories/location/location_repository.dart';
+import '../../datasources/local/location_local_data_source.dart';
+import '../../datasources/remote/location/location_remote_data_source.dart';
+import '../../models/location_model.dart';
+
+class LocationRepositoryImpl implements LocationRepository {
+  final LocationRemoteDataSource remoteDataSource;
+  final LocationLocalDataSource localDataSource;
+
+  LocationRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource
+  });
+
+  @override
+  Future<LocationEntity> getCurrentLocation(String lang) async {
+    final raw = await remoteDataSource.getRawLocation();
+    if (raw == null) throw Exception("Location access denied");
+
+    final address = await remoteDataSource.getAddressFromCoords(
+        raw.latitude!,
+        raw.longitude!,
+        lang
+    );
+
+    final model = LocationModel(
+        lat: raw.latitude!,
+        lng: raw.longitude!,
+        address: address
+    );
+
+    await localDataSource.cacheLocation(model);
+    return model;
+  }
+
+  @override
+  Future<LocationEntity?> getSavedLocation() async {
+    return await localDataSource.getCachedLocation();
+  }
+
+  @override
+  Future<LocationEntity> updateManualLocation(double lat, double lng, String lang) async {
+    final address = await remoteDataSource.getAddressFromCoords(lat, lng, lang);
+
+    final model = LocationModel(
+        lat: lat,
+        lng: lng,
+        address: address
+    );
+
+    await localDataSource.cacheLocation(model);
+    return model;
+  }
+}
+// =======================================================
 // FILE PATH: lib\data\utils\dialog.dart
 // =======================================================
 
@@ -2871,6 +3014,26 @@ class ChatMessageEntity {
   bool get isEdited => updatedAt.isAfter(createdAt.add(const Duration(seconds: 1)));
 }
 // =======================================================
+// FILE PATH: lib\domain\entities\location_entity.dart
+// =======================================================
+
+import 'package:equatable/equatable.dart';
+
+class LocationEntity extends Equatable {
+  final double lat;
+  final double lng;
+  final String address;
+
+  const LocationEntity({
+    required this.lat,
+    required this.lng,
+    required this.address,
+  });
+
+  @override
+  List<Object?> get props => [lat, lng, address];
+}
+// =======================================================
 // FILE PATH: lib\domain\entities\user_entity.dart
 // =======================================================
 
@@ -3070,6 +3233,17 @@ abstract class FavoritesRepository {
 }
 
 
+// =======================================================
+// FILE PATH: lib\domain\repositories\location\location_repository.dart
+// =======================================================
+
+import '../../entities/location_entity.dart';
+
+abstract class LocationRepository {
+  Future<LocationEntity> getCurrentLocation(String lang);
+  Future<LocationEntity?> getSavedLocation();
+  Future<LocationEntity> updateManualLocation(double lat, double lng, String lang);
+}
 // =======================================================
 // FILE PATH: lib\domain\usecases\apartment\add_apartment_use_case.dart
 // =======================================================
@@ -3467,6 +3641,46 @@ class GetApartmentsUseCase {
   }
 }
 
+// =======================================================
+// FILE PATH: lib\domain\usecases\location\get_current_location_usecase.dart
+// =======================================================
+
+import '../../entities/location_entity.dart';
+import '../../repositories/location/location_repository.dart';
+
+class GetCurrentLocationUseCase {
+  final LocationRepository repository;
+  GetCurrentLocationUseCase(this.repository);
+
+  Future<LocationEntity> call(String lang) async => await repository.getCurrentLocation(lang);
+}
+// =======================================================
+// FILE PATH: lib\domain\usecases\location\load_saved_location_usecase.dart
+// =======================================================
+
+import '../../entities/location_entity.dart';
+import '../../repositories/location/location_repository.dart';
+
+class LoadSavedLocationUseCase {
+  final LocationRepository repository;
+  LoadSavedLocationUseCase(this.repository);
+
+  Future<LocationEntity?> call() async => await repository.getSavedLocation();
+}
+// =======================================================
+// FILE PATH: lib\domain\usecases\location\update_manual_location_usecase.dart
+// =======================================================
+
+import '../../entities/location_entity.dart';
+import '../../repositories/location/location_repository.dart' show LocationRepository;
+
+class UpdateManualLocationUseCase {
+  final LocationRepository repository;
+  UpdateManualLocationUseCase(this.repository);
+
+  Future<LocationEntity> call(double lat, double lng, String lang) async =>
+      await repository.updateManualLocation(lat, lng, lang);
+}
 // =======================================================
 // FILE PATH: lib\l10n\app_localizations.dart
 // =======================================================
@@ -7112,6 +7326,7 @@ import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
 import 'package:malaz/presentation/screens/settings/settings_screen.dart';
 import 'package:malaz/presentation/screens/splash_screen/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/config/routes/app_routes.dart';
 import 'core/config/theme/app_theme.dart';
@@ -7183,7 +7398,7 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<AddApartmentCubit>()),
         BlocProvider(create: (context) => sl<MyApartmentsCubit>()),
         BlocProvider(create: (context) => sl<BookingCubit>()),
-        BlocProvider(create: (context) => sl<LocationCubit>()),
+        BlocProvider(create: (context) => sl<LocationCubit>()..loadSavedLocation(),),
       ],
       child: const RentalAppView(),
     );
@@ -7197,10 +7412,10 @@ class RentalAppView extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeState = context.watch<ThemeCubit>().state;
     final languageState = context.watch<LanguageCubit>().state;
-    final authCubit = context.read<AuthCubit>();
 
     final router = buildAppRouter();
 
+    print('<<<<<<<<<<<<<${sl<SharedPreferences>().get('CACHED_LOCATION')}');
     return MaterialApp.router(
       title: 'Malaz Rental',
       debugShowCheckedModeBanner: false,
@@ -8273,6 +8488,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/location_service/location_service.dart';
 import '../../../data/datasources/local/location_local_data_source.dart';
+import '../../../domain/entities/location_entity.dart';
+import '../../../domain/usecases/location/get_current_location_usecase.dart';
+import '../../../domain/usecases/location/load_saved_location_usecase.dart';
+import 'package:equatable/equatable.dart';
+
+import '../../../domain/usecases/location/update_manual_location_usecase.dart';
 
 /// ===========================
 /// ----------[states]---------
@@ -8284,89 +8505,43 @@ abstract class LocationState extends Equatable {
 }
 
 class LocationInitial extends LocationState {}
-
 class LocationLoading extends LocationState {}
-
 class LocationLoaded extends LocationState {
-  final double lat;
-  final double lng;
-  final String address;
-
-  LocationLoaded({required this.lat, required this.lng, required this.address});
-
+  final LocationEntity location;
+  LocationLoaded(this.location);
   @override
-  List<Object?> get props => [lat, lng, address];
+  List<Object?> get props => [location];
 }
-
 class LocationError extends LocationState {
   final String message;
   LocationError(this.message);
-
-  @override
-  List<Object?> get props => [message];
 }
 
 /// ===========================
 /// ----------[cubit]----------
 /// ===========================
 class LocationCubit extends Cubit<LocationState> {
-  final LocationService locationService;
-  final LocationLocalDataSource localDataSource;
+  final GetCurrentLocationUseCase getCurrentLocationUseCase;
+  final LoadSavedLocationUseCase loadSavedLocationUseCase;
+  final UpdateManualLocationUseCase updateManualLocationUseCase;
 
   LocationCubit({
-    required this.locationService,
-    required this.localDataSource,
+    required this.getCurrentLocationUseCase,
+    required this.loadSavedLocationUseCase,
+    required this.updateManualLocationUseCase,
   }) : super(LocationInitial());
 
-  Future<void> getCurrentLocation(String languageCode) async {
+  Future<void> getCurrentLocation(String lang) async {
     emit(LocationLoading());
     try {
-      final position = await locationService.getCurrentLocation();
-
-      final address = await locationService.getAddressFromCoords(
-        position!.latitude!,
-        position.longitude!,
-        languageCode,
-      );
-
-      await localDataSource.cacheCoordinates(position.latitude!, position.longitude!);
-      await localDataSource.cacheUserAddress(address);
-
-      emit(LocationLoaded(
-        lat: position.latitude!,
-        lng: position.longitude!,
-        address: address,
-      ));
-    } catch (e) {
-      emit(LocationError("Failed to get location: ${e.toString()}"));
-    }
+      final loc = await getCurrentLocationUseCase(lang);
+      emit(LocationLoaded(loc));
+    } catch (e) { emit(LocationError(e.toString())); }
   }
 
   Future<void> loadSavedLocation() async {
-    final coords = await localDataSource.getCachedCoordinates();
-    final address = await localDataSource.getCachedAddress();
-
-    if (coords['lat'] != null && coords['lng'] != null && address != null) {
-      emit(LocationLoaded(
-        lat: coords['lat']!,
-        lng: coords['lng']!,
-        address: address,
-      ));
-    }
-  }
-
-  Future<void> updateManualLocation(double lat, double lng, String languageCode) async {
-    emit(LocationLoading());
-    try {
-      final address = await locationService.getAddressFromCoords(lat, lng, languageCode);
-
-      await localDataSource.cacheCoordinates(lat, lng);
-      await localDataSource.cacheUserAddress(address);
-
-      emit(LocationLoaded(lat: lat, lng: lng, address: address));
-    } catch (e) {
-      emit(LocationError(e.toString()));
-    }
+    final loc = await loadSavedLocationUseCase();
+    if (loc != null) emit(LocationLoaded(loc));
   }
 }
 // =======================================================
@@ -9982,10 +10157,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         const SizedBox(height: 6),
         BlocBuilder<LocationCubit, LocationState>(
           builder: (context, state) {
-            if (state is LocationLoading) {
-              return const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white));
+            String address = tr.unknown_location;
+
+            if (state is LocationLoaded) {
+              address = state.location.address;
             }
-            final address = (state is LocationLoaded) ? state.address : tr.unknown_location;
             return Row(
               children: [
                 Icon(Icons.location_on, size: 14, color: colorScheme.surface),
@@ -16756,9 +16932,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/color/app_color.dart';
-import '../../../core/location_service/location_service.dart';
-import '../../../core/service_locator/service_locator.dart';
-import '../../../data/datasources/local/auth_local_data_source.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/language/language_cubit.dart';
@@ -16918,11 +17091,10 @@ class _AppDrawerState extends State<AppDrawer> {
     return BlocBuilder<LocationCubit, LocationState>(
       builder: (context, state) {
         String address = tr.unknown_location;
+        bool isLoading = state is LocationLoading;
 
         if (state is LocationLoaded) {
-          address = state.address;
-        } else if (state is LocationLoading) {
-          address = "...";
+          address = state.location.address;
         }
 
         return Container(
@@ -16942,7 +17114,14 @@ class _AppDrawerState extends State<AppDrawer> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              PulsingLocationIcon(color: Colors.white),
+              if (isLoading)
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              else
+                PulsingLocationIcon(color: Colors.white),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(

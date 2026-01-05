@@ -17,6 +17,7 @@ import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
 import 'package:malaz/presentation/screens/settings/settings_screen.dart';
 import 'package:malaz/presentation/screens/splash_screen/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/config/routes/app_routes.dart';
 import 'core/config/theme/app_theme.dart';
@@ -88,7 +89,7 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<AddApartmentCubit>()),
         BlocProvider(create: (context) => sl<MyApartmentsCubit>()),
         BlocProvider(create: (context) => sl<BookingCubit>()),
-        BlocProvider(create: (context) => sl<LocationCubit>()),
+        BlocProvider(create: (context) => sl<LocationCubit>()..loadSavedLocation(),),
       ],
       child: const RentalAppView(),
     );
@@ -102,7 +103,6 @@ class RentalAppView extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeState = context.watch<ThemeCubit>().state;
     final languageState = context.watch<LanguageCubit>().state;
-    final authCubit = context.read<AuthCubit>();
 
     final router = buildAppRouter();
 

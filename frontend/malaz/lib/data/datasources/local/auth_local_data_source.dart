@@ -87,9 +87,7 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
     await Future.wait([
       _prefs.remove(AppConstants.tokenKey),
       _prefs.remove(AppConstants.userKey),
-      _prefs.remove(AppConstants.addressKey),
-      _prefs.remove(AppConstants.latKey),
-      _prefs.remove(AppConstants.lngKey),
+      _prefs.remove(AppConstants.locationKey),
       _prefs.setBool(AppConstants.pendingKey, false),
     ]);
   }

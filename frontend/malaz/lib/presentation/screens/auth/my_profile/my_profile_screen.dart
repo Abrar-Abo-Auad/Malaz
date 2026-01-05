@@ -196,10 +196,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         const SizedBox(height: 6),
         BlocBuilder<LocationCubit, LocationState>(
           builder: (context, state) {
+            String address = tr.unknown_location;
             if (state is LocationLoading) {
-              return const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white));
+              address = 'Leading...';
             }
-            final address = (state is LocationLoaded) ? state.address : tr.unknown_location;
+            if (state is LocationLoaded) {
+              address = state.location.address;
+            }
             return Row(
               children: [
                 Icon(Icons.location_on, size: 14, color: colorScheme.surface),

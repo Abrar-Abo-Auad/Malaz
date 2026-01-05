@@ -1,51 +1,40 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../domain/entities/location_entity.dart';
+import '../../models/location_model.dart';
 
 abstract class LocationLocalDataSource {
-  Future<void> cacheCoordinates(double lat, double lng);
-  Future<void> cacheUserAddress(String address);
-  Future<Map<String, double?>> getCachedCoordinates();
-  Future<String?> getCachedAddress();
-  Future<void> clearLocationAndAddress();
+  Future<void> cacheLocation(LocationModel location);
+
+  Future<LocationEntity?> getCachedLocation();
 }
 
 class LocationLocalDataSourceImpl implements LocationLocalDataSource {
-  final SharedPreferences _prefs;
+  final SharedPreferences sharedPreferences;
 
-  LocationLocalDataSourceImpl(this._prefs);
+  LocationLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<void> cacheCoordinates(double lat, double lng) async {
-    await Future.wait([
-      _prefs.setDouble(AppConstants.latKey, lat),
-      _prefs.setDouble(AppConstants.lngKey, lng),
-    ]);
+  Future<void> cacheLocation(LocationModel location) async {
+    final jsonString = json.encode(location.toJson());
+    await sharedPreferences.setString(AppConstants.locationKey, jsonString);
   }
 
   @override
-  Future<Map<String, double?>> getCachedCoordinates() async {
-    final lat = _prefs.getDouble(AppConstants.latKey);
-    final lng = _prefs.getDouble(AppConstants.lngKey);
+  Future<LocationEntity?> getCachedLocation() async {
+    final jsonString = sharedPreferences.getString(AppConstants.locationKey);
 
-    return {'lat': lat, 'lng': lng};
-  }
+    print('>>>>>>>>>>${jsonString}');
+    if (jsonString != null) {
+      try {
+        final Map<String, dynamic> jsonMap = json.decode(jsonString);
 
-  @override
-  Future<void> cacheUserAddress(String address) async {
-    await _prefs.setString(AppConstants.addressKey, address);
-  }
-
-  @override
-  Future<String?> getCachedAddress() async {
-    return _prefs.getString(AppConstants.addressKey);
-  }
-
-  @override
-  Future<void> clearLocationAndAddress() async {
-    await Future.wait([
-      _prefs.remove(AppConstants.addressKey),
-      _prefs.remove(AppConstants.latKey),
-      _prefs.remove(AppConstants.lngKey),
-    ]);
+        return LocationModel.fromJson(jsonMap);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 }

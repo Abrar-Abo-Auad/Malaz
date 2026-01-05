@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/location_service/location_service.dart';
-import '../../../data/datasources/local/location_local_data_source.dart';
+import '../../../domain/entities/location_entity.dart';
+import '../../../domain/usecases/location/get_current_location_usecase.dart';
+import '../../../domain/usecases/location/load_saved_location_usecase.dart';
+
+import '../../../domain/usecases/location/update_manual_location_usecase.dart';
 
 /// ===========================
 /// ----------[states]---------
@@ -14,88 +17,46 @@ abstract class LocationState extends Equatable {
 }
 
 class LocationInitial extends LocationState {}
-
 class LocationLoading extends LocationState {}
-
 class LocationLoaded extends LocationState {
-  final double lat;
-  final double lng;
-  final String address;
-
-  LocationLoaded({required this.lat, required this.lng, required this.address});
-
+  final LocationEntity location;
+  LocationLoaded(this.location);
   @override
-  List<Object?> get props => [lat, lng, address];
+  List<Object?> get props => [location];
 }
-
 class LocationError extends LocationState {
   final String message;
   LocationError(this.message);
-
-  @override
-  List<Object?> get props => [message];
 }
 
 /// ===========================
 /// ----------[cubit]----------
 /// ===========================
 class LocationCubit extends Cubit<LocationState> {
-  final LocationService locationService;
-  final LocationLocalDataSource localDataSource;
+  final GetCurrentLocationUseCase getCurrentLocationUseCase;
+  final LoadSavedLocationUseCase loadSavedLocationUseCase;
+  final UpdateManualLocationUseCase updateManualLocationUseCase;
 
   LocationCubit({
-    required this.locationService,
-    required this.localDataSource,
+    required this.getCurrentLocationUseCase,
+    required this.loadSavedLocationUseCase,
+    required this.updateManualLocationUseCase,
   }) : super(LocationInitial());
 
-  Future<void> getCurrentLocation(String languageCode) async {
+  Future<void> getCurrentLocation(String lang) async {
     emit(LocationLoading());
     try {
-      final position = await locationService.getCurrentLocation();
-
-      final address = await locationService.getAddressFromCoords(
-        position!.latitude!,
-        position.longitude!,
-        languageCode,
-      );
-
-      await localDataSource.cacheCoordinates(position.latitude!, position.longitude!);
-      await localDataSource.cacheUserAddress(address);
-
-      emit(LocationLoaded(
-        lat: position.latitude!,
-        lng: position.longitude!,
-        address: address,
-      ));
-    } catch (e) {
-      emit(LocationError("Failed to get location: ${e.toString()}"));
-    }
+      final loc = await getCurrentLocationUseCase(lang);
+      emit(LocationLoaded(loc));
+    } catch (e) { emit(LocationError(e.toString())); }
   }
 
   Future<void> loadSavedLocation() async {
-    final coords = await localDataSource.getCachedCoordinates();
-    final address = await localDataSource.getCachedAddress();
-
-    if (coords['lat'] != null && coords['lng'] != null && address != null) {
-      emit(LocationLoaded(
-        lat: coords['lat']!,
-        lng: coords['lng']!,
-        address: address,
-      ));
-    }
+    final loc = await loadSavedLocationUseCase();
+    if (loc != null) emit(LocationLoaded(loc));
   }
 
-  Future<void> updateManualLocation(double lat, double lng, String languageCode) async {
-    emit(LocationLoading());
-    try {
-      final address = await locationService.getAddressFromCoords(lat, lng, languageCode);
-
-      await localDataSource.cacheCoordinates(lat, lng);
-      await localDataSource.cacheUserAddress(address);
-
-      emit(LocationLoaded(lat: lat, lng: lng, address: address));
-    } catch (e) {
-      emit(LocationError(e.toString()));
-    }
+  void clearLocation() {
+    emit(LocationInitial());
   }
 }
