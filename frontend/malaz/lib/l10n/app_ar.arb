@@ -164,5 +164,6 @@
   "action_okay": "حسناً",
   "location": "الموقع",
   "verified_account": "حساب موثق",
-  "unknown_location": "موقع غير معروف"
+  "unknown_location": "موقع غير معروف",
+  "back_to_top": "العودة للأعلى"
 }

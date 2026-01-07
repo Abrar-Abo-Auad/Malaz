@@ -159,5 +159,6 @@
   "action_okay": "Tamam",
   "location": "Konum",
   "verified_account": "DOĞRULANMIŞ HESAP",
-  "unknown_location": "Bilinmeyen Konum"
+  "unknown_location": "Bilinmeyen Konum",
+  "back_to_top": "Başa dön"
 }

@@ -496,4 +496,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unknown_location => 'Bilinmeyen Konum';
+
+  @override
+  String get back_to_top => 'Başa dön';
 }

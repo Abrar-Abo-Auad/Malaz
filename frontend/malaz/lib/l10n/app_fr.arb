@@ -164,5 +164,6 @@
   "action_okay": "D'accord",
   "location": "Emplacement",
   "verified_account": "COMPTE VÉRIFIÉ",
-  "unknown_location": "Emplacement inconnu"
+  "unknown_location": "Emplacement inconnu",
+  "back_to_top": "Retour en haut"
 }

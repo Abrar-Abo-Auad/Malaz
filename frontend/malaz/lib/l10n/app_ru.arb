@@ -165,5 +165,6 @@
   "action_okay": "Хорошо",
   "location": "Местоположение",
   "verified_account": "ПОДТВЕРЖДЕННЫЙ АККАУНТ",
-  "unknown_location": "Неизвестное место"
+  "unknown_location": "Неизвестное место",
+  "back_to_top": "Наверх"
 }

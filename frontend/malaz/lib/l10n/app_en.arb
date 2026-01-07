@@ -164,5 +164,6 @@
   "action_okay": "Okay",
   "location": "Location",
   "verified_account": "VERIFIED ACCOUNT",
-  "unknown_location": "Unknown Location"
+  "unknown_location": "Unknown Location",
+  "back_to_top": "back to up"
 }

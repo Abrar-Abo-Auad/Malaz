@@ -490,4 +490,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unknown_location => 'موقع غير معروف';
+
+  @override
+  String get back_to_top => 'العودة للأعلى';
 }

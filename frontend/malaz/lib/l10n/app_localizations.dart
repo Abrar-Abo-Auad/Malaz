@@ -1057,6 +1057,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown Location'**
   String get unknown_location;
+
+  /// No description provided for @back_to_top.
+  ///
+  /// In en, this message translates to:
+  /// **'back to up'**
+  String get back_to_top;
 }
 
 class _AppLocalizationsDelegate

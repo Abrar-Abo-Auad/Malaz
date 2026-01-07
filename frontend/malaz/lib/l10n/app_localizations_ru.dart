@@ -496,4 +496,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unknown_location => 'Неизвестное место';
+
+  @override
+  String get back_to_top => 'Наверх';
 }

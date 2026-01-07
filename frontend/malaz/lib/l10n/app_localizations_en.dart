@@ -493,4 +493,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknown_location => 'Unknown Location';
+
+  @override
+  String get back_to_top => 'back to up';
 }
