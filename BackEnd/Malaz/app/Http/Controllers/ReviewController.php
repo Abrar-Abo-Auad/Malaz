@@ -122,17 +122,9 @@ if ($alreadyReviewed) {
         $reviews = Review::where('property_id', $propertyId)
             ->whereHas('property', fn($q) => $q->where('status', 'approved'))
             ->whereNotNull('body')
+            ->with('user')
             ->orderBy('id', 'desc')
-            ->cursorPaginate($perPage)
-            ->through(function ($review) {
-                return [
-                    'id' => $review->id,
-                    'user_id' => $review->user_id,
-                    'rating' => $review->rating,
-                    'body' => $review->body,
-                    'created_at' => $review->created_at,
-                ];
-            });
+            ->cursorPaginate($perPage);
 
         return response()->json([
             'data' => $reviews->items(),
