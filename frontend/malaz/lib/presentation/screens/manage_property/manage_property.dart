@@ -122,7 +122,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
             SliverAppBar(
               pinned: true,
               expandedHeight: 340.0,
-              backgroundColor: Colors.transparent,
+              backgroundColor: Theme.of(context).primaryColor,
               centerTitle: true,
               elevation: 0,
               title: Text(tr.property_manager,
@@ -154,6 +154,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(35)),
+
                       ),
                       child: Column(
                         children: [

@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
-import 'package:malaz/domain/entities/apartments_list.dart';
+import 'package:malaz/domain/entities/apartment/apartments_list.dart';
 
-import '../../entities/filters.dart';
+import '../../entities/filters/filters.dart';
 
 abstract class ApartmentRepository {
   Future<ApartmentsList> getApartments({required String? cursor, Filter? filter});
@@ -20,8 +20,9 @@ abstract class ApartmentRepository {
     required int bedrooms,
     required int area,
     required List <XFile> mainImageUrl,
-    required XFile main_pic
-
+    required XFile main_pic,
+    required double latitude,
+    required double longitude,
   });
   Future<ApartmentsList> getMyApartments({required String? cursor});
 

@@ -3,8 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
 
 import '../../../core/errors/exceptions.dart';
-import '../../../domain/entities/apartments_list.dart';
-import '../../../domain/entities/filters.dart';
+import '../../../domain/entities/apartment/apartments_list.dart';
+import '../../../domain/entities/filters/filters.dart';
 import '../../../domain/repositories/apartment/apartment_repository.dart';
 import '../../datasources/remote/apartment/apartment_remote_data_source.dart';
 
@@ -18,7 +18,7 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
       {required String? cursor, Filter? filter}) async {
     try {
       final remoteApartments =
-          await remoteDataSource.getApartments(cursor: cursor, filter: filter);
+      await remoteDataSource.getApartments(cursor: cursor, filter: filter);
       return remoteApartments;
     } catch (e) {
       rethrow;
@@ -29,7 +29,7 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
   Future<ApartmentsList> getMyApartments({required String? cursor}) async {
     try {
       final remoteApartments =
-          await remoteDataSource.getMyApartments(cursor: cursor);
+      await remoteDataSource.getMyApartments(cursor: cursor);
       return remoteApartments;
     } catch (e) {
       rethrow;
@@ -39,18 +39,21 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
   @override
   Future<Either<Failure, Unit>> addApartment(
       {required String title,
-      required int price,
-      required String city,
-      required String governorate,
-      required String address,
-      required String description,
-      required String type,
-      required int rooms,
-      required int bathrooms,
-      required int bedrooms,
-      required int area,
-      required List<XFile> mainImageUrl,
-      required XFile main_pic}) async {
+        required int price,
+        required String city,
+        required String governorate,
+        required String address,
+        required String description,
+        required String type,
+        required int rooms,
+        required int bathrooms,
+        required int bedrooms,
+        required int area,
+        required List<XFile> mainImageUrl,
+        required XFile main_pic,
+       required double latitude,
+        required double longitude
+      }) async {
     try {
       final resault = await remoteDataSource.addApartment(
           title: title,
@@ -65,7 +68,10 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
           bedrooms: bedrooms,
           area: area,
           mainImageUrl: mainImageUrl,
-          main_pic: main_pic);
+          main_pic: main_pic,
+        longitude: longitude,
+        latitude: latitude
+      );
       return const Right(unit);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

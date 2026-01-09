@@ -1,5 +1,5 @@
 class AppConstants {
-  static const baseurl = 'http://192.168.1.100:8000/api';
+  static const baseurl = 'http://10.78.179.242:8000/api';
   /// [SharedPreferences] Keys
   static const String themeKey = 'theme_mode';
   static const String languageKey = 'language_code';
@@ -17,7 +17,9 @@ class AppConstants {
   /// [Location] Key
   static const String locationKey = 'CACHED_LOCATION';
 
+  /// [Requesting] keys
   static const numberOfApartmentsEachRequest = 2;
+  static const numberOfReviewsEachRequest =  2;
   static const numberOfBookingEachRequest = 5;
 
 

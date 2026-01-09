@@ -1,13 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:malaz/domain/entities/filters.dart';
+import 'package:malaz/domain/entities/filters/filters.dart';
 import 'package:path/path.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/network/network_service.dart';
-import '../../../../domain/entities/apartments_list.dart';
-import '../../../models/apartment_model.dart';
+import '../../../../domain/entities/apartment/apartments_list.dart';
+import '../../../models/apartment/apartment_model.dart';
 
 abstract class ApartmentRemoteDataSource {
   Future<ApartmentsList> getApartments({String? cursor, Filter? filter});
@@ -24,7 +24,9 @@ abstract class ApartmentRemoteDataSource {
     required int bedrooms,
     required int area,
     required List <XFile> mainImageUrl,
-    required XFile main_pic
+    required XFile main_pic,
+    required double latitude,
+    required double longitude,
   });
   Future<ApartmentsList> getMyApartments({String? cursor});
 }
@@ -134,7 +136,9 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
     required int bedrooms,
     required int area,
     required List<XFile> mainImageUrl,
-    required XFile main_pic
+    required XFile main_pic,
+    required double latitude,
+    required double longitude
   })async {
     final endpoint='/properties';
 
@@ -163,6 +167,8 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
           main_pic.path,
           filename:main_pic.path,
         ),
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
       });
       final response = await networkService.post(
         endpoint,

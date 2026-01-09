@@ -2,13 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:malaz/presentation/global_widgets/brand/build_branding.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/config/color/app_color.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/property/property_cubit.dart';
+import 'map_picker.dart';
 
 class AddPropertyScreen extends StatefulWidget {
   const AddPropertyScreen({super.key});
@@ -32,29 +34,17 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _roomsController = TextEditingController();
-
+  final MapController _mapController = MapController();
+  final TextEditingController _searchController = TextEditingController();
+  double? _selectedLat;
+  double? _selectedLng;
   String _selectedPropertyType = '';
-  List<String> _governorateOptions = [];
   String? _selectedGovernorate;
 
   @override
   void initState() {
     super.initState();
     context.read<AddApartmentCubit>().resetState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final tr = AppLocalizations.of(context)!;
-    if (_selectedPropertyType.isEmpty) _selectedPropertyType = tr.apartment;
-
-    _governorateOptions = [
-      tr.damascus, tr.damascus_countryside, tr.aleppo, tr.homs, tr.hama,
-      tr.latakia, tr.tartous, tr.idlib, tr.deir_alZor, tr.raqa,
-      tr.al_hasakah, tr.daraa, tr.sweida, tr.quneitra,
-    ];
-    _selectedGovernorate ??= _governorateOptions[0];
   }
 
   @override
@@ -69,24 +59,6 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
     _titleController.dispose();
     _roomsController.dispose();
     super.dispose();
-  }
-
-  String _mapGovToEnglish(String selected, AppLocalizations tr) {
-    if (selected == tr.damascus) return 'Damascus';
-    if (selected == tr.damascus_countryside) return 'Rif Dimashq';
-    if (selected == tr.aleppo) return 'Aleppo';
-    if (selected == tr.homs) return 'Homs';
-    if (selected == tr.hama) return 'Hama';
-    if (selected == tr.latakia) return 'Latakia';
-    if (selected == tr.tartous) return 'Tartus';
-    if (selected == tr.idlib) return 'Idlib';
-    if (selected == tr.deir_alZor) return 'Deir ez-Zor';
-    if (selected == tr.raqa) return 'Raqqa';
-    if (selected == tr.al_hasakah) return 'Al-Hasakah';
-    if (selected == tr.daraa) return 'Daraa';
-    if (selected == tr.sweida) return 'Sweida';
-    if (selected == tr.quneitra) return 'Quneitra';
-    return 'Damascus';
   }
 
   String _mapTypeToEnglish(String localType, AppLocalizations tr) {
@@ -113,6 +85,13 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
 
   void _submitProperty() {
     if (_images.isEmpty) setState(() => _showImageError = true);
+    if (_selectedLat == null || _selectedLng == null) {
+      _showSnackBar(context, "piease select locationً", Colors.orange);
+      return;
+    }
+
+    if (_cityController.text.isEmpty) _cityController.text = "City Selected";
+    if (_addressController.text.isEmpty) _addressController.text = "Address Selected";
 
     if (_formKey.currentState!.validate() && _images.isNotEmpty) {
       final tr = AppLocalizations.of(context)!;
@@ -124,12 +103,15 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
           bedrooms: int.parse(_bedroomsController.text),
           area: int.parse(_areaController.text),
           city: _cityController.text,
-          governorate: _mapGovToEnglish(_selectedGovernorate!, tr),
+          governorate:_selectedGovernorate!,
           address: _addressController.text,
           description: _descriptionController.text,
           type: _mapTypeToEnglish(_selectedPropertyType, tr),
           images: _images,
-          main_pic: _images.first
+          main_pic: _images.first,
+        latitide: _selectedLat ?? 0.0,
+        longitude: _selectedLng ?? 0.0,
+
       );
     }
   }
@@ -207,7 +189,26 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
       },
     );
   }
+  Future<void> _openMapPicker() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MapPickerScreen()),
+    );
 
+    if (result != null) {
+      setState(() {
+        _selectedLat = result['lat'];
+        _selectedLng = result['lng'];
+
+        var details = result['details'];
+        if (details != null) {
+          _cityController.text = details['city'] ?? '';
+          _addressController.text = details['address'] ?? '';
+          _selectedGovernorate = details['governorate']??'';
+        }
+      });
+    }
+  }
 
   Widget _buildHeader(AppLocalizations tr, ColorScheme colorScheme) {
     return Column(
@@ -287,50 +288,108 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-
-          child: Text(tr.location_details, style: TextStyle(color: colorScheme.primary, fontSize: 18, fontWeight: FontWeight.bold)),
-
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 8),
-          child: DropdownButtonFormField<String>(
-            value: _selectedGovernorate,
-            isDense: true,
-            alignment: AlignmentDirectional.bottomStart,
-            menuMaxHeight: 290,
-            dropdownColor: colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            items: _governorateOptions.map((gov) => DropdownMenuItem(
-              value: gov,
-              child: Text(gov, style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w500)),
-            )).toList(),
-            onChanged: (value) => setState(() => _selectedGovernorate = value),
-            decoration: InputDecoration(
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 15, right: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.public, color: colorScheme.onSurface, size: 20),
-                    const SizedBox(width: 8),
-                    Text("${tr.governorate}", style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              filled: true,
-              fillColor: colorScheme.surface,
-              contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: colorScheme.primary.withOpacity(0.5))),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: colorScheme.primary, width: 2.0)),
+          child: Text(
+            tr.location_details,
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        _PropertyFormInputField(controller: _cityController, icon: Icons.location_city, hint: tr.jaramana, preffix: "${tr.city}", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
-        _PropertyFormInputField(controller: _addressController, icon: Icons.pin_drop, hint: tr.address_loc, preffix: "${tr.address}", isnumber: false, validator: (v) => v!.isEmpty ? tr.field_required : null),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 17),
+          child: InkWell(
+            onTap: _openMapPicker,
+            child: Container(
+              height: 300,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: colorScheme.primary.withOpacity(0.5),
+                  width: 1,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    FlutterMap(
+                      key: ValueKey('${_selectedLat}_${_selectedLng}'),
+                      options: MapOptions(
+                        initialCenter: _selectedLat != null
+                            ? LatLng(_selectedLat!, _selectedLng!)
+                            : const LatLng(33.5138, 36.2765),
+                        initialZoom: _selectedLat != null ? 15.0 : 12.0,
+                        interactionOptions: const InteractionOptions(
+                          flags: InteractiveFlag.none,
+                        ),
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png',
+                          subdomains: const ['a', 'b', 'c'],
+                          userAgentPackageName: 'com.malaz.app',
+                        ),
+                        if (_selectedLat != null)
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: LatLng(_selectedLat!, _selectedLng!),
+                                width: 80,
+                                height: 80,
+                                child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+
+                    if (_selectedLat != null)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, size: 16, color: colorScheme.primary),
+                              const SizedBox(width: 4),
+                              Text("Edit location", style: TextStyle(fontSize: 12, color: colorScheme.primary)),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                    if (_selectedLat == null)
+                      Container(
+                        color: Colors.black.withOpacity(0.2),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.map_outlined, color: Colors.white, size: 40),
+                              const SizedBox(height: 8),
+                              Text("click to select location", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
-
   Widget _buildDescriptionSection(AppLocalizations tr, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

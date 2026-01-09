@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import 'package:go_router/go_router.dart';
-import 'package:malaz/domain/entities/user_entity.dart';
+import 'package:malaz/domain/entities/user/user_entity.dart';
 import 'package:malaz/presentation/global_widgets/user_profile_image/user_profile_image.dart';
-import '../../../../domain/entities/apartment.dart';
+import '../../../domain/entities/apartment/apartment.dart';
 import '../../../core/config/color/app_color.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/favorites/favorites_cubit.dart';
@@ -225,6 +225,7 @@ class _BuildTitleAndRating extends StatelessWidget {
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             height: 1.2,
+
           ),
         ),
 
@@ -234,12 +235,15 @@ class _BuildTitleAndRating extends StatelessWidget {
           children: [
             Icon(Icons.location_on, size: 16, color: theme.colorScheme.secondary),
             const SizedBox(width: 4),
+            Expanded(child:
             Text(
+              maxLines: 2,
               '${apartment.city}, ${apartment.address}',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
-            ),
+              softWrap: true,
+            ),)
           ],
         ),
 

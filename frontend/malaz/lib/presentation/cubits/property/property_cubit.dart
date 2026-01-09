@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/errors/failures.dart';
 import '../../../data/utils/failure_mapper.dart';
-import '../../../domain/entities/apartment.dart';
+import '../../../domain/entities/apartment/apartment.dart';
 import '../../../domain/usecases/apartment/add_apartment_use_case.dart';
 import '../../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../../l10n/app_localizations.dart';
@@ -69,6 +69,8 @@ class AddApartmentCubit extends Cubit<ApartmentState> {
     required int area,
     required List<XFile> images,
     required XFile main_pic,
+    required double latitide,
+    required double longitude
   }) async {
     emit(AddApartmentLoading());
 
@@ -86,6 +88,8 @@ class AddApartmentCubit extends Cubit<ApartmentState> {
       area: area,
       mainImageUrl: images,
       main_pic: main_pic,
+      latitude: latitide,
+      longitude: longitude
     );
 
     final result = await addApartmentUseCase.call(params);

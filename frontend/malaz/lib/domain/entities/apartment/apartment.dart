@@ -1,4 +1,4 @@
-import 'package:malaz/domain/entities/user_entity.dart';
+import 'package:malaz/domain/entities/user/user_entity.dart';
 
 class Apartment {
   final int id;
@@ -20,6 +20,8 @@ class Apartment {
   final int numberOfReviews;
   final String mainImageUrl;
   final bool isFav;
+  final double? latitude;
+  final double? longitude;
 
   Apartment({
     required this.id,
@@ -41,6 +43,8 @@ class Apartment {
     required this.numberOfReviews,
     required this.mainImageUrl,
     this.isFav = false,
+    this.latitude,
+    this.longitude
   });
 
   @override
