@@ -1,20 +1,61 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:malaz/domain/entities/user/user_entity.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/config/color/app_color.dart';
 import '../../../core/service_locator/service_locator.dart';
+import '../../../data/datasources/local/auth/auth_local_data_source.dart';
 import '../../../data/models/chat/conversation_model.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/chat/chat_cubit.dart';
 import '../../cubits/auth/auth_cubit.dart';
+import '../../cubits/chat/pusher_service/pusher_service.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
 
-class ChatsScreen extends StatelessWidget {
+class ChatsScreen extends StatefulWidget {
   const ChatsScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ChatsScreen> createState() => _ChatsScreenState();
+}
+
+class _ChatsScreenState extends State<ChatsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _setupPusherListener();
+  }
+
+  void _setupPusherListener() async {
+    final myUser = _getCurrentUser(context);
+    String? token = await sl<AuthLocalDatasource>().getCachedToken();
+
+    if (myUser == null || token == null) return;
+
+    await PusherService().init(token: token);
+
+    await PusherService().subscribe(
+      channelName: 'private-user.${myUser.id}',
+      onEvent: (event) {
+        log("List Event: ${event.eventName}");
+        context.read<ChatCubit>().getConversations();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    final myUser = _getCurrentUser(context);
+    if (myUser != null) {
+      PusherChannelsFlutter.getInstance().unsubscribe(channelName: 'private-conversations.${myUser.id}');
+    }
+    super.dispose();
+  }
 
   UserEntity? _getCurrentUser(BuildContext context) {
     final authState = context.read<AuthCubit>().state;
@@ -159,7 +200,7 @@ class ChatsScreen extends StatelessWidget {
   }
 
   Widget _buildActivitySection(ChatState state, bool isDark, int? myId) {
-    if (state is ChatConversationsLoading) return _buildHorizontalShimmer(isDark);
+    if (state is ChatLoading) return _buildHorizontalShimmer(isDark);
     if (state is ChatConversationsLoaded) {
       return _BuildActivitiesSection(conversations: state.conversations, isDark: isDark, myId: myId);
     }
@@ -167,7 +208,7 @@ class ChatsScreen extends StatelessWidget {
   }
 
   Widget _buildMessagesContent(ChatState state, bool isDark, int? myId, AppLocalizations tr, colorScheme) {
-    if (state is ChatConversationsLoading) return _BuildShimmerList(isDark: isDark);
+    if (state is ChatLoading) return _BuildShimmerList(isDark: isDark);
     if (state is ChatConversationsLoaded) {
       if (state.conversations.isEmpty) {
         return SliverToBoxAdapter(
@@ -201,7 +242,7 @@ class ChatsScreen extends StatelessWidget {
                   height: 60,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(22), // مطابق لشكل Squircle
+                    borderRadius: BorderRadius.circular(22),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -305,12 +346,15 @@ class _BuildMessagesList extends StatelessWidget {
                 child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28),
               ),
               child: InkWell(
-                onTap: () => context.push('/one_chat', extra: {
-                  'id': conv.id,
-                  'firstName': otherUser!.first_name,
-                  'lastName': otherUser.last_name,
-                  'otherUserId': otherUser.id,
-                }),
+                onTap: () {
+                  context.read<ChatCubit>().markMessageAsRead(conv.id);
+                  context.push('/one_chat', extra: {
+                    'id': conv.id,
+                    'firstName': otherUser!.first_name,
+                    'lastName': otherUser.last_name,
+                    'otherUserId': otherUser.id,
+                  });
+                },
                 borderRadius: BorderRadius.circular(24),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -372,19 +416,40 @@ class _BuildMessagesList extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(tr.active, style: const TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
+        Text(
+            conv.unreadCount > 0 ? tr.new_messages : tr.active,
+            style: TextStyle(
+                fontSize: 10,
+                color: conv.unreadCount > 0 ? colorScheme.primary : Colors.green,
+                fontWeight: FontWeight.bold
+            )
+        ),
         const SizedBox(height: 8),
         if (conv.unreadCount > 0)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(gradient: AppColors.premiumGoldGradient, borderRadius: BorderRadius.circular(10)),
-            child: Text('${conv.unreadCount}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 500),
+            builder: (context, value, child) => Transform.scale(
+              scale: value,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                    gradient: AppColors.premiumGoldGradient,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(color: AppColors.primaryLight.withOpacity(0.3), blurRadius: 8)
+                    ]
+                ),
+                child: Text('${conv.unreadCount}', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ),
           )
         else
           Icon(Icons.done_all_rounded, size: 18, color: colorScheme.primary.withOpacity(0.4)),
       ],
     );
   }
+
   Future<bool?> _showDeleteConfirm(BuildContext context) {
     final tr = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
