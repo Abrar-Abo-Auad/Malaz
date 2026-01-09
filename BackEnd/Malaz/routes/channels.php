@@ -10,6 +10,8 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 Broadcast::channel('conversations.{conversationId}', function ($user, $conversationId) {
 
+    \Log::info('hello', [$user]);
+    return true;
     return \App\Models\Conversation::where('id', $conversationId)
         ->where(function ($q) use ($user) {
             $q->where('user_one_id', $user->id)
