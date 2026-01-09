@@ -24,7 +24,9 @@ abstract class ApartmentRemoteDataSource {
     required int bedrooms,
     required int area,
     required List <XFile> mainImageUrl,
-    required XFile main_pic
+    required XFile main_pic,
+    required double latitude,
+    required double longitude,
   });
   Future<ApartmentsList> getMyApartments({String? cursor});
 }
@@ -128,7 +130,9 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
     required int bedrooms,
     required int area,
     required List<XFile> mainImageUrl,
-    required XFile main_pic
+    required XFile main_pic,
+    required double latitude,
+    required double longitude
   })async {
     final endpoint='/properties';
 
@@ -157,6 +161,8 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
           main_pic.path,
           filename:main_pic.path,
         ),
+        'latitude': latitude.toString(),
+        'longitude': longitude.toString(),
       });
       final response = await networkService.post(
         endpoint,

@@ -69,6 +69,8 @@ class AddApartmentCubit extends Cubit<ApartmentState> {
     required int area,
     required List<XFile> images,
     required XFile main_pic,
+    required double latitide,
+    required double longitude
   }) async {
     emit(AddApartmentLoading());
 
@@ -86,6 +88,8 @@ class AddApartmentCubit extends Cubit<ApartmentState> {
       area: area,
       mainImageUrl: images,
       main_pic: main_pic,
+      latitude: latitide,
+      longitude: longitude
     );
 
     final result = await addApartmentUseCase.call(params);

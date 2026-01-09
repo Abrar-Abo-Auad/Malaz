@@ -338,7 +338,7 @@ class AppTheme {
 // =======================================================
 
 class AppConstants {
-  static const baseurl = 'http://10.199.148.242:8000/api';
+  static const baseurl = 'http://10.78.179.242:8000/api';
   /// [SharedPreferences] Keys
   static const String themeKey = 'theme_mode';
   static const String languageKey = 'language_code';
@@ -357,6 +357,8 @@ class AppConstants {
   static const String locationKey = 'CACHED_LOCATION';
 
   static const numberOfApartmentsEachRequest = 2;
+  static const numberOfBookingEachRequest = 5;
+
 
   static String userProfileImage(int userId) => "$baseurl/users/$userId/profile_image";
 }
@@ -392,41 +394,44 @@ class ErrorHandler {
   }
 
   static Exception _handleBadResponse(Response? response) {
-    if (response == null) return ServerException(message: 'Unknown server error');
+    if (response == null)
+      return ServerException(message: 'Unknown server error');
 
     final statusCode = response.statusCode;
     final data = response.data;
     String message = 'Something went wrong';
 
-    if (data is Map && data.containsKey('message')) {
-      message = data['message'];
+    if (data is Map) {
+      if (data.containsKey('message') && data['message'] != null) {
+        message = data['message'].toString();
+      } else if (data.containsKey('error') && data['error'] != null) {
+        message = data['error'].toString();
+      }
     }
 
     if (statusCode == 401) {
       return UnauthenticatedException(message);
     }
 
-    if(statusCode == 403) {
+    if (statusCode == 403) {
       if (message.toLowerCase().contains('does not exist')) {
         return PhoneNotFoundException(message);
       }
     }
-
     if (statusCode == 422 && data is Map) {
       if (data.containsKey('errors')) {
         final errors = data['errors'];
         if (errors is Map && errors.isNotEmpty) {
-          final firstKey = errors.keys.first;
-          final firstErrorList = errors[firstKey];
+          final firstErrorList = errors.values.first;
           if (firstErrorList is List && firstErrorList.isNotEmpty) {
             return ServerException(
-              message: firstErrorList.first.toString(),
-              statusCode: 422,
-            );
+                message: firstErrorList.first.toString(), statusCode: 422);
           }
         }
       }
+      return ServerException(message: message, statusCode: 422);
     }
+
 
     if (statusCode != null && statusCode >= 500) {
       return ServerException(message: 'Server internal error', statusCode: 500);
@@ -584,70 +589,6 @@ class UnexpectedFailure extends Failure {
   const UnexpectedFailure(super.message);
 }
 // =======================================================
-// FILE PATH: lib\core\location_service\location_service.dart
-// =======================================================
-
-import 'dart:convert';
-
-import 'package:location/location.dart';
-import 'package:http/http.dart' as http;
-
-class LocationService {
-  Location location = Location();
-
-  Future<LocationData?> getCurrentLocation() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-
-    serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        return null;
-      }
-    }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return null;
-      }
-    }
-
-    try {
-      return await location.getLocation();
-    } catch (e) {
-      print("خطأ في جلب الموقع: $e");
-      return null;
-    }
-  }
-
-  Future<String> getAddressFromCoords(double lat, double lng, String languageCode) async {
-    try {
-      final url = Uri.parse('https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&zoom=10');
-
-      final response = await http.get(url, headers: {
-        'User-Agent': 'MalazApp_Development',
-        'Accept-Language': languageCode,
-      });
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final address = data['address'];
-
-        String city = address['city'] ?? address['town'] ?? address['village'] ?? address['state'] ?? "";
-        String country = address['country'] ?? "";
-
-        return "$city, $country";
-      }
-    } catch (e) {
-      print("Error fetching address: $e");
-    }
-    return "Unknown";
-  }
-}
-// =======================================================
 // FILE PATH: lib\core\network\auth_interceptor.dart
 // =======================================================
 
@@ -718,6 +659,7 @@ import 'package:dio/dio.dart';
 
 import '../constants/app_constants.dart';
 import '../errors/error_handler.dart';
+import '../errors/exceptions.dart';
 import 'auth_interceptor.dart';
 abstract class NetworkService {
   Future<Response> get(String endpoint, {Map<String, dynamic>? queryParameters});
@@ -787,14 +729,24 @@ class NetworkServiceImpl implements NetworkService {
       throw ErrorHandler.handle(e);
     }
   }
-
   @override
   Future<Response> patch(String endpoint, {dynamic data, Map<String, dynamic>? queryParameters}) async {
     try {
       final response = await _dio.patch(endpoint, data: data, queryParameters: queryParameters);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+        );
+      }
+
       return response;
     } on DioException catch (e) {
       throw ErrorHandler.handle(e);
+    } catch (e) {
+      throw UnexpectedException();
     }
   }
 }
@@ -851,6 +803,7 @@ import '../../domain/usecases/location/load_saved_location_usecase.dart';
 import '../../domain/usecases/location/update_manual_location_usecase.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
 import '../../presentation/cubits/booking/booking_cubit.dart';
+import '../../presentation/cubits/booking/manage_booking.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
 import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
@@ -913,7 +866,12 @@ Future<void> setUpServices() async {
 
   sl.registerFactory(() => LanguageCubit(sl()));
 
-  sl.registerFactory(() => BookingCubit(sl<GetBookedDatesUseCase>(), sl<MakeBookUseCase>(), sl<GetUserBooking>(),sl<UpdateStatus>()));
+  sl.registerFactory(() => BookingCubit(sl<GetBookedDatesUseCase>(), sl<MakeBookUseCase>(),));
+
+  sl.registerFactory(() => ManageBookingCubit(
+    sl<GetUserBooking>(),
+    sl<UpdateStatus>(),
+  ));
 
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
   sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
@@ -1581,7 +1539,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         'property_id': booking.propertyId,
         'check_in': booking.checkIn.toString().split(' ')[0],
         'check_out': booking.checkOut.toString().split(' ')[0],
-        'total_price': booking.price
+        'total_price': booking.totalPrice
       },
     );
   }
@@ -1624,6 +1582,11 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         'status':status
         }
     );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(response.data['message'] ?? 'Failed to update status');
+    }
+    print('Update Status Success: ${response.data}');
+
 
   }
 }
@@ -7493,6 +7456,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:malaz/presentation/cubits/auth/auth_cubit.dart';
 import 'package:malaz/presentation/cubits/booking/booking_cubit.dart';
+import 'package:malaz/presentation/cubits/booking/manage_booking.dart';
 import 'package:malaz/presentation/cubits/favorites/favorites_cubit.dart';
 import 'package:malaz/presentation/cubits/chat/chat_cubit.dart';
 
@@ -7579,6 +7543,8 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<MyApartmentsCubit>()),
         BlocProvider(create: (context) => sl<BookingCubit>()),
         BlocProvider(create: (context) => sl<LocationCubit>()..loadSavedLocation(),),
+        BlocProvider(create: (context) => sl<ManageBookingCubit>())
+        //BlocProvider(create: (context) => sl<AuthCubit>()),// ..checkAuth()
       ],
       child: const RentalAppView(),
     );
@@ -7595,7 +7561,6 @@ class RentalAppView extends StatelessWidget {
 
     final router = buildAppRouter();
 
-    print('<<<<<<<<<<<<<${sl<SharedPreferences>().get('CACHED_LOCATION')}');
     return MaterialApp.router(
       title: 'Malaz Rental',
       debugShowCheckedModeBanner: false,
@@ -8050,14 +8015,9 @@ class AuthCubit extends Cubit<AuthState> {
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:malaz/domain/entities/booking.dart';
-import 'package:malaz/domain/repositories/booking/booking_repository.dart';
 import 'package:malaz/domain/usecases/booking/Get_Booked_Dates_Use_Case.dart';
 import 'package:malaz/domain/usecases/booking/make_book_use_case.dart';
-import 'package:malaz/domain/usecases/booking/update_status_use_case.dart';
 
-import '../../../domain/usecases/booking/all_booking_use_case.dart';
-import '../../../domain/usecases/booking/update_status_use_case.dart';
-import '../../../domain/usecases/booking/update_status_use_case.dart';
 abstract class BookingState extends Equatable {
   const BookingState();
   @override
@@ -8091,59 +8051,18 @@ class SendingBookingError extends BookingState {
   const SendingBookingError(this.message);
 }
 
-class AllBookingLoading extends BookingState{}
-
-class AllBookingsLoaded extends BookingState {
-  final List<Booking> bookings;
-  const AllBookingsLoaded(this.bookings);
-  @override
-  List<Object> get props => [bookings];
-}
-
-class AllBookingError extends BookingState{
-  final String message;
-  const AllBookingError(this.message);
-}
-
-class UpdateBookingStatusLoading extends BookingState {}
-
-class UpdateBookingStatusSuccess extends BookingState {
-  final int bookingId;
-  final String newStatus;
-  UpdateBookingStatusSuccess(this.bookingId, this.newStatus);
-}
-
-class UpdateBookingStatusError extends BookingState {
-  final String message;
-  UpdateBookingStatusError(this.message);
-}
-
-
 class BookingCubit extends Cubit<BookingState> {
   final GetBookedDatesUseCase getBookedDatesUseCase;
   final MakeBookUseCase makeBookUseCase;
-  final GetUserBooking allBookingUseCase;
-  final UpdateStatus updateStatus;
-
-  BookingCubit(this.getBookedDatesUseCase, this.makeBookUseCase, this.allBookingUseCase, this.updateStatus)
+  BookingCubit(this.getBookedDatesUseCase, this.makeBookUseCase)
       : super(BookingInitial());
-
-  Future<void> fetchAllBookings(int userId) async {
-    emit(AllBookingLoading());
-    final response = await allBookingUseCase(userId: userId);
-
-    response.fold(
-          (failure) => emit(AllBookingError(failure.message??"error")),
-          (bookingList) => emit(AllBookingsLoaded(bookingList.booking)),
-    );
-  }
 
   Future<void> loadBookedDates(int propertyId) async {
     emit(BookingLoading());
     final response = await getBookedDatesUseCase.call(propertyId: propertyId);
     response.fold(
-      (failure) => emit(BookingError(failure.message!)),
-      (bookedRanges) {
+          (failure) => emit(BookingError(failure.message!)),
+          (bookedRanges) {
         List<DateTime> dates = bookedRanges
             .expand((range) => _breakToDates(range.checkIn!, range.checkOut!))
             .toList();
@@ -8158,7 +8077,7 @@ class BookingCubit extends Cubit<BookingState> {
 
     response.fold(
             (failure) => emit(SendingBookingError(failure.message!)),
-        (_) => emit(SentBooking()));
+            (_) => emit(SentBooking()));
   }
 
   List<DateTime> _breakToDates(DateTime checkIn, DateTime checkOut) {
@@ -8172,22 +8091,83 @@ class BookingCubit extends Cubit<BookingState> {
 
     return dates;
   }
+}
 
-  Future<void> updateBookingStatus(int bookingId, String status,int ownerId) async {
-    emit(UpdateBookingStatusLoading());
+// =======================================================
+// FILE PATH: lib\presentation\cubits\booking\manage_booking.dart
+// =======================================================
 
-    final response = await updateStatus.call(propertyId: bookingId,status: status);
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:malaz/domain/entities/booking.dart';
+import '../../../domain/usecases/booking/all_booking_use_case.dart';
+import '../../../domain/usecases/booking/update_status_use_case.dart';
+
+// --- States ---
+abstract class ManageBookingState extends Equatable {
+  const ManageBookingState();
+  @override
+  List<Object?> get props => [];
+}
+
+class ManageBookingInitial extends ManageBookingState {}
+
+class AllBookingLoading extends ManageBookingState {}
+class AllBookingsLoaded extends ManageBookingState {
+  final List<Booking> bookings;
+  const AllBookingsLoaded(this.bookings);
+  @override
+  List<Object?> get props => [bookings];
+}
+class AllBookingError extends ManageBookingState {
+  final String message;
+  const AllBookingError(this.message);
+}
+
+class UpdateStatusLoading extends ManageBookingState {}
+class UpdateStatusSuccess extends ManageBookingState {
+  final String message;
+  const UpdateStatusSuccess(this.message);
+}
+class UpdateStatusError extends ManageBookingState {
+  final String message;
+  const UpdateStatusError(this.message);
+}
+
+// --- Cubit ---
+class ManageBookingCubit extends Cubit<ManageBookingState> {
+  final GetUserBooking allBookingUseCase;
+  final UpdateStatus updateStatusUseCase;
+
+  ManageBookingCubit(this.allBookingUseCase, this.updateStatusUseCase)
+      : super(ManageBookingInitial());
+
+  Future<void> fetchAllBookings(int userId) async {
+    emit(AllBookingLoading());
+    final response = await allBookingUseCase(userId: userId);
 
     response.fold(
-          (failure) => emit(UpdateBookingStatusError(failure.message!)),
-          (success) {
+          (failure) => emit(AllBookingError(failure.message ?? "error")),
+          (bookingList) => emit(AllBookingsLoaded(bookingList.booking)),
+    );
+  }
 
-            fetchAllBookings(ownerId);
-          }
+  Future<void> updateBookingStatus(int bookingId, String status, int ownerId) async {
+    emit(UpdateStatusLoading());
+
+    final response = await updateStatusUseCase.call(propertyId: bookingId, status: status);
+
+    response.fold(
+          (failure)
+          {emit(UpdateStatusError(failure.message ?? "Failed to update status, please try again."));
+            fetchAllBookings(ownerId);},
+          (success) {
+        emit(UpdateStatusSuccess("Booking $status successfully"));
+        fetchAllBookings(ownerId);
+      },
     );
   }
 }
-
 // =======================================================
 // FILE PATH: lib\presentation\cubits\chat\chat_cubit.dart
 // =======================================================
@@ -8726,12 +8706,9 @@ class LanguageCubit extends Cubit<LanguageState> {
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/location_service/location_service.dart';
-import '../../../data/datasources/local/location_local_data_source.dart';
 import '../../../domain/entities/location_entity.dart';
 import '../../../domain/usecases/location/get_current_location_usecase.dart';
 import '../../../domain/usecases/location/load_saved_location_usecase.dart';
-import 'package:equatable/equatable.dart';
 
 import '../../../domain/usecases/location/update_manual_location_usecase.dart';
 
@@ -8782,6 +8759,10 @@ class LocationCubit extends Cubit<LocationState> {
   Future<void> loadSavedLocation() async {
     final loc = await loadSavedLocationUseCase();
     if (loc != null) emit(LocationLoaded(loc));
+  }
+
+  void clearLocation() {
+    emit(LocationInitial());
   }
 }
 // =======================================================
@@ -10398,7 +10379,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         BlocBuilder<LocationCubit, LocationState>(
           builder: (context, state) {
             String address = tr.unknown_location;
-
+            if (state is LocationLoading) {
+              address = 'Leading...';
+            }
             if (state is LocationLoaded) {
               address = state.location.address;
             }
@@ -13179,13 +13162,14 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
   void _onConfirmBooking(Apartment apartment) {
     if (_rangeStart == null || _rangeEnd == null) return;
-
+    int nights = _rangeEnd!.difference(_rangeStart!).inDays;
+    int finalTotalPrice = nights * apartment.price;
     context.read<BookingCubit>().makeBook(
       Booking(
         propertyId: apartment.id,
         checkIn: _rangeStart!,
         checkOut: _rangeEnd!,
-        price: apartment.price
+        totalPrice: finalTotalPrice.toString()
       )
     );
   }
@@ -15310,7 +15294,6 @@ class _HomeViewState extends State<HomeView> {
         child: Column(
           children: [
             _BuildHomeHeader(scaffoldKey: _scaffoldKey),
-            const _BuildFilterList(),
             const SizedBox(height: 10),
             Expanded(
               child: RefreshIndicator(
@@ -15376,27 +15359,6 @@ class _BuildHomeHeader extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BuildFilterList extends StatelessWidget {
-  const _BuildFilterList();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 36,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: const [
-          _BuildFilterChip(label: 'All', isSelected: true),
-          _BuildFilterChip(label: 'Near Me'),
-          _BuildFilterChip(label: 'High Rated'),
-          _BuildFilterChip(label: 'Newest'),
         ],
       ),
     );
@@ -15630,35 +15592,6 @@ class _BuildIconButton extends StatelessWidget {
   }
 }
 
-class _BuildFilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-
-  const _BuildFilterChip({required this.label, this.isSelected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? colorScheme.secondary : colorScheme.surface,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: isSelected ? colorScheme.secondary : Colors.grey.withOpacity(0.3),
-        ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-            color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface.withOpacity(0.7),
-            fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
 class _BuildShimmerLoading extends StatelessWidget {
   const _BuildShimmerLoading();
 
@@ -15818,24 +15751,497 @@ class _BuildModernNavBar extends StatelessWidget {
   }
 }
 // =======================================================
-// FILE PATH: lib\presentation\screens\manage_property\manage_property.dart
+// FILE PATH: lib\presentation\screens\manage_property\booking_card.dart
 // =======================================================
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:malaz/presentation/global_widgets/user_profile_image/user_profile_image.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import '../../../domain/entities/booking.dart';
+import '../../cubits/booking/manage_booking.dart';
+import '../../cubits/chat/chat_cubit.dart';
+import '../../global_widgets/user_profile_image/user_profile_image.dart';
 import '../../../core/config/color/app_color.dart';
+
+class BookingCardWidget extends StatelessWidget {
+  final Booking booking;
+  final bool isPending;
+  final int ownerId;
+
+  const BookingCardWidget({
+    super.key,
+    required this.booking,
+    required this.isPending,
+    required this.ownerId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String firstName = booking.user?.first_name ?? 'Guest';
+    final String lastName = booking.user?.last_name ?? '';
+    final String checkInStr = "${booking.checkIn!.day}/${booking.checkIn!.month}";
+    final String checkOutStr = "${booking.checkOut!.day}/${booking.checkOut!.month}";
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4))
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              UserProfileImage(userId: booking.userId!),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("$firstName $lastName",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 2),
+                    Text("From $checkInStr to $checkOutStr",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                  ],
+                ),
+              ),
+              _buildChatButton(context, firstName, lastName),
+            ],
+          ),
+          const Divider(height: 30, thickness: 0.8),
+          _buildApartmentInfo(isPending),
+          if (isPending) _buildActionSection(context),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildChatButton(BuildContext context, String fName, String lName) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(Icons.chat_outlined, color: Theme.of(context).colorScheme.primary),
+        onPressed: () async {
+          final chatCubit = context.read<ChatCubit>();
+          chatCubit.clearMessages();
+          final newId = await chatCubit.saveNewConversation(booking.userId!);
+          if (newId != null && context.mounted) {
+            context.pushNamed('one_chat', extra: {
+              'id': newId,
+              'firstName': fName,
+              'lastName': lName,
+              'otherUserId': booking.userId,
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildApartmentInfo(bool isPending) {
+    return Row(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            booking.apartment?.mainImageUrl ?? '',
+            width: 50, height: 50, fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(width: 50, height: 50, color: Colors.grey[100], child: const Icon(Icons.home)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(booking.apartment?.title ?? "Property",
+                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              Text("${booking.totalPrice} \$",
+                  style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 14)),
+            ],
+          ),
+        ),
+        if (!isPending) _StatusBadge(status: booking.status!),
+      ],
+    );
+  }
+
+  Widget _buildActionSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => _showConfirmActionDialog(context, 'cancelled'),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.primaryLight.withOpacity(0.5)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: const Text("Reject", style: TextStyle(color: AppColors.primaryLight, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showConfirmActionDialog(context, 'confirmed'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: AppColors.premiumGoldGradient2,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(child: Text("Accept", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  void _showConfirmActionDialog(BuildContext context, String status) {
+    final bool isAccept = status == 'confirmed';
+    final cubit = context.read<ManageBookingCubit>();
+
+    showDialog(
+      context: context,
+      builder: (confirmContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: isAccept ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isAccept ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                    color: isAccept ? Colors.green : Colors.red,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  isAccept ? "Confirm Booking?" : "Reject Request?",
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Are you sure you want to change the status to $status?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 25),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(confirmContext),
+                        child: const Text("Back", style: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(confirmContext);
+                          _showSmartResultDialog(context, cubit);
+                          cubit.updateBookingStatus(booking.id!, status, ownerId);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            gradient: isAccept ? AppColors.premiumGoldGradient2 : null,
+                            color: isAccept ? null : Colors.redAccent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Text("Confirm", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSmartResultDialog(BuildContext context, ManageBookingCubit cubit) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        bool isLoading = true;
+        bool? isSuccess;
+        String message = "Processing your request...";
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final subscription = cubit.stream.listen((state) {
+              if (state is UpdateStatusSuccess || state is UpdateStatusError) {
+                if (dialogContext.mounted) {
+                  setState(() {
+                    isLoading = false;
+                    isSuccess = state is UpdateStatusSuccess;
+                    message = isSuccess!
+                        ? (state as UpdateStatusSuccess).message
+                        : (state as UpdateStatusError).message;
+                  });
+                }
+              }
+            });
+
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              child: Padding(
+                padding: const EdgeInsets.all(25),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isLoading) ...[
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 20),
+                      const Text("Please wait...", style: TextStyle(fontWeight: FontWeight.bold)),
+                    ] else ...[
+                      Icon(
+                        isSuccess! ? Icons.check_circle_rounded : Icons.error_outline_rounded,
+                        color: isSuccess! ? Colors.green : Colors.red,
+                        size: 60,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        isSuccess! ? "Success" : "Notice",
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(message, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[700])),
+                      const SizedBox(height: 25),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isSuccess! ? Colors.green : Colors.redAccent,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () {
+                            subscription.cancel();
+                            Navigator.pop(dialogContext);
+                          },
+                          child: const Text("OK", style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String status;
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color color = Colors.orange;
+    if (status == 'accepted' || status == 'confirmed') color = Colors.green;
+    if (status == 'canceled' || status == 'rejected' || status == 'cancelled') color = Colors.red;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withOpacity(0.2))),
+      child: Text(status.toUpperCase(),
+          style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+    );
+  }
+}
+// =======================================================
+// FILE PATH: lib\presentation\screens\manage_property\booking_shimmer.dart
+// =======================================================
+
+import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
+
+const Color _placeholderColor = Colors.white;
+
+class BuildBookingShimmer extends StatelessWidget {
+  const BuildBookingShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.symmetric( vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Shimmer.fromColors(
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+        child: const Column(
+          children: [
+            _BuildShimmerUserHeader(),
+            Divider(height: 32, color: _placeholderColor, thickness: 0.8),
+            _BuildShimmerApartmentRow(),
+            SizedBox(height: 20),
+            _BuildShimmerActionButtons(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BuildShimmerUserHeader extends StatelessWidget {
+  const _BuildShimmerUserHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 55, height: 55,
+          decoration: const BoxDecoration(color: _placeholderColor, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(width: 100, height: 16, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+              const SizedBox(height: 8),
+              Container(width: 140, height: 12, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+            ],
+          ),
+        ),
+        Container(width: 40, height: 40, decoration: const BoxDecoration(color: _placeholderColor, shape: BoxShape.circle)),
+      ],
+    );
+  }
+}
+
+class _BuildShimmerApartmentRow extends StatelessWidget {
+  const _BuildShimmerApartmentRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 50, height: 50,
+          decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(12)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(width: 120, height: 14, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+              const SizedBox(height: 8),
+              Container(width: 60, height: 14, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+            ],
+          ),
+        ),
+        Container(width: 65, height: 24, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(10))),
+      ],
+    );
+  }
+}
+
+class _BuildShimmerActionButtons extends StatelessWidget {
+  const _BuildShimmerActionButtons();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 45,
+            decoration: BoxDecoration(
+              border: Border.all(color: _placeholderColor, width: 2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            height: 45,
+            decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+// =======================================================
+// FILE PATH: lib\presentation\screens\manage_property\manage_property.dart
+// =======================================================
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:shimmer/shimmer.dart';
+import '../../../core/config/color/app_color.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/auth/auth_cubit.dart';
-import '../../cubits/chat/chat_cubit.dart';
+import '../../cubits/booking/manage_booking.dart';
 import '../../cubits/property/property_cubit.dart';
-import '../../cubits/booking/booking_cubit.dart';
 import '../../global_widgets/apartment_cards/apartment_card.dart';
+import '../../global_widgets/apartment_cards/apartment_shimmer.dart';
+import '../../global_widgets/user_profile_image/user_profile_image.dart';
 import '../details/details_screen.dart';
 import '../property/add_property.dart';
-import '../../../domain/entities/booking.dart';
+import 'booking_card.dart';
+import 'booking_shimmer.dart';
 
 class ManagePropertiesScreen extends StatefulWidget {
   const ManagePropertiesScreen({super.key});
@@ -15852,7 +16258,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
+    _refreshInitialData();
 
     _myApartmentsScrollController.addListener(() {
       if (_myApartmentsScrollController.position.pixels >=
@@ -15871,11 +16277,11 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     });
   }
 
-  void _loadInitialData() {
+  void _refreshInitialData() {
     context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true);
     final authState = context.read<AuthCubit>().state;
     if (authState is AuthAuthenticated) {
-      context.read<BookingCubit>().fetchAllBookings(authState.user.id);
+      context.read<ManageBookingCubit>().fetchAllBookings(authState.user.id);
     }
   }
 
@@ -15891,39 +16297,80 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final tr = AppLocalizations.of(context)!;
 
-    return BlocListener<BookingCubit, BookingState>(
-      listenWhen: (previous, current) =>
-      current is UpdateBookingStatusSuccess || current is UpdateBookingStatusError,
-      listener: (context, state) {
-        if (state is UpdateBookingStatusSuccess) {
-          // بعد النجاح، نعيد جلب البيانات لتحديث القائمة
-          final authState = context.read<AuthCubit>().state;
-          if (authState is AuthAuthenticated) {
-            context.read<BookingCubit>().fetchAllBookings(authState.user.id);
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Status updated to ${state.newStatus}!"), backgroundColor: Colors.green),
-          );
-        }
-        if (state is UpdateBookingStatusError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
-        }
-      },
-      child: Scaffold(
-        backgroundColor: colorScheme.surface,
-        floatingActionButton: _currentPage == 0
-            ? FloatingActionButton.extended(
-          heroTag: 'manage_property_fab',
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPropertyScreen())),
-          backgroundColor: colorScheme.primary,
-          icon: Icon(Icons.add_home_work_rounded, color: colorScheme.onPrimary),
-          label: Text(tr.add_new, style: const TextStyle(fontWeight: FontWeight.bold)),
-        )
-            : null,
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [_buildSliverAppBar(colorScheme, tr)],
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      floatingActionButton: _currentPage == 0
+          ? FloatingActionButton.extended(
+        heroTag: 'manage_property_fab',
+        onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const AddPropertyScreen())),
+        backgroundColor: colorScheme.primary,
+        icon: Icon(Icons.add_home_work_rounded, color: colorScheme.onPrimary),
+        label: Text(tr.add_new,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+      )
+          : null,
+      body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                pinned: true,
+                expandedHeight: 340.0,
+                backgroundColor: colorScheme.primary,
+                centerTitle: true,
+                title: Text(tr.property_manager,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800, color: colorScheme.surface)),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    color: colorScheme.primary,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: kToolbarHeight + 40),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(35)),
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          _buildProfileHeader(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(80),
+                  child: Container(
+                    color: colorScheme.surface,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 12),
+                        _buildGradientIndicator(),
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildTabItem(tr.properties, 0),
+                              _buildTabItem(tr.inbound, 1),
+                              _buildTabItem(tr.history, 2),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ];
+          },
+
           body: PageView(
             controller: _pageController,
             children: [
@@ -15933,35 +16380,48 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildBookingsTab({required String targetStatus}) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, authState) {
-        if (authState is! AuthAuthenticated) return const Center(child: Text("Please Login"));
+        if (authState is! AuthAuthenticated) {
+          return const Center(child: Text("Please Login"));
+        }
 
-        return BlocBuilder<BookingCubit, BookingState>(
-          // حل مشكلة اختفاء البيانات: لا نعيد بناء القائمة عند حالات التحميل المؤقتة (UpdateStatus)
-          buildWhen: (previous, current) =>
-          current is AllBookingLoading || current is AllBookingsLoaded || current is AllBookingError,
+        return BlocBuilder<ManageBookingCubit, ManageBookingState>(
+          buildWhen: (prev, curr) =>
+          curr is AllBookingLoading || curr is AllBookingsLoaded,
           builder: (context, state) {
-            if (state is AllBookingLoading) return const Center(child: CircularProgressIndicator.adaptive());
+            if (state is AllBookingLoading) {
+              return const _BuildShimmerRequest();
+            }
 
             if (state is AllBookingsLoaded) {
               final bookings = state.bookings.where((b) {
-                return targetStatus == 'pending' ? b.status == 'pending' : b.status != 'pending';
+                return (targetStatus == 'pending')
+                    ? b.status == 'pending'
+                    : b.status != 'pending';
               }).toList();
 
+              if (bookings.isEmpty) {
+                return const Center(child: Text("No data found"));
+              }
+
               return RefreshIndicator(
-                onRefresh: () async => context.read<BookingCubit>().fetchAllBookings(authState.user.id),
+                onRefresh: () async => context
+                    .read<ManageBookingCubit>()
+                    .fetchAllBookings(authState.user.id),
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  itemCount: bookings.isEmpty ? 1 : bookings.length,
+                  itemCount: bookings.length,
                   itemBuilder: (context, index) {
-                    if (bookings.isEmpty) return const SizedBox(height: 200, child: Center(child: Text("No data found")));
-                    return _buildBookingCard(bookings[index], targetStatus == 'pending', authState.user.id);
+                    return BookingCardWidget(
+                      booking: bookings[index],
+                      isPending: targetStatus == 'pending',
+                      ownerId: authState.user.id,
+                    );
                   },
                 ),
               );
@@ -15973,180 +16433,50 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     );
   }
 
-  Widget _buildBookingCard(Booking booking, bool isPending, int ownerId) {
-    final theme = Theme.of(context);
-    // التاريخ مع السنة
-    final String checkInStr = "${booking.checkIn?.day}/${booking.checkIn?.month}/${booking.checkIn?.year}";
-    final String checkOutStr = "${booking.checkOut?.day}/${booking.checkOut?.month}/${booking.checkOut?.year}";
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), spreadRadius: 2, blurRadius: 5, offset: const Offset(0, 3))],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              UserProfileImage(userId: booking.userId!, radius: 25),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("${booking.user?.first_name} ${booking.user?.last_name}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text("From $checkInStr to $checkOutStr", style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-                  ],
-                ),
-              ),
-              // منطق الـ Chat المعاد إصلاحه
-              IconButton(
-                onPressed: () async {
-                  final chatCubit = context.read<ChatCubit>();
-                  chatCubit.clearMessages();
-                  final newId = await chatCubit.saveNewConversation(booking.userId!);
-                  if (newId != null) {
-                    context.pushNamed('one_chat', extra: {
-                      'id': newId,
-                      'name': '${booking.user?.first_name} ${booking.user?.last_name}',
-                      'otherUserId': booking.userId,
-                    });
-                  }
-                },
-                icon: Icon(Icons.chat_outlined, color: theme.colorScheme.primary),
-              )
-            ],
-          ),
-          const Divider(height: 24),
-          _buildApartmentInfo(booking, isPending),
-          if (isPending) ...[
-            const SizedBox(height: 16),
-            _buildActionButtons(booking, ownerId),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildApartmentInfo(Booking booking, bool isPending) {
-    return Row(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            booking.apartment?.mainImageUrl ?? '',
-            width: 45, height: 45, fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(width: 45, height: 45, color: Colors.grey[100], child: const Icon(Icons.home)),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(booking.apartment?.title ?? "Property", maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w500)),
-              Text("${booking.totalPrice} \$", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13)),
-            ],
-          ),
-        ),
-        if (!isPending) _buildStatusBadge(booking.status!),
-      ],
-    );
-  }
-
-  Widget _buildActionButtons(Booking booking, int ownerId) {
-    return BlocBuilder<BookingCubit, BookingState>(
-      builder: (context, state) {
-        final bool isLoading = state is UpdateBookingStatusLoading;
-        return Row(
-          children: [
-            Expanded(child: _buildBaseButton("Reject", const Color(0xFFD4AF37), () => context.read<BookingCubit>().updateBookingStatus(booking.id!, 'cancelled', ownerId), isLoading, isGradient: false)),
-            const SizedBox(width: 12),
-            Expanded(child: _buildBaseButton("Accept", Colors.white, () => context.read<BookingCubit>().updateBookingStatus(booking.id!, 'confirmed', ownerId), isLoading, isGradient: true)),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildBaseButton(String text, Color textColor, VoidCallback onPressed, bool isLoading, {required bool isGradient}) {
-    return Container(
-      height: 45,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: isGradient ? AppColors.premiumGoldGradient2 : null,
-        border: !isGradient ? Border.all(color: textColor.withOpacity(0.5)) : null,
-      ),
-      child: MaterialButton(
-        onPressed: isLoading ? null : onPressed,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: isLoading
-            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : Text(text, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  // --- بقية الـ Widgets المساعدة (UI فقط) ---
-
-  Widget _buildSliverAppBar(ColorScheme colorScheme, AppLocalizations tr) {
-    return SliverAppBar(
-      pinned: true, expandedHeight: 340.0, backgroundColor: colorScheme.primary, centerTitle: true,
-      title: Text(tr.property_manager, style: TextStyle(fontWeight: FontWeight.w800, color: colorScheme.surface)),
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          color: colorScheme.primary,
-          child: Container(
-            margin: const EdgeInsets.only(top: kToolbarHeight + 40),
-            decoration: BoxDecoration(color: colorScheme.surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(35))),
-            child: Column(children: [const SizedBox(height: 20), _buildProfileImage(), const SizedBox(height: 12), _buildUserName()]),
-          ),
-        ),
-      ),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
-        child: Container(color: colorScheme.surface, child: Column(children: [_buildGradientIndicator(), const SizedBox(height: 12), _buildTabs()])),
-      ),
-    );
-  }
-
-  Widget _buildTabs() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [_buildTabItem("Properties", 0), _buildTabItem("Inbound", 1), _buildTabItem("History", 2)],
-      ),
-    );
-  }
-
-  Widget _buildStatusBadge(String status) {
-    Color color = (status == 'confirmed' || status == 'completed') ? Colors.green : Colors.red;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-      child: Text(status.toUpperCase(), style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
-    );
-  }
-
   Widget _buildPropertiesList() {
     return BlocBuilder<MyApartmentsCubit, ApartmentState>(
       builder: (context, state) {
-        if (state is MyApartmentsLoading) return const Center(child: CircularProgressIndicator.adaptive());
+        if (state is MyApartmentsLoading) {
+          return const _BuildShimmerPropertying();
+        }
         if (state is MyApartmentsLoaded) {
+          if (state.myApartments.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: () => context
+                  .read<MyApartmentsCubit>()
+                  .fetchMyApartments(isRefresh: true),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const [
+                  SizedBox(height: 200, child: Center(child: Text("No properties added yet.")))
+                ],
+              ),
+            );
+          }
           return RefreshIndicator(
-            onRefresh: () => context.read<MyApartmentsCubit>().fetchMyApartments(isRefresh: true),
+            onRefresh: () => context
+                .read<MyApartmentsCubit>()
+                .fetchMyApartments(isRefresh: true),
             child: ListView.builder(
               controller: _myApartmentsScrollController,
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
-              itemCount: state.myApartments.length,
-              itemBuilder: (context, index) => ApartmentCard(
-                apartment: state.myApartments[index],
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DetailsScreen(apartment: state.myApartments[index]))),
-              ),
+              itemCount: state.myApartments.length + (state.hasReachedMax ? 0 : 1),
+              itemBuilder: (context, index) {
+                if (index < state.myApartments.length) {
+                  return ApartmentCard(
+                    apartment: state.myApartments[index],
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => DetailsScreen(
+                                apartment: state.myApartments[index]))),
+                  );
+                } else {
+                  return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Center(child: CircularProgressIndicator.adaptive()));
+                }
+              },
             ),
           );
         }
@@ -16155,26 +16485,100 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     );
   }
 
-  Widget _buildUserName() => BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
-    String name = "User";
-    if (state is AuthAuthenticated) name = "${state.user.first_name} ${state.user.last_name}";
-    return Text(name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900));
-  });
-
-  Widget _buildProfileImage() => BlocBuilder<AuthCubit, AuthState>(builder: (context, state) {
-    int? id = (state is AuthAuthenticated) ? state.user.id : null;
-    return CircleAvatar(radius: 66, child: id != null ? ClipOval(child: UserProfileImage(userId: id, radius: 66)) : const Icon(Icons.person));
-  });
+  Widget _buildProfileHeader() {
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        String name = "User";
+        int? id;
+        if (state is AuthAuthenticated) {
+          name = "${state.user.first_name} ${state.user.last_name}";
+          id = state.user.id;
+        }
+        return Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.primaryLight, width: 2),
+              ),
+              child: CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.grey[100],
+                child: id == null
+                    ? const Icon(Icons.person, size: 40)
+                    : ClipOval(child: UserProfileImage(userId: id, radius: 60)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+          ],
+        );
+      },
+    );
+  }
 
   Widget _buildTabItem(String title, int index) {
     bool isSelected = _currentPage == index;
     return GestureDetector(
-      onTap: () => _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut),
-      child: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey)),
+      onTap: () => _pageController.animateToPage(index,
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(15)),
+        child: Text(title,
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey)),
+      ),
     );
   }
 
-  Widget _buildGradientIndicator() => SmoothPageIndicator(controller: _pageController, count: 3, effect: ExpandingDotsEffect(activeDotColor: Theme.of(context).colorScheme.primary, dotHeight: 6, dotWidth: 6));
+  Widget _buildGradientIndicator() {
+    return SmoothPageIndicator(
+      controller: _pageController,
+      count: 3,
+      effect: ExpandingDotsEffect(
+          activeDotColor: Theme.of(context).colorScheme.primary,
+          dotHeight: 6,
+          dotWidth: 6,
+          expansionFactor: 4),
+    );
+  }
+}
+
+class _BuildShimmerPropertying extends StatelessWidget {
+  const _BuildShimmerPropertying();
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      itemCount: AppConstants.numberOfApartmentsEachRequest,
+      itemBuilder: (context, index) => Shimmer.fromColors(
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+        child: const BuildShimmerCard(),
+      ),
+    );
+  }
+}
+
+class _BuildShimmerRequest extends StatelessWidget {
+  const _BuildShimmerRequest();
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      itemCount: AppConstants.numberOfBookingEachRequest,
+      itemBuilder: (context, index) => const BuildBookingShimmer(),
+    );
+  }
 }
 // =======================================================
 // FILE PATH: lib\presentation\screens\property\add_property.dart
@@ -17201,6 +17605,10 @@ class _AppDrawerState extends State<AppDrawer> {
         String address = tr.unknown_location;
         bool isLoading = state is LocationLoading;
 
+        if (state is LocationLoading) {
+          address = '...';
+        }
+
         if (state is LocationLoaded) {
           address = state.location.address;
         }
@@ -17308,6 +17716,7 @@ class _AppDrawerState extends State<AppDrawer> {
           await Future.delayed(const Duration(milliseconds: 210));
 
           if (context.mounted) {
+            context.read<LocationCubit>().clearLocation();
             context.read<AuthCubit>().logout();
           }
         },

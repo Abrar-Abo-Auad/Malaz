@@ -71,7 +71,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
     final tr = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       floatingActionButton: _currentPage == 0
           ? FloatingActionButton.extended(
         heroTag: 'manage_property_fab',
@@ -102,7 +101,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                     child: Container(
                       margin: const EdgeInsets.only(top: kToolbarHeight + 40),
                       decoration: BoxDecoration(
-                        color: colorScheme.surface,
+                        color: colorScheme.background,
                         borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(35)),
                       ),
@@ -118,7 +117,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(80),
                   child: Container(
-                    color: colorScheme.surface,
+                    color: colorScheme.background,
                     child: Column(
                       children: [
                         const SizedBox(height: 12),

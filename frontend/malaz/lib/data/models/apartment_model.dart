@@ -24,6 +24,8 @@ class ApartmentModel extends Apartment {
     required super.numberOfReviews,
     required super.mainImageUrl,
     super.isFav,
+    super.latitude,
+    super.longitude,
   });
 
   factory ApartmentModel.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,12 @@ class ApartmentModel extends Apartment {
       mainImageUrl: json['main_image_url'] ?? '',
 
       isFav: json['is_favorite'] ?? false,
+      latitude: json['latitude'] != null
+          ? double.tryParse(json['latitude'].toString())
+          : null,
+      longitude: json['longitude'] != null
+          ? double.tryParse(json['longitude'].toString())
+          : null,
     );
   }
   Map<String, dynamic> toJson(){
@@ -73,7 +81,9 @@ class ApartmentModel extends Apartment {
       'rating': rating,
       'number_of_reviews': numberOfReviews,
       'main_image_url': mainImageUrl,
-      'is_favorite': isFav
+      'is_favorite': isFav,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

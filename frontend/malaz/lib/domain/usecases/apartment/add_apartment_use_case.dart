@@ -24,7 +24,9 @@ class AddApartmentUseCase {
         bedrooms: apartment.bedrooms,
         area: apartment.area,
         mainImageUrl: apartment.mainImageUrl,
-        main_pic: apartment.main_pic
+        main_pic: apartment.main_pic,
+        latitude: apartment.latitude,
+        longitude:apartment.longitude
 
     );
   }
@@ -44,8 +46,10 @@ class ApartmentParams {
   final int area;
   final List <XFile> mainImageUrl;
   final XFile main_pic;
+  final double latitude;
+  final double longitude;
 
-  ApartmentParams({
+  ApartmentParams( {
     required this.title,
     required this.price,
     required this.city,
@@ -58,6 +62,8 @@ class ApartmentParams {
     required this.bedrooms,
     required this.area,
     required this.mainImageUrl,
-    required this.main_pic
+    required this.main_pic,
+    required this.latitude,
+    required this.longitude,
   });
 }

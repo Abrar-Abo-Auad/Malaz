@@ -48,8 +48,9 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
     required int bedrooms,
     required int area,
     required List <XFile> mainImageUrl,
-    required XFile main_pic
-  }) async {
+    required XFile main_pic,
+    required double latitude,
+    required double longitude,  }) async {
     try {
       final resault =await remoteDataSource.addApartment(
           title: title,
@@ -64,7 +65,9 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
           bedrooms: bedrooms,
           area: area,
           mainImageUrl: mainImageUrl,
-          main_pic:main_pic
+          main_pic:main_pic,
+          latitude: latitude,
+          longitude: longitude,
       );
       return const Right(unit);
     } on ServerException catch (e) {

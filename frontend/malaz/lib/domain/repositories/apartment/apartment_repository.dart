@@ -18,8 +18,9 @@ abstract class ApartmentRepository {
     required int bedrooms,
     required int area,
     required List <XFile> mainImageUrl,
-    required XFile main_pic
-
+    required XFile main_pic,
+    required double latitude,
+    required double longitude,
   });
   Future<ApartmentsList> getMyApartments({required String? cursor});
 
