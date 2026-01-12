@@ -213,20 +213,25 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
       );
   }
   Widget _buildNestedScrollPage(Widget child) {
-    return Builder(
-      builder: (context) {
-        return CustomScrollView(
-          key: PageStorageKey<String>(child.hashCode.toString()),
-          slivers: [
-            SliverOverlapInjector(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            ),
-            SliverToBoxAdapter(
-              child: child,
-            ),
-          ],
-        );
-      },
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Builder(
+        builder: (context) {
+          return CustomScrollView(
+            key: PageStorageKey<String>(child.hashCode.toString()),
+            slivers: [
+              SliverOverlapInjector(
+                handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              ),
+              SliverFillRemaining(
+                hasScrollBody: true,
+                child: child,
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -261,8 +266,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                     .read<ManageBookingCubit>()
                     .fetchAllBookings(authState.user.id),
                 child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {
@@ -307,8 +310,6 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                 .read<MyApartmentsCubit>()
                 .fetchMyApartments(isRefresh: true),
             child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
               controller: _myApartmentsScrollController,
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
               itemCount: state.myApartments.length + (state.hasReachedMax ? 0 : 1),
