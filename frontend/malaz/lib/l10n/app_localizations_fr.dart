@@ -572,4 +572,62 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get new_messages => 'Nouveaux messages';
+
+  @override
+  String get modify_reservation => 'Modifier la Réservation';
+
+  @override
+  String changing_dates_for(Object propertyTitle) {
+    return 'Changement de dates pour $propertyTitle';
+  }
+
+  @override
+  String get confirm_new_dates => 'Confirmer les Nouvelles Dates';
+
+  @override
+  String get cancel_booking_title => 'Annuler la Réservation ?';
+
+  @override
+  String cancel_booking_msg(Object propertyTitle) {
+    return 'Êtes-vous sûr de vouloir annuler votre séjour à $propertyTitle ? Cette action est irréversible.';
+  }
+
+  @override
+  String get keep_stay => 'Garder la Réservation';
+
+  @override
+  String get yes_cancel => 'Oui, Annuler';
+
+  @override
+  String get view_receipt => 'Voir le Reçu';
+
+  @override
+  String get check_in => 'ARRIVÉE';
+
+  @override
+  String get check_out => 'DÉPART';
+
+  @override
+  String get edit => 'Modifier';
+
+  @override
+  String get status_pending => 'EN ATTENTE';
+
+  @override
+  String get status_confirmed => 'CONFIRMÉ';
+
+  @override
+  String get status_completed => 'TERMINÉ';
+
+  @override
+  String get status_canceled => 'ANNULÉ';
+
+  @override
+  String get status_conflicted => 'CONFLIT';
+
+  @override
+  String get rate_the_apartment => 'Évaluation de l\'appartement';
+
+  @override
+  String get view_details => 'voir les détails';
 }
