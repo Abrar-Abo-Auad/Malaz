@@ -48,10 +48,17 @@ class ReviewController extends Controller
             ]);
         }
         $user = auth()->user();
-        $exists = Booking::where('user_id', $user->id)
+        $exists = $user
+            ->bookings()
             ->where('property_id', $propertyId)
-            ->where('status', 'completed')
+            ->whereIn('status', ['completed', 'confirmed'])
+            ->where('check_out', '>', today()->toDate())
             ->exists();
+
+        // $exists = Booking::where('user_id', $user->id)
+        //     ->where('property_id', $propertyId)
+        //     ->where('status', 'completed')
+        //     ->exists();
 
         $alreadyReviewed = Review::where('user_id', $user->id)
             ->where('property_id', $propertyId)
