@@ -6,7 +6,9 @@ import '../../../data/models/chat/chat_message_model.dart';
 import '../../../data/models/chat/conversation_model.dart';
 import '../../../domain/repositories/chat/chat_repository.dart';
 
-/////////////////////////  Chat States ///////////////////////////
+/// ===========================
+/// ----------[states]---------
+/// ===========================
 
 abstract class ChatState {}
 
@@ -47,7 +49,9 @@ class ChatConversationsError extends ChatState {
 }
 
 
-/////////////////////////  Chat Cubit ////////////////////////////
+/// ===========================
+/// ----------[cubit]---------
+/// ===========================
 
 class ChatCubit extends Cubit<ChatState> {
   final ChatRepository repository;
@@ -129,8 +133,11 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   void getMessages(int conversationId, {bool isSilent = false}) async {
-    if (!isSilent) emit(ChatMessagesInitialLoading());
+    allMessages = [];
+    emit(ChatMessagesInitialLoading());
+
     final result = await repository.getMessages(conversationId);
+
     result.fold(
           (error) => emit(ChatConversationsError(error.toString())),
           (messages) {

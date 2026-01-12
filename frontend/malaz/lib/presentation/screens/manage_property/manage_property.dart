@@ -257,15 +257,22 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                     : b.status != 'pending';
               }).toList();
 
-              if (bookings.isEmpty) {
-                return const Center(child: Text("No data found"));
-              }
-
               return RefreshIndicator(
                 onRefresh: () async => context
                     .read<ManageBookingCubit>()
                     .fetchAllBookings(authState.user.id),
-                child: ListView.builder(
+                child: bookings.isEmpty
+                    ? ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      child: const Center(child: Text("No data found")),
+                    ),
+                  ],
+                )
+                    : ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {

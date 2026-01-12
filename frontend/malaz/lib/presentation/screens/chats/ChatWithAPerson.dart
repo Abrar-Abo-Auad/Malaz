@@ -79,11 +79,25 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
   @override
   void initState() {
     super.initState();
+
     final authState = context.read<AuthCubit>().state;
     if (authState is AuthAuthenticated) myId = authState.user.id;
 
-    context.read<ChatCubit>().getMessages(widget.conversationId);
-    _connectToPusher();
+    final chatCubit = context.read<ChatCubit>();
+
+    int currentId = widget.conversationId;
+
+    if (chatCubit.state is ChatMessagesLoaded) {
+      currentId = (chatCubit.state as ChatMessagesLoaded).conversationId;
+    }
+
+    if (currentId > 0) {
+      log(">>>> Loading messages for ID: $currentId");
+      chatCubit.getMessages(currentId);
+      _connectToPusher();
+    } else {
+      chatCubit.emit(ChatMessagesLoaded(messages: [], conversationId: 0));
+    }
   }
 
   void _connectToPusher() async {
@@ -98,8 +112,10 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
   void _subscribeToCurrentConversation([int? overrideId]) async {
     final int idToSubscribe = overrideId ?? widget.conversationId;
 
-    if (idToSubscribe == -1) return;
-
+    if (idToSubscribe <= 0) {
+      log(">>>> Skipping Pusher subscription: Conversation not created yet.");
+      return;
+    }
     final channelName = "private-conversations.$idToSubscribe";
 
     if (_currentSubscribedChannel == channelName) return;
@@ -417,38 +433,36 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                   final text = _messageController.text.trim();
                   if (text.isEmpty) return;
 
+                  final chatCubit = context.read<ChatCubit>();
+                  final myIdValue = _getMyId(context) ?? 0;
+
+                  if (myIdValue == 0) {
+                    log("Error: User ID is null or 0");
+                    return;
+                  }
+
                   if (_editingMessage != null) {
-                    context.read<ChatCubit>().editMessage(_editingMessage!.id, text);
+                    chatCubit.editMessage(_editingMessage!.id, text);
                     setState(() => _editingMessage = null);
                     _messageController.clear();
                   } else {
-                    final myIdValue = myId ?? 0;
-                    final chatCubit = context.read<ChatCubit>();
-                    final text = _messageController.text.trim();
-
-                    if (text.isEmpty) return;
-
-                    int currentId = -1;
+                    int currentId = widget.conversationId;
                     if (chatCubit.state is ChatMessagesLoaded) {
                       currentId = (chatCubit.state as ChatMessagesLoaded).conversationId;
                     }
 
-                    if (currentId == -1) {
+                    if (currentId <= 0) {
                       final newId = await chatCubit.saveNewConversation(widget.otherUserId);
 
-                      if (newId != null && newId != -1) {
+                      if (newId != null && newId > 0) {
                         _onSendMessage(context, myIdValue, overrideId: newId);
+
+                        _subscribeToCurrentConversation(newId);
                       } else {
-                        if (chatCubit.state is ChatMessagesLoaded) {
-                          final fallbackId = (chatCubit.state as ChatMessagesLoaded).conversationId;
-                          if (fallbackId != -1) {
-                            _onSendMessage(context, myIdValue, overrideId: fallbackId);
-                            return;
-                          }
-                        }
+                        log("Failed to create conversation: newId is $newId");
                       }
                     } else {
-                      _onSendMessage(context, myIdValue);
+                      _onSendMessage(context, myIdValue, overrideId: currentId);
                     }
                   }
                 },

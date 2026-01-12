@@ -92,7 +92,6 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<BookingCubit>()),
         BlocProvider(create: (context) => sl<LocationCubit>()..loadSavedLocation(),),
         BlocProvider(create: (context) => sl<ManageBookingCubit>())
-        //BlocProvider(create: (context) => sl<AuthCubit>()),// ..checkAuth()
       ],
       child: const RentalAppView(),
     );
