@@ -17,18 +17,14 @@ class PropertyPolicy
         return false;
     }
 
-    public function showMessage(User $user, Conversation $conversation)
-    {
-        return ($conversation->user_one_id === $user->id || $conversation->user_two_id === $user->id)
-            ? Response::allow()
-            : Response::deny(__('validation.conversation.unauthorized'));
-    }
+   
 
     /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Conversation $conversation)
     {
+        return false;
         return ($conversation->user_one_id === $user->id || $conversation->user_two_id === $user->id)
             ? Response::allow()
             : Response::deny(__('validation.conversation.unauthorized'));
@@ -42,12 +38,7 @@ class PropertyPolicy
         return false;
     }
 
-    public function self(User $user, $ownerId)
-    {
-        return ($user->id !== $ownerId)
-            ? Response::allow()
-            : Response::deny(__('validation.conversation.self_start'));
-    }
+    
     /**
      * Determine whether the user can update the model.
      */
