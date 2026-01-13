@@ -208,5 +208,15 @@
   "error_generic_title": "Ups, bir şeyler ters gitti",
   "action_retry": "Tekrar Dene",
   "password_length_message": "Parola en az 6 karakter içermelidir.",
-  "not_chat_yourself": "Kendi kendine sohbet edemezsin."
+  "not_chat_yourself": "Kendi kendine sohbet edemezsin.",
+  "added_successfully": "Başarıyla eklendi",
+  "property_added_message": "Mülkünüz şu anda işleme alınıyor ve onaylandıktan sonra herkesin görebileceği şekilde yayınlanacaktır.",
+  "complete_all_fields": "Lütfen gerekli tüm bilgileri eksiksiz doldurun.",
+  "at_least_one_img": "En az bir görsel gereklidir.",
+  "click_to_select_location": "Konum seçmek için tıklayın",
+  "search": "aramak...",
+  "confirm_location": "konumu onaylayın",
+  "confirm_post_property": "Emlak ilanının onaylanması",
+  "confirm_post_property_message": "Mülke ait detaylar inceleme için gönderilecektir. Bilgilerin doğru olduğundan emin misiniz?",
+  "yes_post_it": "Evet, yayınlayın."
 }

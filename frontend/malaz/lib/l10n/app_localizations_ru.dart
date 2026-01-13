@@ -645,4 +645,39 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get action_retry => 'Повторить';
+
+  @override
+  String get added_successfully => 'Добавлено успешно';
+
+  @override
+  String get property_added_message =>
+      'Ваша заявка на размещение объявления находится в процессе обработки и станет доступна всем после одобрения.';
+
+  @override
+  String get complete_all_fields =>
+      'Пожалуйста, заполните всю необходимую информацию.';
+
+  @override
+  String get at_least_one_img => 'Требуется как минимум одно изображение.';
+
+  @override
+  String get click_to_select_location =>
+      'нажмите, чтобы выбрать местоположение';
+
+  @override
+  String get search => 'поиск...';
+
+  @override
+  String get confirm_location => 'подтвердить местоположение';
+
+  @override
+  String get confirm_post_property =>
+      'Подтверждение размещения объявления об объекте недвижимости';
+
+  @override
+  String get confirm_post_property_message =>
+      'Информация об объекте недвижимости будет отправлена ​​на проверку. Вы уверены, что данные верны?';
+
+  @override
+  String get yes_post_it => '«Да, опубликуйте это».';
 }

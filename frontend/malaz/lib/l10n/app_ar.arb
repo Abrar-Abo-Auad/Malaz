@@ -213,5 +213,16 @@
   "reviews_empty_title": "لا توجد تقييمات بعد",
   "reviews_empty_subtitle": "كن أول من يقيم هذا العقار!",
   "error_generic_title": "عذراً، حدث خطأ ما",
-  "action_retry": "إعادة المحاولة"
+  "action_retry": "إعادة المحاولة",
+  "not_chat_yourself": "! لا يمكنك التحدث مع نفسك",
+  "added_successfully": "تمت الإضافة بنجاح",
+  "property_added_message": "عقارك الآن تحت المعالجة وسيظهر للجميع فور الموافقة عليه",
+  "complete_all_fields": "يرجى إكمال جميع البيانات المطلوبة",
+  "at_least_one_img": "يلزم وجود صورة واحدة على الأقل",
+  "click_to_select_location": "انقر لتحديد الموقع",
+  "search": "...بحث",
+  "confirm_location": "تأكيد الموقع",
+  "confirm_post_property": "تأكيد نشر العقار",
+  "confirm_post_property_message": "سيتم إرسال بيانات العقار للمراجعة، هل أنت متأكد من صحة المعلومات؟",
+  "yes_post_it": "نعم، أنشر"
 }

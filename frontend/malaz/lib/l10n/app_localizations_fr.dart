@@ -652,4 +652,38 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get action_retry => 'Réessayer';
+
+  @override
+  String get added_successfully => 'Ajouté avec succès';
+
+  @override
+  String get property_added_message =>
+      'Votre dossier est en cours de traitement et sera visible par tous dès qu\'il sera approuvé.';
+
+  @override
+  String get complete_all_fields =>
+      'Veuillez compléter tous les renseignements requis.';
+
+  @override
+  String get at_least_one_img => 'Au moins une image est requise';
+
+  @override
+  String get click_to_select_location =>
+      'Cliquez pour sélectionner l\'emplacement';
+
+  @override
+  String get search => 'recherche...';
+
+  @override
+  String get confirm_location => 'confirmer l\'emplacement';
+
+  @override
+  String get confirm_post_property => 'Confirmation de l\'annonce immobilière';
+
+  @override
+  String get confirm_post_property_message =>
+      'Les détails du bien seront envoyés pour vérification. Êtes-vous sûr(e) que les informations sont correctes ?';
+
+  @override
+  String get yes_post_it => 'Oui, publiez-le.';
 }

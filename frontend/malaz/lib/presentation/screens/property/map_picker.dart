@@ -4,6 +4,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../l10n/app_localizations.dart';
+
 class MapPickerScreen extends StatefulWidget {
   const MapPickerScreen({super.key});
 
@@ -100,6 +102,8 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
+
     return SafeArea(child:
     Scaffold(
       body: Stack(
@@ -139,7 +143,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: "search....",
+                  hintText: tr.search,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   border: InputBorder.none,
                   suffixIcon: IconButton(
@@ -177,7 +181,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
               },
               child: _isFetching
                   ? const CircularProgressIndicator()
-                  : const Text("Confirm location"),
+                  : Text(tr.confirm_location),
             ),
           ),
         ],

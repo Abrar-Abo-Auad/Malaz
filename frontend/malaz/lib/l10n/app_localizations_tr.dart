@@ -644,4 +644,37 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get action_retry => 'Tekrar Dene';
+
+  @override
+  String get added_successfully => 'Başarıyla eklendi';
+
+  @override
+  String get property_added_message =>
+      'Mülkünüz şu anda işleme alınıyor ve onaylandıktan sonra herkesin görebileceği şekilde yayınlanacaktır.';
+
+  @override
+  String get complete_all_fields =>
+      'Lütfen gerekli tüm bilgileri eksiksiz doldurun.';
+
+  @override
+  String get at_least_one_img => 'En az bir görsel gereklidir.';
+
+  @override
+  String get click_to_select_location => 'Konum seçmek için tıklayın';
+
+  @override
+  String get search => 'aramak...';
+
+  @override
+  String get confirm_location => 'konumu onaylayın';
+
+  @override
+  String get confirm_post_property => 'Emlak ilanının onaylanması';
+
+  @override
+  String get confirm_post_property_message =>
+      'Mülke ait detaylar inceleme için gönderilecektir. Bilgilerin doğru olduğundan emin misiniz?';
+
+  @override
+  String get yes_post_it => 'Evet, yayınlayın.';
 }

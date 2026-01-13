@@ -213,5 +213,15 @@
   "reviews_empty_title": "No reviews yet",
   "reviews_empty_subtitle": "Be the first to review this property!",
   "error_generic_title": "Oops, something went wrong",
-  "action_retry": "Retry"
+  "action_retry": "Retry",
+  "added_successfully": "Added successfully",
+  "property_added_message": "Your property is now being processed and will be visible to everyone as soon as it is approved.",
+  "complete_all_fields": "Please complete all required information.",
+  "at_least_one_img": "At least one image is required",
+  "click_to_select_location": "Click to select location",
+  "search": "Search...",
+  "confirm_location": "Confirm Location",
+  "confirm_post_property": "Property listing confirmation",
+  "confirm_post_property_message": "The property details will be sent for review. Are you sure the information is correct?",
+  "yes_post_it": "Yes, publish it."
 }
