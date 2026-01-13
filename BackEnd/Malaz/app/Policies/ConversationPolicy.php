@@ -19,9 +19,25 @@ class ConversationPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Conversation $conversation): bool
+    public function view(User $user, Conversation $conversation)
     {
-        return false;
+        return ($conversation->user_one_id === $user->id || $conversation->user_two_id === $user->id)
+            ? Response::allow()
+            : Response::deny(__('validation.conversation.unauthorized'));
+    }
+
+    public function showMessage(User $user, Conversation $conversation)
+    {
+        return ($conversation->user_one_id === $user->id || $conversation->user_two_id === $user->id)
+            ? Response::allow()
+            : Response::deny(__('validation.conversation.unauthorized'));
+    }
+
+    public function self(User $user, $ownerId)
+    {
+        return ($user->id !== $ownerId)
+            ? Response::allow()
+            : Response::deny(__('validation.conversation.self_start'));
     }
 
     /**
@@ -44,11 +60,11 @@ class ConversationPolicy
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Conversation $conversation)
-{
-    return ($conversation->user_one_id === $user->id || $conversation->user_two_id === $user->id)
-        ? Response::allow()
-        : Response::deny(__('validation.conversation.unauthorized'));
-}
+    {
+        return ($conversation->user_one_id === $user->id || $conversation->user_two_id === $user->id)
+            ? Response::allow()
+            : Response::deny(__('validation.conversation.unauthorized'));
+    }
 
 
     /**
