@@ -642,4 +642,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get action_retry => 'Retry';
+
+  @override
+  String get added_successfully => 'Added successfully';
+
+  @override
+  String get property_added_message =>
+      'Your property is now being processed and will be visible to everyone as soon as it is approved.';
+
+  @override
+  String get complete_all_fields => 'Please complete all required information.';
+
+  @override
+  String get at_least_one_img => 'At least one image is required';
+
+  @override
+  String get click_to_select_location => 'Click to select location';
+
+  @override
+  String get search => 'Search...';
+
+  @override
+  String get confirm_location => 'Confirm Location';
+
+  @override
+  String get confirm_post_property => 'Property listing confirmation';
+
+  @override
+  String get confirm_post_property_message =>
+      'The property details will be sent for review. Are you sure the information is correct?';
+
+  @override
+  String get yes_post_it => 'Yes, publish it.';
 }

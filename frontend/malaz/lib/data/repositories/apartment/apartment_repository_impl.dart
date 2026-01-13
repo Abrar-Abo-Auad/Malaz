@@ -51,7 +51,7 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
         required int area,
         required List<XFile> mainImageUrl,
         required XFile main_pic,
-       required double latitude,
+        required double latitude,
         required double longitude
       }) async {
     try {
@@ -69,8 +69,8 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
           area: area,
           mainImageUrl: mainImageUrl,
           main_pic: main_pic,
-        longitude: longitude,
-        latitude: latitude
+          longitude: longitude,
+          latitude: latitude
       );
       return const Right(unit);
     } on ServerException catch (e) {

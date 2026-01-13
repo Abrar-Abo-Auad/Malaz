@@ -639,4 +639,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get action_retry => 'إعادة المحاولة';
+
+  @override
+  String get added_successfully => 'تمت الإضافة بنجاح';
+
+  @override
+  String get property_added_message =>
+      'عقارك الآن تحت المعالجة وسيظهر للجميع فور الموافقة عليه';
+
+  @override
+  String get complete_all_fields => 'يرجى إكمال جميع البيانات المطلوبة';
+
+  @override
+  String get at_least_one_img => 'يلزم وجود صورة واحدة على الأقل';
+
+  @override
+  String get click_to_select_location => 'انقر لتحديد الموقع';
+
+  @override
+  String get search => '...بحث';
+
+  @override
+  String get confirm_location => 'تأكيد الموقع';
+
+  @override
+  String get confirm_post_property => 'تأكيد نشر العقار';
+
+  @override
+  String get confirm_post_property_message =>
+      'سيتم إرسال بيانات العقار للمراجعة، هل أنت متأكد من صحة المعلومات؟';
+
+  @override
+  String get yes_post_it => 'نعم، أنشر';
 }

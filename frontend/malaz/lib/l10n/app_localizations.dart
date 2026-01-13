@@ -1345,6 +1345,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get action_retry;
+
+  /// No description provided for @added_successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Added successfully'**
+  String get added_successfully;
+
+  /// No description provided for @property_added_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your property is now being processed and will be visible to everyone as soon as it is approved.'**
+  String get property_added_message;
+
+  /// No description provided for @complete_all_fields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete all required information.'**
+  String get complete_all_fields;
+
+  /// No description provided for @at_least_one_img.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one image is required'**
+  String get at_least_one_img;
+
+  /// No description provided for @click_to_select_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to select location'**
+  String get click_to_select_location;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get search;
+
+  /// No description provided for @confirm_location.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Location'**
+  String get confirm_location;
+
+  /// No description provided for @confirm_post_property.
+  ///
+  /// In en, this message translates to:
+  /// **'Property listing confirmation'**
+  String get confirm_post_property;
+
+  /// No description provided for @confirm_post_property_message.
+  ///
+  /// In en, this message translates to:
+  /// **'The property details will be sent for review. Are you sure the information is correct?'**
+  String get confirm_post_property_message;
+
+  /// No description provided for @yes_post_it.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, publish it.'**
+  String get yes_post_it;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:malaz/presentation/global_widgets/brand/build_branding.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../../../core/config/color/app_color.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/property/property_cubit.dart';
 import '../../global_widgets/glowing_key/build_glowing_key.dart';
@@ -86,6 +87,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   }
 
   void _showConfirmDialog(BuildContext context, VoidCallback onConfirm) {
+    final tr = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -105,13 +108,13 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                   color: AppColors.primaryLight.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Image.asset('assets/icons/key_logo.png', width: 40, height: 40, color: AppColors.primaryLight),
+                child: Image.asset(AppConstants.LogoPath, width: 40, height: 40, color: AppColors.primaryLight),
               ),
               const SizedBox(height: 20),
-              const Text("تأكيد نشر العقار",
+              Text(tr.confirm_post_property,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
               const SizedBox(height: 12),
-              const Text("سيتم إرسال بيانات العقار للمراجعة، هل أنت متأكد من صحة المعلومات؟",
+              Text(tr.confirm_post_property_message,
                   textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 14)),
               const SizedBox(height: 30),
               Row(
@@ -119,7 +122,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("تعديل", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                      child: Text(tr.edit, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -132,8 +135,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                           gradient: AppColors.premiumGoldGradient2,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: const Center(
-                          child: Text("نعم، أنشر",
+                        child: Center(
+                          child: Text(tr.yes_post_it,
                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
                       ),
@@ -148,6 +151,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
     );
   }
   void _showSuccessDialog(BuildContext context) {
+    final tr = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -172,10 +177,10 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text("تمت الإضافة بنجاح",
+              Text(tr.added_successfully,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
               const SizedBox(height: 10),
-              const Text("عقارك الآن تحت المعالجة وسيظهر للجميع فور الموافقة عليه.",
+              Text(tr.property_added_message,
                   textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 30),
               GestureDetector(
@@ -190,8 +195,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                     gradient: AppColors.premiumGoldGradient2,
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: const Center(
-                    child: Text("حسناً",
+                  child: Center(
+                    child: Text(tr.action_okay,
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
                   ),
                 ),
@@ -204,6 +209,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   }
 
   void _submitProperty() {
+    final tr = AppLocalizations.of(context)!;
     bool isFormValid = _formKey.currentState!.validate();
     bool isImagesEmpty = _images.isEmpty;
     bool isLocationEmpty = (_selectedLat == null || _selectedLng == null);
@@ -211,7 +217,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
 
     if (!isFormValid || isImagesEmpty || isTypeEmpty || isLocationEmpty) {
       if (isImagesEmpty) setState(() => _showImageError = true);
-      _showSnackBar(context, "يرجى إكمال جميع البيانات المطلوبة");
+      _showSnackBar(context, tr.complete_all_fields);
       return;
     }
 
@@ -246,7 +252,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.info_outline, color: AppColors.primaryLight), // أيقونة ذهبية
+            Icon(Icons.info_outline, color: AppColors.primaryLight),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -270,8 +276,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
 
     return BlocConsumer<AddApartmentCubit, ApartmentState>(
       listener: (context, state) {
-        if (state is AddApartmentSuccess ||
-            (state is AddApartmentError && state.message.contains("successfully"))) {
+        if (state is AddApartmentSuccess || (state is AddApartmentError && state.message.contains("successfully"))) {
 
           _showSuccessDialog(context);
         }
@@ -367,9 +372,9 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
             showError: _showImageError,
           ),
           if (_showImageError)
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 8),
-              child: Text("At least one image is required", style: TextStyle(color: Colors.red, fontSize: 12)),
+              child: Text(tr.at_least_one_img, style: TextStyle(color: Colors.red, fontSize: 12)),
             ),
         ],
       ),
@@ -496,7 +501,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                             children: [
                               Icon(Icons.edit, size: 16, color: colorScheme.primary),
                               const SizedBox(width: 4),
-                              Text("Edit location", style: TextStyle(fontSize: 12, color: colorScheme.primary)),
+                              Text('${tr.edit} ${tr.location}', style: TextStyle(fontSize: 12, color: colorScheme.primary)),
                             ],
                           ),
                         ),
@@ -511,7 +516,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                             children: [
                               const Icon(Icons.map_outlined, color: Colors.white, size: 40),
                               const SizedBox(height: 8),
-                              Text("click to select location", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              Text(tr.click_to_select_location, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),

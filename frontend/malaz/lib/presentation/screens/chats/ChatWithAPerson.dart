@@ -8,14 +8,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/config/color/app_color.dart';
+import '../../../core/service_locator/service_locator.dart';
 import '../../../data/datasources/local/auth/auth_local_data_source.dart';
 import '../../../data/models/chat/chat_message_model.dart';
-import '../../../core/service_locator/service_locator.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/chat/chat_cubit.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/chat/pusher_service/pusher_service.dart';
-import '../../global_widgets/glowing_key/build_glowing_key.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
 
 class ChatWithAPerson extends StatefulWidget {
@@ -77,27 +76,14 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
   }
 
   @override
+  @override
   void initState() {
     super.initState();
-
     final authState = context.read<AuthCubit>().state;
     if (authState is AuthAuthenticated) myId = authState.user.id;
 
-    final chatCubit = context.read<ChatCubit>();
-
-    int currentId = widget.conversationId;
-
-    if (chatCubit.state is ChatMessagesLoaded) {
-      currentId = (chatCubit.state as ChatMessagesLoaded).conversationId;
-    }
-
-    if (currentId > 0) {
-      log(">>>> Loading messages for ID: $currentId");
-      chatCubit.getMessages(currentId);
-      _connectToPusher();
-    } else {
-      chatCubit.emit(ChatMessagesLoaded(messages: [], conversationId: 0));
-    }
+    context.read<ChatCubit>().getMessages(widget.conversationId);
+    _connectToPusher();
   }
 
   void _connectToPusher() async {
@@ -219,7 +205,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
 
                             final channelName = "private-conversations.${state.conversationId}";
                             if (_currentSubscribedChannel != channelName) {
-                              log(">>>> New Conversation detected (${state.conversationId}), re-subscribing...");
+                              log("🔄 New Conversation detected (${state.conversationId}), re-subscribing...");
                               _subscribeToCurrentConversation(state.conversationId);
                             }
 
@@ -310,12 +296,12 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
             PositionedDirectional(
               top: -10,
               start: -20,
-              child: const BuildGlowingKey(size: 100,opacity:  0.12,rotation: -0.2),
+              child: _buildGlowingKey(100, 0.12, -0.2),
             ),
             PositionedDirectional(
               bottom: -10,
               end: 20,
-              child: const BuildGlowingKey(size: 80,opacity:  0.1,rotation:  0.5),
+              child: _buildGlowingKey(80, 0.1, 0.5),
             ),
 
             SafeArea(
@@ -388,6 +374,21 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
     );
   }
 
+  Widget _buildGlowingKey(double size, double opacity, double rotation) {
+    return Opacity(
+      opacity: opacity,
+      child: Transform.rotate(
+        angle: rotation,
+        child: Image.asset(
+          'assets/icons/key_logo.png',
+          width: size,
+          height: size,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
   Widget _buildMessageInput(BuildContext context, bool isDark, int myId, AppLocalizations tr) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 25),
@@ -433,36 +434,38 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                   final text = _messageController.text.trim();
                   if (text.isEmpty) return;
 
-                  final chatCubit = context.read<ChatCubit>();
-                  final myIdValue = _getMyId(context) ?? 0;
-
-                  if (myIdValue == 0) {
-                    log("Error: User ID is null or 0");
-                    return;
-                  }
-
                   if (_editingMessage != null) {
-                    chatCubit.editMessage(_editingMessage!.id, text);
+                    context.read<ChatCubit>().editMessage(_editingMessage!.id, text);
                     setState(() => _editingMessage = null);
                     _messageController.clear();
                   } else {
-                    int currentId = widget.conversationId;
+                    final myIdValue = myId ?? 0;
+                    final chatCubit = context.read<ChatCubit>();
+                    final text = _messageController.text.trim();
+
+                    if (text.isEmpty) return;
+
+                    int currentId = -1;
                     if (chatCubit.state is ChatMessagesLoaded) {
                       currentId = (chatCubit.state as ChatMessagesLoaded).conversationId;
                     }
 
-                    if (currentId <= 0) {
+                    if (currentId == -1) {
                       final newId = await chatCubit.saveNewConversation(widget.otherUserId);
 
-                      if (newId != null && newId > 0) {
+                      if (newId != null && newId != -1) {
                         _onSendMessage(context, myIdValue, overrideId: newId);
-
-                        _subscribeToCurrentConversation(newId);
                       } else {
-                        log("Failed to create conversation: newId is $newId");
+                        if (chatCubit.state is ChatMessagesLoaded) {
+                          final fallbackId = (chatCubit.state as ChatMessagesLoaded).conversationId;
+                          if (fallbackId != -1) {
+                            _onSendMessage(context, myIdValue, overrideId: fallbackId);
+                            return;
+                          }
+                        }
                       }
                     } else {
-                      _onSendMessage(context, myIdValue, overrideId: currentId);
+                      _onSendMessage(context, myIdValue);
                     }
                   }
                 },

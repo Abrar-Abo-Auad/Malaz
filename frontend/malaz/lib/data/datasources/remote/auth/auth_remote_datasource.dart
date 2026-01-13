@@ -97,7 +97,15 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       data: {'phone': phone, 'password': password},
     );
 
+    print('phone number : ${response.data['user']['phone']}');
+
     final data = response.data;
+    if(data == null) {
+      print('null data found');
+    } else {
+      print('tokem from data source ${data['access_token']}');
+      print('status code ${response.statusCode}');
+    }
     String? message = data is Map<String, dynamic> ? data['message']?.toString() : null;
 
     if (response.statusCode == 200 && data['data'] != null) {
@@ -110,6 +118,12 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     }
 
     if (data['access_token'] != null) {
+      print('i am in');
+      if(data == null) {
+        print('i am out');
+      } else {
+        print('not null');
+      }
       return data;
     }
 
