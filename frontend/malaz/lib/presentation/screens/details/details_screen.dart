@@ -5,9 +5,13 @@ import 'package:malaz/presentation/global_widgets/buttons/custom_button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:malaz/domain/entities/user/user_entity.dart';
 import 'package:malaz/presentation/global_widgets/user_profile_image/user_profile_image.dart';
+import '../../../core/service_locator/service_locator.dart';
+import '../../../data/datasources/local/auth/auth_local_data_source.dart';
+import '../../../data/models/chat/conversation_model.dart';
 import '../../../domain/entities/apartment/apartment.dart';
 import '../../../core/config/color/app_color.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/favorites/favorites_cubit.dart';
 import '../../cubits/chat/chat_cubit.dart';
 import '../book_now/book_now_screen.dart';
@@ -17,19 +21,30 @@ import '../book_now/book_now_screen.dart';
 /// The full details page for a specific apartment.
 /// Uses [CustomScrollView] with [SliverAppBar] for a premium scrolling experience.
 /// ============================================================================
-class DetailsScreen extends StatelessWidget {
+class DetailsScreen extends StatefulWidget {
   final Apartment apartment;
 
   const DetailsScreen({super.key, required this.apartment});
 
   @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ChatCubit>().getConversations();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      bottomNavigationBar: _BuildBottomBookingBar(apartment: apartment),
+      bottomNavigationBar: _BuildBottomBookingBar(apartment: widget.apartment),
       body: CustomScrollView(
         slivers: [
-          _BuildSliverAppBar(apartment: apartment),
+          _BuildSliverAppBar(apartment: widget.apartment),
 
           SliverToBoxAdapter(
             child: Padding(
@@ -37,13 +52,13 @@ class DetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _BuildTitleAndRating(apartment: apartment),
+                  _BuildTitleAndRating(apartment: widget.apartment),
                   const SizedBox(height: 24),
-                  _BuildOwnerCard(owner: apartment.owner,),
+                  _BuildOwnerCard(owner: widget.apartment.owner,),
                   const SizedBox(height: 24),
-                  _BuildAmenitiesSection(apartment: apartment),
+                  _BuildAmenitiesSection(apartment: widget.apartment),
                   const SizedBox(height: 24),
-                  _BuildDescription(description: apartment.description),
+                  _BuildDescription(description: widget.apartment.description),
                   const SizedBox(height: 24),
                   const _BuildReviewSection(),
                   const SizedBox(height: 100),
@@ -397,13 +412,36 @@ class _BuildOwnerCard extends StatelessWidget {
             ),
             child: IconButton(
               onPressed: () async {
-                final chatCubit = context.read<ChatCubit>();
-                chatCubit.clearMessages();
-                final newId = await chatCubit.saveNewConversation(owner.id);
+                int? myId = _getMyId(context);
+                if (owner.id == myId) {
+                  _showSnackBar(context, l10n.not_chat_yourself, theme.primaryColor);
+                } else {
+                  final chatCubit = context.read<ChatCubit>();
+                  final router = GoRouter.of(context);
 
-                if (newId != null) {
-                  context.pushNamed('one_chat', extra: {
-                    'id': newId,
+                  await chatCubit.getConversations();
+
+                  int existingId = 0;
+                  final state = chatCubit.state;
+
+                  if (state is ChatConversationsLoaded) {
+                    final foundConversations = state.conversations.where(
+                            (c) => c.userOneId == owner.id || c.userTwoId == owner.id
+                    ).toList();
+
+                    if (foundConversations.isNotEmpty) {
+                      existingId = foundConversations.first.id;
+                    }
+                  }
+
+                  if (existingId > 0) {
+                    chatCubit.getMessages(existingId);
+                  } else {
+                    chatCubit.clearMessages();
+                  }
+
+                  router.push('/one_chat', extra: {
+                    'id': existingId,
                     'firstName': owner.first_name,
                     'lastName': owner.last_name,
                     'otherUserId': owner.id,
@@ -411,9 +449,29 @@ class _BuildOwnerCard extends StatelessWidget {
                 }
               },
               icon: Icon(Icons.chat_outlined, color: theme.colorScheme.primary),
-            ),
+            )
           )
         ],
+      ),
+    );
+  }
+  int? _getMyId(BuildContext context) {
+    final state = context.read<AuthCubit>().state;
+    if (state is AuthAuthenticated) return state.user.id;
+    if (state is AuthPending) return state.user.id;
+    return null;
+  }
+
+  void _showSnackBar(BuildContext context, String message, Color color) {
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

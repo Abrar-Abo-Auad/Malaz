@@ -9,6 +9,7 @@ import 'package:malaz/presentation/global_widgets/brand/build_branding.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/config/routes/route_info.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../cubits/chat/chat_cubit.dart';
 import '../../cubits/home/home_cubit.dart';
 import '../../global_widgets/apartment_cards/apartment_card.dart';
 import '../side_drawer/app_drawer.dart';

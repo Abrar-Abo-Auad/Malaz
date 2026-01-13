@@ -26,10 +26,16 @@ class ChatMessageModel {
   });
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
+    int safeInt(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      return int.tryParse(value.toString()) ?? 0;
+    }
+
     return ChatMessageModel(
-      id: int.tryParse(json['id'].toString()) ?? 0,
-      senderId: int.tryParse(json['sender_id'].toString()) ?? 0,
-      conversationId: int.tryParse(json['conversation_id'].toString()) ?? 0,
+      id: safeInt(json['id']),
+      senderId: safeInt(json['sender_id']),
+      conversationId: safeInt(json['conversation_id']),
       body: json['body'] ?? '',
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
       updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,

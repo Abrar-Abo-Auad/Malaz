@@ -23,15 +23,23 @@ class ConversationModel {
   });
 
   factory ConversationModel.fromJson(Map<String, dynamic> json) {
+    int safeInt(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      return int.tryParse(value.toString()) ?? 0;
+    }
+
     return ConversationModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
-      userOneId: json['user_one_id'] as int,
-      userTwoId: json['user_two_id'] as int,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      unreadCount: json['unread_count'] is int
-          ? json['unread_count']
-          : int.parse(json['unread_count'].toString()),
+      id: safeInt(json['id']),
+      userOneId: safeInt(json['user_one_id']),
+      userTwoId: safeInt(json['user_two_id']),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
+      unreadCount: safeInt(json['unread_count']),
       userOne: json['user_one'] != null
           ? UserModel.fromJson(json['user_one'] as Map<String, dynamic>)
           : null,

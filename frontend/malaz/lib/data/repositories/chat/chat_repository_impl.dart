@@ -74,10 +74,10 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<Either<Failure, ConversationModel>> saveNewConversation(int partnerId) async {
+  Future<Either<Failure, ConversationModel>> saveNewConversation(int otherUserId) async {
     try {
-      final result = await remoteDataSource.saveNewConversation(partnerId);
-
+      final result = await remoteDataSource.saveNewConversation(otherUserId);
+      log("Server Response: $result");
       if (result != null && result['conversation'] != null) {
         final Map<String, dynamic> conversationData = Map<String, dynamic>.from(result['conversation']);
 
