@@ -107,6 +107,7 @@ class ConversationController extends Controller
 
     public function showmessage(Request $request, Conversation $conversation)
     {
+        return 1;
         // $this->authorize('showMessage', $conversation);
         $user = auth()->user();
         if ($conversation->user_one_id !== $user->id || $conversation->user_two_id !== $user->id)
@@ -118,11 +119,11 @@ class ConversationController extends Controller
         $conversation->messages()
             ->whereNull('read_at')
             ->where('sender_id', '!=', auth()->id())
-            ->update(['read_at' => now()]);
+            ->updateQuietly(['read_at' => now()]);
 
-        $perPage = (int) $request->input('per_page', 20);
+        $perPage = (int) $request->input('perpage', 20);
         $messages = $conversation->messages()->with('sender')->latest()->cursorPaginate($perPage);
-
+        
         return response()->json([
             'message' => __('validation.conversation.show'),
             'last_messages' => $messages,
