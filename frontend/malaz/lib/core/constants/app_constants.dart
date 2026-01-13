@@ -15,6 +15,8 @@ class AppConstants {
   static const String tokenKey = 'CACHED_TOKEN';
   static const String userKey = 'CACHED_USER';
   static const String pendingKey = 'IS_PENDING';
+  static const String phoneUserKey = 'USER_PHONE';
+  static const String passwordUserKey = 'USER_PASSWORD';
 
   /// [Location] Key
   static const String locationKey = 'CACHED_LOCATION';
