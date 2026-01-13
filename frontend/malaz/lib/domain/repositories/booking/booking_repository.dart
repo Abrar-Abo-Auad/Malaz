@@ -9,4 +9,7 @@ abstract class BookingRepository {
   Future<Either<Failure, List<BookingModel>>> getBookedDates(int propertyId);
   Future<Either<Failure, BookingList>> getUserBookings(int userId);
   Future<Either<Failure,void>> updateStatus(int propertyID,String status);
+  Future<Either<Failure, BookingList>> getMyBookings(int userId);
+  Future<Either<Failure, void>> updateBookingDates({required int bookingId, required String checkIn, required String checkOut,});
+
 }

@@ -13,11 +13,12 @@ class BookingRepositoryImpl implements BookingRepository {
   BookingRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, List<BookingModel>>> getBookedDates(int propertyId) async {
+  Future<Either<Failure, List<BookingModel>>> getBookedDates(
+      int propertyId) async {
     try {
       final response = await remoteDataSource.getBookedDates(propertyId);
       return Right(response);
-    } catch(e) {
+    } catch (e) {
       final failure = FailureMapper.map(e);
       return Left(failure);
     }
@@ -28,7 +29,7 @@ class BookingRepositoryImpl implements BookingRepository {
     try {
       final response = await remoteDataSource.makeBooking(booking);
       return Right(response);
-    } catch(e) {
+    } catch (e) {
       final failure = FailureMapper.map(e);
       return Left(failure);
     }
@@ -46,13 +47,40 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateStatus(int propertyID, String status) async{
+  Future<Either<Failure, void>> updateStatus(int propertyID,
+      String status) async {
     try {
-      final response = await remoteDataSource.UpdateStatus(propertyID,status);
+      final response = await remoteDataSource.UpdateStatus(propertyID, status);
       return Right(response);
-    } catch(e) {
+    } catch (e) {
       final failure = FailureMapper.map(e);
       return Left(failure);
+    }
+  }
+
+
+  @override
+  Future<Either<Failure, BookingList>> getMyBookings(int userId) async {
+    try {
+      final response = await remoteDataSource.fetchAllBookings(userId);
+      return Right(response);
+    } catch (e) {
+      final failure = FailureMapper.map(e);
+      return Left(failure);
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateBookingDates({
+    required int bookingId,
+    required String checkIn,
+    required String checkOut,
+  }) async {
+    try {
+      await remoteDataSource.updateBookingDate(bookingId, checkIn, checkOut);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

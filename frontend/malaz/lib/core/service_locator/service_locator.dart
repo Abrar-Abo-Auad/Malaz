@@ -47,6 +47,7 @@ import '../../domain/usecases/location/update_manual_location_usecase.dart';
 import '../../presentation/cubits/auth/auth_cubit.dart';
 import '../../presentation/cubits/booking/booking_cubit.dart';
 import '../../presentation/cubits/booking/manage_booking.dart';
+import '../../presentation/cubits/booking/my_booking.dart';
 import '../../presentation/cubits/chat/chat_cubit.dart';
 import '../../presentation/cubits/favorites/favorites_cubit.dart';
 import '../../presentation/cubits/home/home_cubit.dart';
@@ -115,6 +116,7 @@ Future<void> setUpServices() async {
     sl<GetUserBooking>(),
     sl<UpdateStatus>(),
   ));
+  sl.registerFactory(() => MyBookingCubit(sl()));
 
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
   sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
