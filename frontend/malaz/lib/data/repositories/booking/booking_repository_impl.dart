@@ -62,9 +62,11 @@ class BookingRepositoryImpl implements BookingRepository {
   @override
   Future<Either<Failure, BookingList>> getMyBookings(int userId) async {
     try {
-      final response = await remoteDataSource.fetchAllBookings(userId);
+      final response = await remoteDataSource.fetchMyBookings(userId);
       return Right(response);
+
     } catch (e) {
+      print("Error in Repository: $e");
       final failure = FailureMapper.map(e);
       return Left(failure);
     }

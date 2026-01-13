@@ -689,7 +689,7 @@ class _PropertyFormInputField extends StatelessWidget {
               ),
             ),
           )
-               : null,
+              : null,
           hintText: hint,
           hintStyle: TextStyle(
             color: colorScheme.onSurface.withOpacity(0.4),

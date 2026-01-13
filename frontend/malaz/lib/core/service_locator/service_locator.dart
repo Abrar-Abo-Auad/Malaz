@@ -36,7 +36,9 @@ import '../../domain/usecases/apartment/my_apartment_use_case.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
+import '../../domain/usecases/booking/My_booking_usecase.dart';
 import '../../domain/usecases/booking/all_booking_use_case.dart';
+import '../../domain/usecases/booking/update_Booking_Date.dart';
 import '../../domain/usecases/favorites/add_favorites_use_case.dart';
 import '../../domain/usecases/favorites/delete_favorites_use_case.dart';
 import '../../domain/usecases/favorites/get_favorites_use_case.dart';
@@ -116,8 +118,7 @@ Future<void> setUpServices() async {
     sl<GetUserBooking>(),
     sl<UpdateStatus>(),
   ));
-  sl.registerFactory(() => MyBookingCubit(sl()));
-
+  sl.registerFactory(() => MyBookingCubit(sl<GetMyBooking>(),sl<UpdateBookingUseCase>(),sl<UpdateStatus>(),));
   sl.registerFactory(() => HomeCubit(getApartmentsUseCase: sl()));
   sl.registerLazySingleton(() => FavoritesCubit(getFavoritesUseCase: sl(),addFavoriteUseCase: sl(), deleteFavoriteUseCase: sl()));
 
@@ -126,6 +127,10 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton(() => GetMyApartmentsUseCase(sl()));
 
   sl.registerLazySingleton(() => GetApartmentsUseCase(sl()));
+
+  sl.registerLazySingleton(() => UpdateBookingUseCase(sl()));
+
+  sl.registerLazySingleton(() => GetMyBooking(sl()));
 
   sl.registerLazySingleton<ApartmentRepository>(() => ApartmentRepositoryImpl(remoteDataSource: sl()));
   sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));

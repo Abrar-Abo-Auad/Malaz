@@ -6,29 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../core/config/color/app_color.dart';
+import '../../../domain/entities/booking/booking.dart';
+import '../../../domain/entities/booking/booking_list.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/booking/booking_cubit.dart';
+import '../../cubits/booking/my_booking.dart';
 import '../../global_widgets/glowing_key/build_glowing_key.dart';
 import '../review_apartment/apartment_review_dialog.dart';
-
-enum BookingStatus { pending, confirmed, completed, canceled, conflicted }
-
-class BookingModel {
-  final String id;
-  final String title;
-  final String location;
-  final DateTime checkIn;
-  final DateTime checkOut;
-  final double price;
-  final BookingStatus status;
-  final String imageUrl;
-
-  BookingModel({
-    required this.id, required this.title, required this.location,
-    required this.checkIn, required this.checkOut, required this.price,
-    required this.status, required this.imageUrl,
-  });
-}
 
 class ManageMyBookingsScreen extends StatefulWidget {
   const ManageMyBookingsScreen({super.key});
@@ -38,111 +23,99 @@ class ManageMyBookingsScreen extends StatefulWidget {
 }
 
 class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
-  BookingStatus? _selectedFilter;
-  final List<BookingModel> _mockBookings = [
-    BookingModel(
-      id: 'BK-001',
-      title: 'Luxury Villa Malaz',
-      location: 'Riyadh, Saudi Arabia',
-      checkIn: DateTime(2026, 1, 15),
-      checkOut: DateTime(2026, 1, 20),
-      price: 2500,
-      status: BookingStatus.pending,
-      imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500',
-    ),
+  String? _selectedFilter;
 
-    BookingModel(
-      id: 'BK-002',
-      title: 'Modern Downtown Studio',
-      location: 'Jeddah, Saudi Arabia',
-      checkIn: DateTime(2026, 2, 10),
-      checkOut: DateTime(2026, 2, 12),
-      price: 850,
-      status: BookingStatus.confirmed,
-      imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500',
-    ),
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
 
-    BookingModel(
-      id: 'BK-003',
-      title: 'Ocean View Penthouse',
-      location: 'Al Khobar, Saudi Arabia',
-      checkIn: DateTime(2025, 12, 01),
-      checkOut: DateTime(2025, 12, 05),
-      price: 4200,
-      status: BookingStatus.completed,
-      imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500',
-    ),
-
-    BookingModel(
-      id: 'BK-004',
-      title: 'Desert Rose Resort',
-      location: 'Al Ula, Saudi Arabia',
-      checkIn: DateTime(2026, 3, 20),
-      checkOut: DateTime(2026, 3, 25),
-      price: 5500,
-      status: BookingStatus.canceled,
-      imageUrl: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=500',
-    ),
-
-    BookingModel(
-      id: 'BK-005',
-      title: 'City Center Apartment',
-      location: 'Riyadh, Saudi Arabia',
-      checkIn: DateTime(2026, 4, 05),
-      checkOut: DateTime(2026, 4, 07),
-      price: 1200,
-      status: BookingStatus.conflicted,
-      imageUrl: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=500',
-    ),
-  ];
+  void _loadInitialData() {
+    final authState = context.read<AuthCubit>().state;
+    if (authState is AuthAuthenticated) {
+      context.read<MyBookingCubit>().fetchMyBookings(authState.user.id);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final tr = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
-    final filteredBookings = _selectedFilter == null
-        ? _mockBookings
-        : _mockBookings.where((b) => b.status == _selectedFilter).toList();
-
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          _buildPremiumAppBar(context, tr, colorScheme),
+        body: BlocListener<MyBookingCubit, MyBookingState>(
+    listener: (context, state) {
+    },
+      child:  RefreshIndicator(
+        onRefresh: () async {
+      _loadInitialData();
+      await Future.delayed(const Duration(seconds: 1));
+    },
+          color: colorScheme.primary,
+          child: BlocBuilder<MyBookingCubit, MyBookingState>(
+        builder: (context, state) {
+          BookingList myBookingList = BookingList(booking: []);
+          if (state is MyBookingLoaded) {
+            myBookingList = BookingList(booking: state.bookings);
+          }
+          final bookingsToDisplay = _selectedFilter == null
+              ? myBookingList.booking
+              : myBookingList.booking.where((b) =>
+          b.status?.toLowerCase() == _selectedFilter!.toLowerCase()
+          ).toList();
 
-          _buildActiveFilterIndicator(tr),
-
-          if (filteredBookings.isEmpty)
-            SliverFillRemaining(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[300]),
-                    const SizedBox(height: 16),
-                    Text("No bookings found", style: TextStyle(color: Colors.grey[400])),
-                  ],
-                ),
-              ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) => _PremiumBookingCard(
-                    booking: filteredBookings[index],
-                    onEdit: () => _handleEdit(context, filteredBookings[index]),
-                    onCancel: () => _handleCancel(context, filteredBookings[index]),
-                  ),
-                  childCount: filteredBookings.length,
-                ),
-              ),
+          return CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
             ),
-        ],
+            slivers: [
+              _buildPremiumAppBar(context, tr, colorScheme),
+              _buildActiveFilterIndicator(tr),
+
+              if (state is MyBookingLoading)
+                const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
+              else if (state is MyBookingError)
+                SliverFillRemaining(child: Center(child: Text(state.message)))
+
+              else if (bookingsToDisplay.isEmpty)
+                  _buildEmptyState(tr)
+
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                            (context, index) => _PremiumBookingCard(
+                          booking: bookingsToDisplay[index],
+                          onEdit: () => _handleEdit(context, bookingsToDisplay[index]),
+                          onCancel: () => _handleCancel(context, bookingsToDisplay[index]),
+                        ),
+                        childCount: bookingsToDisplay.length,
+                      ),
+                    ),
+                  ),
+            ],
+          );
+        },
+      ),)
+    ));
+  }
+
+  Widget _buildEmptyState(AppLocalizations tr) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.inventory_2_outlined, size: 80, color: Colors.grey[300]),
+            const SizedBox(height: 16),
+            Text("no_data_found" ?? "No bookings found",
+                style: TextStyle(color: Colors.grey[400])),
+          ],
+        ),
       ),
     );
   }
@@ -162,11 +135,13 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
       actions: [
         Padding(
           padding: const EdgeInsetsDirectional.only(end: 15, top: 10),
-          child: PopupMenuButton<BookingStatus?>(
+          child: PopupMenuButton<String?>(
             initialValue: _selectedFilter,
-            onSelected: (status) {
+            onSelected: (String? statusName) {
               HapticFeedback.mediumImpact();
-              setState(() => _selectedFilter = status);
+              setState(() {
+                _selectedFilter = statusName;
+              });
             },
             child: Container(
               padding: const EdgeInsets.all(10),
@@ -180,10 +155,10 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             itemBuilder: (context) => [
               _buildPopupItem(null, "All Bookings", Icons.all_inbox_rounded, colorScheme),
-              _buildPopupItem(BookingStatus.pending, tr.status_pending, Icons.timer_outlined, colorScheme),
-              _buildPopupItem(BookingStatus.confirmed, tr.status_confirmed, Icons.check_circle_outline, colorScheme),
-              _buildPopupItem(BookingStatus.completed, tr.status_completed, Icons.history_edu_rounded, colorScheme),
-              _buildPopupItem(BookingStatus.canceled, tr.status_canceled, Icons.block_flipped, colorScheme),
+              _buildPopupItem("pending", tr.status_pending, Icons.timer_outlined, colorScheme),
+              _buildPopupItem("confirmed", tr.status_confirmed, Icons.check_circle_outline, colorScheme),
+              _buildPopupItem("completed", tr.status_completed, Icons.history_edu_rounded, colorScheme),
+              _buildPopupItem("cancelled", tr.status_canceled, Icons.block_flipped, colorScheme),
             ],
           ),
         ),
@@ -226,7 +201,7 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
     );
   }
 
-  PopupMenuItem<BookingStatus?> _buildPopupItem(BookingStatus? status, String label, IconData icon, ColorScheme colorScheme) {
+  PopupMenuItem<String?> _buildPopupItem(String? status, String label, IconData icon, ColorScheme colorScheme) {
     return PopupMenuItem(
       value: status,
       child: Row(
@@ -245,8 +220,8 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
     );
   }
 
-  void _handleEdit(BuildContext context, BookingModel booking) {
-    context.read<BookingCubit>().loadBookedDates(int.parse(booking.id.split('-').last));
+  void _handleEdit(BuildContext context, Booking booking) {
+    context.read<BookingCubit>().loadBookedDates(booking.apartment!.id);
 
     showModalBottomSheet(
       context: context,
@@ -256,7 +231,7 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
     );
   }
 
-  void _handleCancel(BuildContext context, BookingModel booking) {
+  void _handleCancel(BuildContext context, Booking booking) {
     final theme = Theme.of(context);
     final tr = AppLocalizations.of(context)!;
 
@@ -309,9 +284,9 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
                     text: TextSpan(
                       style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14, height: 1.6),
                       children: [
-                        TextSpan(text: tr.cancel_booking_msg(booking.title)),
+                        TextSpan(text: tr.cancel_booking_msg(booking.apartment!.title)),
                         TextSpan(
-                          text: "'${booking.title}'",
+                          text: "'${booking.apartment!.title}'",
                           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                         ),
                       ],
@@ -338,10 +313,14 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
-                            // TODO: Cubit
-                            // context.read<BookingCubit>().cancelBooking(booking.id);
-                            //_showSuccessCancellation(context);
+                            final authState = context.read<AuthCubit>().state;
+                            if (authState is AuthAuthenticated) {
+                              context.read<MyBookingCubit>().cancelBooking(
+                                propertyId: booking.id!,
+                                userId: authState.user.id,
+                              );
+                              Navigator.pop(context);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.colorScheme.error,
@@ -397,7 +376,7 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
             TextButton(
               onPressed: () {
                 HapticFeedback.lightImpact();
-                setState(() => _selectedFilter = null); // هذا سيعيد عرض All Bookings
+                setState(() => _selectedFilter = null);
               },
               child: Text(
                 "Clear All", // tr.clear_all
@@ -410,20 +389,22 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
     );
   }
 
-  String _getStatusLabel(BookingStatus status, AppLocalizations tr) {
+  String _getStatusLabel(String status, AppLocalizations tr) {
     switch (status) {
-      case BookingStatus.pending: return tr.status_pending;
-      case BookingStatus.confirmed: return tr.status_confirmed;
-      case BookingStatus.completed: return tr.status_completed;
-      case BookingStatus.canceled: return tr.status_canceled;
-      case BookingStatus.conflicted: return tr.status_conflicted;
+      case "pending": return tr.status_pending;
+      case "confirmed": return tr.status_confirmed;
+      case "completed": return tr.status_completed;
+      case "cancelled": return tr.status_canceled;
+      case "conflicted": return tr.status_conflicted;
+      default :
+        return tr.status_pending;
     }
   }
 
 }
 
 class _EditBookingSheet extends StatefulWidget {
-  final BookingModel booking;
+  final Booking booking;
   const _EditBookingSheet({required this.booking});
 
   @override
@@ -440,7 +421,7 @@ class _EditBookingSheetState extends State<_EditBookingSheet> {
     super.initState();
     _rangeStart = widget.booking.checkIn;
     _rangeEnd = widget.booking.checkOut;
-    _focusedDay = widget.booking.checkIn;
+    _focusedDay = widget.booking.checkIn!;
   }
 
   @override
@@ -472,7 +453,7 @@ class _EditBookingSheetState extends State<_EditBookingSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(tr.modify_reservation, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-                  Text(tr.changing_dates_for(widget.booking.title), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text(tr.changing_dates_for(widget.booking.apartment!.title), style: const TextStyle(color: Colors.grey, fontSize: 12)),
                 ],
               ),
             ],
@@ -513,8 +494,20 @@ class _EditBookingSheetState extends State<_EditBookingSheet> {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: (_rangeStart != null && _rangeEnd != null) ? () => Navigator.pop(context) : null,
-              style: ElevatedButton.styleFrom(
+              onPressed: (_rangeStart != null && _rangeEnd != null)
+                  ? () {
+                final authState = context.read<AuthCubit>().state;
+                if (authState is AuthAuthenticated) {
+                  context.read<MyBookingCubit>().updateBookingDates(
+                    bookingId: widget.booking.id!,
+                    checkIn: _rangeStart!,
+                    checkOut: _rangeEnd!,
+                    userId: authState.user.id,
+                  );
+                  Navigator.pop(context);
+                }
+              }
+                  : null,              style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -530,7 +523,7 @@ class _EditBookingSheetState extends State<_EditBookingSheet> {
 }
 
 class _PremiumBookingCard extends StatelessWidget {
-  final BookingModel booking;
+  final Booking booking;
   final VoidCallback onEdit;
   final VoidCallback onCancel;
 
@@ -540,7 +533,7 @@ class _PremiumBookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final tr = AppLocalizations.of(context)!;
-    final config = _getStatusConfig(booking.status, tr);
+    final config = _getStatusConfig(booking.status!, tr);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 25),
@@ -557,7 +550,7 @@ class _PremiumBookingCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                child: Image.network(booking.imageUrl, height: 180, width: double.infinity, fit: BoxFit.cover),
+                child: Image.network(booking.apartment!.mainImageUrl, height: 180, width: double.infinity, fit: BoxFit.cover),
               ),
               Positioned(
                 top: 15, right: 15,
@@ -572,7 +565,7 @@ class _PremiumBookingCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(bottom: 12, left: 20, child: Text("\$${booking.price.toInt()}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20))),
+              Positioned(bottom: 12, left: 20, child: Text("\$${booking.totalPrice}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20))),
             ],
           ),
           Padding(
@@ -580,15 +573,15 @@ class _PremiumBookingCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(booking.title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+                Text(booking.apartment!.title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
                 const SizedBox(height: 15),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildDateInfo(tr.check_in, booking.checkIn, theme: theme.colorScheme),
+                    _buildDateInfo(tr.check_in, booking.checkIn!, theme: theme.colorScheme),
                     Icon(Icons.swap_horiz_rounded, color: theme.primaryColor),
-                    _buildDateInfo(tr.check_out, booking.checkOut, isEnd: true, theme: theme.colorScheme),
+                    _buildDateInfo(tr.check_out, booking.checkOut!, isEnd: true, theme: theme.colorScheme),
                   ],
                 ),
 
@@ -602,7 +595,7 @@ class _PremiumBookingCard extends StatelessWidget {
                   children: [
                     _buildGlassStatus(config),
 
-                    if (booking.status == BookingStatus.pending)
+                    if (booking.status == "pending")
                       Row(
                         children: [
                           _buildActionBtn(Icons.edit_calendar_rounded, tr.edit, Colors.blueAccent, onEdit),
@@ -610,7 +603,7 @@ class _PremiumBookingCard extends StatelessWidget {
                           _buildActionBtn(Icons.close_rounded, tr.cancel, Colors.redAccent, onCancel),
                         ],
                       )
-                    else if (booking.status == BookingStatus.completed)
+                    else if (booking.status == "completed")
                       _buildPremiumRateButton(context, tr, booking)
                     else
                       _buildViewDetailsBtn(context, tr)
@@ -634,7 +627,7 @@ class _PremiumBookingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: theme.primaryColor.withOpacity(0.05), // خلفية باهتة جداً
+          color: theme.primaryColor.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: theme.primaryColor.withOpacity(0.2)),
         ),
@@ -657,7 +650,7 @@ class _PremiumBookingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPremiumRateButton(BuildContext context, AppLocalizations tr, BookingModel booking) {
+  Widget _buildPremiumRateButton(BuildContext context, AppLocalizations tr, Booking booking) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -695,11 +688,11 @@ class _PremiumBookingCard extends StatelessWidget {
     );
   }
 
-  void _showReviewDialog(BuildContext context, BookingModel booking) {
+  void _showReviewDialog(BuildContext context, Booking booking) {
     showDialog(
       context: context,
       builder: (context) => ApartmentReviewDialog(
-        propertyName: booking.title,
+        propertyName: booking.apartment!.title,
         onSubmitted: (rating, comment) {
           print("التقييم: $rating، التعليق: $comment");
           /// TODO: REVIEW CUBIT...
@@ -740,9 +733,9 @@ class _PremiumBookingCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12), // خلفية شفافة قليلاً
+          color: color.withOpacity(0.12),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2), width: 1), // إطار خفيف جداً
+          border: Border.all(color: color.withOpacity(0.2), width: 1),
         ),
         child: Row(
           children: [
@@ -763,13 +756,15 @@ class _PremiumBookingCard extends StatelessWidget {
     );
   }
 
-  _StatusConfig _getStatusConfig(BookingStatus status, AppLocalizations tr) {
+  _StatusConfig _getStatusConfig(String status, AppLocalizations tr) {
     switch (status) {
-      case BookingStatus.pending: return _StatusConfig(tr.status_pending, Colors.orange, Icons.schedule);
-      case BookingStatus.confirmed: return _StatusConfig(tr.status_confirmed, Colors.green, Icons.verified);
-      case BookingStatus.completed: return _StatusConfig(tr.status_completed, Colors.blue, Icons.task_alt);
-      case BookingStatus.canceled: return _StatusConfig(tr.status_canceled, Colors.red, Icons.cancel_outlined);
-      case BookingStatus.conflicted: return _StatusConfig(tr.status_conflicted, Colors.purple, Icons.warning_amber_rounded);
+      case "confirmed": return _StatusConfig(tr.status_confirmed, Colors.green, Icons.verified);
+      case "completed": return _StatusConfig(tr.status_completed, Colors.blue, Icons.task_alt);
+      case "cancelled": return _StatusConfig(tr.status_canceled, Colors.red, Icons.cancel_outlined);
+      case "conflicted": return _StatusConfig(tr.status_conflicted, Colors.purple, Icons.warning_amber_rounded);
+      case "pending":
+      default:
+        return _StatusConfig(tr.status_pending, Colors.orange, Icons.schedule);
     }
   }
 }

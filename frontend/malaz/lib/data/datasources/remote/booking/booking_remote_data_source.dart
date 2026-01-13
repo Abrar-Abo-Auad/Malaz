@@ -81,12 +81,10 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     final response = await networkService.get(
       "/bookings/user/$userId",
     );
-
     List<BookingModel> bookings = [];
     if (response.data != null) {
       print('Server Response Data: ${response.data}');
-      final List? rawData = response.data['bookings'];
-
+      final List rawData = response.data as List;
       if (rawData != null) {
         bookings = rawData.map((e) => BookingModel.fromJson(e)).toList();
       }
