@@ -49,7 +49,7 @@ class ReviewsCubit extends Cubit<ReviewsState> {
   final GetReviewsUseCase getReviewsUseCase;
 
   String? _nextCursor;
-  bool _isFetching = false;
+  bool _isFetching = false; // لمنع الطلبات المتكررة
 
   ReviewsCubit(this.getReviewsUseCase) : super(ReviewsInitial());
 
@@ -115,5 +115,6 @@ class ReviewsCubit extends Cubit<ReviewsState> {
       if (!isClosed) emit(const ReviewsError(message: "Unexpected Error"));
     } finally {
       _isFetching = false;
+    }
   }
 }
