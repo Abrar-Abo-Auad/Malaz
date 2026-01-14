@@ -22,7 +22,7 @@ class AppConstants {
   static const String locationKey = 'CACHED_LOCATION';
 
   /// [Requesting] keys
-  static const numberOfApartmentsEachRequest = 2;
+  static const numberOfApartmentsEachRequest = 30;
   static const numberOfReviewsEachRequest =  20;
   static const numberOfBookingEachRequest = 5;
 
