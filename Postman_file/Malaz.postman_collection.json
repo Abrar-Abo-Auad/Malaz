@@ -1196,7 +1196,7 @@
               },
               {
                 "key": "Accept-Language",
-                "value": "ar",
+                "value": "ru",
                 "type": "text"
               }
             ],
@@ -1227,14 +1227,14 @@
                 },
                 {
                   "key": "fcm_token",
-                  "value": "some token",
+                  "value": "eMl7XPUqkQi_NYY8tNwdQA:APA91bHGf6-lY-pDx6PK8gKaVd8ixAfHjRef7vSeVfgbyyviJVrUEj74mXaqvNfQouGwEQ0E6N5Rg58R_4h6EjQoMF_ZdzkXM0dy5L3vUp4aCSNjzEjU-rU",
                   "type": "text",
                   "uuid": "2e4363a9-3108-416b-b98a-d3c28d930dfd"
                 }
               ]
             },
             "url": {
-              "raw": "{{localhost}}/api/users/register?phone=+1111111118&first_name=mohamad&last_name=Alnouri&date_of_birth=1-1-1&password=123456789",
+              "raw": "{{localhost}}/api/users/register?phone=+1111111213&first_name=mohamad&last_name=Alnouri&date_of_birth=1-1-1&password=123456789",
               "host": [
                 "{{localhost}}"
               ],
@@ -1246,7 +1246,7 @@
               "query": [
                 {
                   "key": "phone",
-                  "value": "+1111111118"
+                  "value": "+1111111213"
                 },
                 {
                   "key": "first_name",
@@ -1775,11 +1775,17 @@
                   "value": "password",
                   "type": "text",
                   "uuid": "0f72da99-6c3a-48d3-9496-70ba6b6d1a27"
+                },
+                {
+                  "key": "fcm_token",
+                  "value": "dkZCnjTdTzkNuRhMi8WEHR:APA91bF_pRgXFV90jWC6zv7odt6TzGjPgPnaX1wC2y8f44jyZlSQSTLqP9EkOOLgMAXeRXwkbUfILVNmsDE_JoQbRQ5OHcZVqfwW2T94DhiRwT0fhNzx1M8",
+                  "type": "text",
+                  "uuid": "27a8a162-7650-4722-a5c1-5fdd22670eb4"
                 }
               ]
             },
             "url": {
-              "raw": "{{localhost}}/api/users/login?phone=+22300465",
+              "raw": "{{localhost}}/api/users/login?phone=+20200124",
               "host": [
                 "{{localhost}}"
               ],
@@ -1791,7 +1797,7 @@
               "query": [
                 {
                   "key": "phone",
-                  "value": "+22300465"
+                  "value": "+20200124"
                 },
                 {
                   "key": "",
@@ -2726,6 +2732,11 @@
                 "key": "Accept",
                 "value": "application/json",
                 "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "ar",
+                "type": "text"
               }
             ],
             "body": {
@@ -2733,7 +2744,7 @@
               "formdata": []
             },
             "url": {
-              "raw": "{{localhost}}/api/reviews/properties/2?rating=4&body=hello world",
+              "raw": "{{localhost}}/api/reviews/properties/75?rating=4&body=hello world",
               "host": [
                 "{{localhost}}"
               ],
@@ -2741,7 +2752,7 @@
                 "api",
                 "reviews",
                 "properties",
-                "2"
+                "75"
               ],
               "query": [
                 {
@@ -4153,7 +4164,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "3|f3Za2q8x5FKY9sLSgc1rhIjNXRdXhXLxz9qcbV0J7948e75f",
+                  "value": "{{usertoken}}",
                   "type": "string"
                 }
               ]
@@ -4164,10 +4175,15 @@
                 "key": "Accept",
                 "value": "application/json",
                 "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "ru",
+                "type": "text"
               }
             ],
             "url": {
-              "raw": "{{localhost}}/api/bookings/store?property_id=5&check_in=2030-1-5&check_out=2030-1-6&total_price=100&currency=432",
+              "raw": "{{localhost}}/api/bookings/store?property_id=75&check_in=2030-1-5&check_out=2030-1-6&total_price=100&currency=432",
               "host": [
                 "{{localhost}}"
               ],
@@ -4179,7 +4195,7 @@
               "query": [
                 {
                   "key": "property_id",
-                  "value": "5"
+                  "value": "75"
                 },
                 {
                   "key": "check_in",
@@ -5862,6 +5878,11 @@
                 "key": "Accept",
                 "value": "application/json",
                 "type": "text"
+              },
+              {
+                "key": "Accept-Language",
+                "value": "ar",
+                "type": "text"
               }
             ],
             "body": {
@@ -5941,6 +5962,12 @@
                 {
                   "key": "number_of_bedrooms",
                   "value": "3"
+                },
+                {
+                  "key": "lang",
+                  "value": "tr",
+                  "type": "text",
+                  "disabled": true
                 }
               ]
             }

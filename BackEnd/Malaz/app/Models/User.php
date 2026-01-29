@@ -83,6 +83,7 @@ class User extends Authenticatable
         'remember_token',
         'profile_image',
         'identity_card_image',
+        'fcm_token',
     ];
 
     /**

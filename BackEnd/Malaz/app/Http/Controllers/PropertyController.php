@@ -265,28 +265,29 @@ class PropertyController extends Controller
         }
 
         if ($user && $user->fcm_token) {
-        try {
-            $messaging = Firebase::messaging();
+            try {
+                $messaging = Firebase::messaging();
 
-            $notification = Notification::create(
-                'تم نشر عقارك! 🏠',
-                "تهانينا {$user->first_name}، تم نشر عقارك: {$property->title}" 
-            );
+                $notification = Notification::create(
+                    __('notifications.property_submitted_title'),
+                    __('notifications.property_submitted_body', ['name' => $user->first_name,'property_title' => $property->title]),
+                );
 
-            $message = CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification($notification)
-                ->withData([ 
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'type' => 'property_approved',
-                    'property_id' => $property->id
-                ]);
+                $message = CloudMessage::withTarget('token', $user->fcm_token)
+                    ->withNotification($notification)
+                    ->withData([
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                        'type' => 'property_submitted',
+                        'property_id' => $property->id
+                    ]);
 
-            $messaging->send($message);
+                $messaging->send($message);
+                \Log::info(__('notifications.property_submitted_body', ['property_title' => $property->title]));
 
-        } catch (\Exception $e) {
-            \Log::error('FCM Error: ' . $e->getMessage());
+            } catch (\Exception $e) {
+                \Log::error('FCM Error: ' . $e->getMessage());
+            }
         }
-    }
 
         return response()->json([
             'data' => $property,

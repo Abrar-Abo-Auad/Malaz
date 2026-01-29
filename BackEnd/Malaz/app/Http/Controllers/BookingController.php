@@ -7,6 +7,9 @@ use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Arr;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class BookingController extends Controller
 {
@@ -135,6 +138,41 @@ class BookingController extends Controller
             'status' => 'pending',
             'total_price' => $request->total_price,
         ]);
+        $user = $booking->property->user;
+        $property = $booking->property;
+
+        if ($user && $user->fcm_token) {
+
+            $originalLocale = app()->getLocale();
+
+            $recipientLocale = $user->language ?? 'en';
+            app()->setLocale($recipientLocale);
+
+            try {
+                $messaging = Firebase::messaging();
+
+                $notification = Notification::create(
+                    __('notifications.new_booking_title'),
+                    __('notifications.new_booking_body', ['tenant_name' => auth()->user()->first_name, 'property_title' => $property->title]),
+                );
+                \Log::info(__('notifications.new_booking_body', ['tenant_name' => auth()->user()->first_name, 'property_title' => $property->title]));
+                app()->setLocale($originalLocale);
+
+                $message = CloudMessage::withTarget('token', $user->fcm_token)
+                    ->withNotification($notification)
+                    ->withData([
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                        'type' => 'new_booking',
+                        'property_id' =>(string) $propertyId,
+                    ]);
+
+                $messaging->send($message);
+
+
+            } catch (\Exception $e) {
+                \Log::error('FCM Error: ' . $e->getMessage());
+            }
+        }
 
         return response()->json($booking, 201);
     }

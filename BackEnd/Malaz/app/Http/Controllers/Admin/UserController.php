@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class UserController extends Controller
@@ -49,6 +52,39 @@ class UserController extends Controller
         $user->phone_verified_at = date('Y-m-d H:i:s');
 
         if ($user->save()) {
+
+            if ($user && $user->fcm_token) {
+
+                $originalLocale = app()->getLocale();
+
+                $recipientLocale = $user->language ?? 'en';
+                app()->setLocale($recipientLocale);
+
+                try {
+                    $messaging = Firebase::messaging();
+
+                    $notification = Notification::create(
+                        __('notifications.account_accepted_title'),
+                        __('notifications.account_accepted_body', ['name' => $user->first_name]),
+                    );
+
+                    $message = CloudMessage::withTarget('token', $user->fcm_token)
+                        ->withNotification($notification)
+                        ->withData([
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                            'type' => 'user_approved',
+                            'user_id' => (string) $user->id,
+                        ]);
+
+                    $messaging->send($message);
+
+                    app()->setLocale($originalLocale);
+                    \Log::info(__('notifications.account_accepted_title', ['name' => $user->first_name]));
+
+                } catch (\Exception $e) {
+                    \Log::error('FCM Error: ' . $e->getMessage());
+                }
+            }
             return redirect()->route('admin.dashboard')
                 ->with('success', 'User approved successfully.');
         }

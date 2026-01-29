@@ -6,6 +6,9 @@ use App\Models\Booking;
 use App\Models\Property;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class ReviewController extends Controller
 {
@@ -72,13 +75,49 @@ class ReviewController extends Controller
             ], 400);
         }
 
-        if (1||$exists) {
+        if (1 || $exists) {
             $review = Review::create([
                 'user_id' => $user->id,
                 'property_id' => $propertyId,
                 'rating' => max($request->rating, 0),
                 'body' => $request->body,
             ]);
+
+            $receiver = $review->property->user;
+            $property = $review->property;
+
+            if ($receiver && $receiver->fcm_token) {
+
+                $originalLocale = app()->getLocale();
+
+                $recipientLocale = $receiver->language ?? 'en';
+                app()->setLocale($recipientLocale);
+
+                try {
+                    $messaging = Firebase::messaging();
+
+                    $notification = Notification::create(
+                        __('notifications.new_review_title'),
+                        __('notifications.new_review_body', ['reviewer_name' => $user->first_name, 'property_title' => $property->title]),
+                    );
+
+                    $message = CloudMessage::withTarget('token', $receiver->fcm_token)
+                        ->withNotification($notification)
+                        ->withData([
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                            'type' => 'new_review',
+                            'property_id' => (string) $property->id,
+                        ]);
+
+                    $messaging->send($message);
+
+                    app()->setLocale($originalLocale);
+                    \Log::info(__('notifications.new_review_body', ['reviewer_name' => $user->first_name, 'property_title' => $property->title]));
+
+                } catch (\Exception $e) {
+                    \Log::error('FCM Error: ' . $e->getMessage());
+                }
+            }
 
             if ($request->rating != -1) {
                 $property = $review->property;

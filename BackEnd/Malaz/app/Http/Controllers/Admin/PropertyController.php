@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class PropertyController extends Controller
 {
@@ -16,7 +19,7 @@ class PropertyController extends Controller
         $properties = Property::with('user')
             ->when($request->search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
-                      ->orWhere('city', 'like', "%{$search}%");
+                    ->orWhere('city', 'like', "%{$search}%");
             })
             ->when($request->status, function ($query, $status) {
                 $query->where('status', 'like', $status);
@@ -52,6 +55,41 @@ class PropertyController extends Controller
     {
         if ($property->status === 'pending') {
             $property->update(['status' => 'approved']);
+            $user = $property->user;
+            if ($user && $user->fcm_token) {
+
+                $originalLocale = app()->getLocale();
+
+                $recipientLocale = $user->language ?? 'en';
+                app()->setLocale($recipientLocale);
+
+                try {
+                    $messaging = Firebase::messaging();
+
+                    $notification = Notification::create(
+                        __('notifications.property_approved_title'),
+                        __('notifications.property_approved_body', ['name' => $user->first_name, 'property_title' => $property->title]),
+                    );
+
+                    \Log::info(__('notifications.property_approved_body', ['name' => $user->first_name, 'property_title' => $property->title]));
+                    app()->setLocale($originalLocale);
+
+                    $message = CloudMessage::withTarget('token', $user->fcm_token)
+                        ->withNotification($notification)
+                        ->withData([
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                            'type' => 'property_approved',
+                            'property_id' => (string) $property->id,
+                        ]);
+
+                    $messaging->send($message);
+
+
+                } catch (\Exception $e) {
+                    \Log::error('FCM Error: ' . $e->getMessage());
+                }
+            }
+
             return redirect()->back()->with('success', 'Property has been approved.');
         }
         return redirect()->back()->with('error', 'This property is not pending and cannot be approved.');
