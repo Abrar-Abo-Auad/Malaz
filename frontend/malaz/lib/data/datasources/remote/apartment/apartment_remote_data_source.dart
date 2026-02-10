@@ -32,6 +32,7 @@ abstract class ApartmentRemoteDataSource {
 }
 class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
   final NetworkService networkService;
+
   ApartmentRemoteDataSourceImpl({required this.networkService});
 
   @override
@@ -142,11 +143,11 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
     required XFile main_pic,
     required double latitude,
     required double longitude
-  })async {
-    final endpoint='/properties';
+  }) async {
+    final endpoint = '/properties';
 
-    try{
-      final formData=FormData.fromMap({
+    try {
+      final formData = FormData.fromMap({
         'title': title,
         'price': price,
         'city': city,
@@ -162,13 +163,13 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
           mainImageUrl.map((image) async {
             return await MultipartFile.fromFile(
               image.path,
-              filename: basename(image.path),
+              filename: basename(main_pic.path),
             );
           }).toList(),
         ),
         "main_pic": await MultipartFile.fromFile(
           main_pic.path,
-          filename:main_pic.path,
+          filename: main_pic.path,
         ),
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
@@ -178,15 +179,21 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
         data: formData,
       );
 
-      if (response.data['status'] == 200 || response.data['status'] == "success") {
+      if (response.statusCode == 200 || response.statusCode == 201 ||
+          response.data['status'] == 'success' ||
+          response.data['message'].toString().contains('بنجاح')) {
         return unit;
       } else {
-        throw ServerException(message: response.data['message']);
+        throw ServerException(
+            message: response.data['message'] ?? "Unknown Error");
       }
-    }
-    catch (e, stack) {
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? "Network Error";
+      throw ServerException(message: message);
+    } catch (e, stack) {
       print('ADD PROPERTY ERROR: $e');
       print(stack);
-      rethrow;}
+      rethrow;
+    }
   }
 }

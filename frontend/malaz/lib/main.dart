@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -20,6 +21,7 @@ import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
 import 'package:malaz/presentation/screens/settings/settings_screen.dart';
 import 'package:malaz/presentation/screens/splash_screen/splash_screen.dart';
+import 'package:malaz/services/notification_service/notification_service.dart';
 
 import 'core/config/routes/app_routes.dart';
 import 'core/config/theme/app_theme.dart';
@@ -68,17 +70,49 @@ import 'l10n/app_localizations.dart';
 ///     like [LoginScreen], [HomeRegisterScreen], and [SettingsScreen].
 ///   - [home]: The widget displayed when the app starts, which is [SplashScreen] here.
 ///
+
+final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await NotificationService.requestPermission();
+
+  String? token = await FirebaseMessaging.instance.getToken();
+  print("[FCM DEVICE TOKEN]: $token");
+
   await setUpServices();
 
   runApp(const RentalApp());
 }
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("🔔 [FCM Background] استلام إشعار في الخلفية");
+  print("🔔 [FCM Background] العنوان: ${message.notification?.title}");
+  print("🔔 [FCM Background] البيانات (Data): ${message.data}");
+}
+
+void setupFirebaseListeners() {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print("🔔 [FCM Foreground] استلام إشعار والتطبيق مفتوح!");
+    print("🔔 [FCM Foreground] العنوان: ${message.notification?.title}");
+    if (message.notification != null) {
+      print("🔔 [FCM Foreground] محتوى الإشعار موجود وسيتم عرضه");
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    print("🔔 [FCM Opened] تم الضغط على الإشعار وفتح التطبيق");
+    print("🔔 [FCM Opened] البيانات المرسلة: ${message.data}");
+  });
+}
 class RentalApp extends StatelessWidget {
   const RentalApp({super.key});
 
@@ -111,12 +145,16 @@ class RentalAppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService.initialize(context);
+    });
     final themeState = context.watch<ThemeCubit>().state;
     final languageState = context.watch<LanguageCubit>().state;
 
     final router = buildAppRouter();
 
     return MaterialApp.router(
+      scaffoldMessengerKey: messengerKey,
       title: 'Malaz Rental',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

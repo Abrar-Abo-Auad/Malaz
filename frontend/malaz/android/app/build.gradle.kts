@@ -7,13 +7,22 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+
+    implementation("com.google.firebase:firebase-messaging")
+
+    implementation("com.google.firebase:firebase-analytics")
+}
 android {
     namespace = "com.example.malaz"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -32,6 +41,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {

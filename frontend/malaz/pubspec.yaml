@@ -46,6 +46,7 @@ dependencies:
   pusher_channels_flutter: ^2.4.0
   firebase_core: ^4.4.0
   firebase_messaging: ^16.1.1
+  flutter_local_notifications: ^20.0.0
   #pusher_channels_flutter: any
 
 dev_dependencies:

@@ -12,9 +12,9 @@ import '../../../core/service_locator/service_locator.dart';
 import '../../../data/datasources/local/auth/auth_local_data_source.dart';
 import '../../../data/models/chat/chat_message_model.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../services/pusher_service/pusher_service.dart';
 import '../../cubits/chat/chat_cubit.dart';
 import '../../cubits/auth/auth_cubit.dart';
-import '../../cubits/chat/pusher_service/pusher_service.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
 
 class ChatWithAPerson extends StatefulWidget {
