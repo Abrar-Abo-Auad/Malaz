@@ -71,7 +71,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         child: Divider(color: colorScheme.outlineVariant.withOpacity(0.3), thickness: 0.5),
                       ),
                       _buildDrawerItem(context, Icons.apartment_rounded, tr.become_a_renter, () {}),
-                      _buildDrawerItem(context, Icons.settings_outlined, tr.settings,(){}),
+                      _buildDrawerItem(context, Icons.settings_outlined, tr.settings,() => context.push('/settings')),
                     ],
                   ),
                 ),
@@ -293,7 +293,7 @@ class _AppDrawerState extends State<AppDrawer> {
             const SizedBox(height: 25),
             Text(tr.select_theme, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
             const SizedBox(height: 30),
-            _ThemeSwitcher(),
+            ThemeSwitcher(),
             const SizedBox(height: 20),
           ],
         ),
@@ -371,7 +371,7 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 }
 
-class _ThemeSwitcher extends StatelessWidget {
+class ThemeSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -400,7 +400,10 @@ class _ThemeSwitcher extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Expanded(
       child: GestureDetector(
-        onTap: () => context.read<ThemeCubit>().changeTheme(mode),
+        onTap: () {
+          Navigator.pop(context);
+          context.read<ThemeCubit>().changeTheme(mode);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           padding: const EdgeInsets.symmetric(vertical: 12),

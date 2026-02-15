@@ -224,5 +224,15 @@
   "errorWrongPassword": "Hatalı şifre, lütfen tekrar deneyin",
   "errorInvalidCredentials": "Geçersiz giriş bilgileri",
   "errorNoNetwork": "İnternet bağlantısı yok, lütfen ağınızı kontrol edin",
-  "errorUnexpected": "Üzgünüz, beklenmedik bir hata oluştu"
+  "errorUnexpected": "Üzgünüz, beklenmedik bir hata oluştu",
+  "notifications": "Bildirimler",
+  "enable_notifications": "Bildirimleri Etkinleştir",
+  "notifications_description": "Emlak güncellemeleri için uyarılar alın",
+  "notification_sound": "Bildirim Sesi",
+  "select_from_system": "Sistem seslerinden seçin",
+  "default_sound": "Varsayılan Ses",
+  "custom_tone_selected": "Özel ton seçildi",
+  "app_preferences": "Uygulama Tercihleri",
+  "select_theme": "Tema Seç",
+  "select_language": "Dil Seç"
 }

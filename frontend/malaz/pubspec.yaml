@@ -47,6 +47,8 @@ dependencies:
   firebase_core: ^4.4.0
   firebase_messaging: ^16.1.1
   flutter_local_notifications: ^20.0.0
+  audioplayers: ^6.5.1
+  file_picker: ^10.3.10
   #pusher_channels_flutter: any
 
 dev_dependencies:

@@ -29,6 +29,35 @@ class NotificationService {
     print('>>> [Permission] حالة صلاحية الإشعارات: ${settings.authorizationStatus}');
   }
 
+  static Future<void> updateNotificationChannel(String? soundUri) async {
+    final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    // اسم القناة الثابت
+    const String fixedChannelId = 'malaz_notifications_channel';
+
+    // 1. حذف القناة القديمة
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.deleteNotificationChannel(channelId: fixedChannelId);
+
+    // 2. إنشاء القناة باستخدام الرموز المسماة (Named Parameters)
+    final AndroidNotificationChannel channel = AndroidNotificationChannel(
+      fixedChannelId,      // الـ ID لا يزال positional في أغلب النسخ كأول باراميتر
+      'Malaz Notifications', // الاسم أيضاً positional كـ ثاني باراميتر
+      description: 'Main notifications for malaz app', // هنا نستخدم الأسماء
+      importance: Importance.max,
+      playSound: true,
+      sound: soundUri != null ? UriAndroidNotificationSound(soundUri) : null,
+    );
+
+    // 3. تسجيل القناة
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    print("📢 Channel updated locally: $fixedChannelId");
+  }
+
   static Future<void> handleInitialMessage(BuildContext context) async {
     RemoteMessage? initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {

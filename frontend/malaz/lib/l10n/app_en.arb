@@ -229,5 +229,15 @@
   "errorWrongPassword": "Incorrect password, please try again",
   "errorInvalidCredentials": "Invalid login credentials",
   "errorNoNetwork": "No internet connection, please check your network",
-  "errorUnexpected": "Sorry, an unexpected error occurred"
+  "errorUnexpected": "Sorry, an unexpected error occurred",
+  "notifications": "Notifications",
+  "enable_notifications": "Enable Notifications",
+  "notifications_description": "Receive alerts for property updates or new messages",
+  "notification_sound": "Notification Sound",
+  "select_from_system": "Select from system sounds",
+  "default_sound": "Default Sound",
+  "custom_tone_selected": "Custom tone selected",
+  "app_preferences": "App Preferences",
+  "select_theme": "Select Theme",
+  "select_language": "Select Language"
 }

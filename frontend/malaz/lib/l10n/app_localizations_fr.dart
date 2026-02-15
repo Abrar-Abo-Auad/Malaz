@@ -46,10 +46,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chats => 'discussions';
 
   @override
-  String get select_theme => 'choisir le thème';
+  String get select_theme => 'Choisir le thème';
 
   @override
-  String get select_language => 'choisir la langue';
+  String get select_language => 'Choisir la langue';
 
   @override
   String get messages => 'Messages';
@@ -707,4 +707,29 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorUnexpected => 'Désolé, une erreur inattendue s\'est produite';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get enable_notifications => 'Activer les notifications';
+
+  @override
+  String get notifications_description =>
+      'Recevoir des alertes pour les mises à jour des propriétés';
+
+  @override
+  String get notification_sound => 'Son de notification';
+
+  @override
+  String get select_from_system => 'Choisir parmi les sons du système';
+
+  @override
+  String get default_sound => 'Son par défaut';
+
+  @override
+  String get custom_tone_selected => 'Tonalité personnalisée sélectionnée';
+
+  @override
+  String get app_preferences => 'Préférences de l\'application';
 }

@@ -179,13 +179,13 @@ abstract class AppLocalizations {
   /// No description provided for @select_theme.
   ///
   /// In en, this message translates to:
-  /// **'select theme'**
+  /// **'Select Theme'**
   String get select_theme;
 
   /// No description provided for @select_language.
   ///
   /// In en, this message translates to:
-  /// **'select language'**
+  /// **'Select Language'**
   String get select_language;
 
   /// No description provided for @messages.
@@ -1441,6 +1441,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sorry, an unexpected error occurred'**
   String get errorUnexpected;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @enable_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get enable_notifications;
+
+  /// No description provided for @notifications_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive alerts for property updates or new messages'**
+  String get notifications_description;
+
+  /// No description provided for @notification_sound.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Sound'**
+  String get notification_sound;
+
+  /// No description provided for @select_from_system.
+  ///
+  /// In en, this message translates to:
+  /// **'Select from system sounds'**
+  String get select_from_system;
+
+  /// No description provided for @default_sound.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Sound'**
+  String get default_sound;
+
+  /// No description provided for @custom_tone_selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom tone selected'**
+  String get custom_tone_selected;
+
+  /// No description provided for @app_preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'App Preferences'**
+  String get app_preferences;
 }
 
 class _AppLocalizationsDelegate

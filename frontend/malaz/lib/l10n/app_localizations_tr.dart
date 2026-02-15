@@ -45,10 +45,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chats => 'sohbetler';
 
   @override
-  String get select_theme => 'tema seç';
+  String get select_theme => 'Tema Seç';
 
   @override
-  String get select_language => 'dil seç';
+  String get select_language => 'Dil Seç';
 
   @override
   String get messages => 'Mesajlar';
@@ -697,4 +697,29 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get errorUnexpected => 'Üzgünüz, beklenmedik bir hata oluştu';
+
+  @override
+  String get notifications => 'Bildirimler';
+
+  @override
+  String get enable_notifications => 'Bildirimleri Etkinleştir';
+
+  @override
+  String get notifications_description =>
+      'Emlak güncellemeleri için uyarılar alın';
+
+  @override
+  String get notification_sound => 'Bildirim Sesi';
+
+  @override
+  String get select_from_system => 'Sistem seslerinden seçin';
+
+  @override
+  String get default_sound => 'Varsayılan Ses';
+
+  @override
+  String get custom_tone_selected => 'Özel ton seçildi';
+
+  @override
+  String get app_preferences => 'Uygulama Tercihleri';
 }

@@ -230,5 +230,15 @@
   "errorWrongPassword": "Неверный пароль, пожалуйста, попробуйте еще раз",
   "errorInvalidCredentials": "Неверные данные для входа",
   "errorNoNetwork": "Нет подключения к интернету, проверьте сеть",
-  "errorUnexpected": "К сожалению, произошла непредвиденная ошибка"
+  "errorUnexpected": "К сожалению, произошла непредвиденная ошибка",
+  "notifications": "Уведомления",
+  "enable_notifications": "Включить уведомления",
+  "notifications_description": "Получать оповещения об обновлениях недвижимости",
+  "notification_sound": "Звук уведомления",
+  "select_from_system": "Выбрать из системных звуков",
+  "default_sound": "Звук по умолчанию",
+  "custom_tone_selected": "Выбрана своя мелодия",
+  "app_preferences": "Настройки приложения",
+  "select_theme": "Выберите тему",
+  "select_language": "Выберите язык"
 }

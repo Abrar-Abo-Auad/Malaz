@@ -15,6 +15,7 @@ import 'package:malaz/presentation/cubits/language/language_cubit.dart';
 import 'package:malaz/presentation/cubits/location/location_cubit.dart';
 import 'package:malaz/presentation/cubits/property/property_cubit.dart';
 import 'package:malaz/presentation/cubits/review/review_cubit.dart';
+import 'package:malaz/presentation/cubits/settings/settings_cubit.dart';
 import 'package:malaz/presentation/cubits/theme/theme_cubit.dart';
 
 import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
@@ -82,14 +83,25 @@ Future<void> main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  await NotificationService.requestPermission();
-
-  String? token = await FirebaseMessaging.instance.getToken();
-  print("[FCM DEVICE TOKEN]: $token");
-
   await setUpServices();
 
+  await NotificationService.requestPermission();
+
+  _fetchFCMToken();
+
   runApp(const RentalApp());
+}
+
+Future<void> _fetchFCMToken() async {
+  try {
+    await Future.delayed(const Duration(seconds: 2));
+    String? token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      print("[FCM DEVICE TOKEN]: $token");
+    }
+  } catch (e) {
+    print(">>>> Exception occurred at fetch FCM Token: $e");
+  }
 }
 
 @pragma('vm:entry-point')
@@ -122,6 +134,7 @@ class RentalApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => sl<ThemeCubit>()),
         BlocProvider(create: (context) => sl<LanguageCubit>()),
+        BlocProvider(create: (context) => sl<SettingsCubit>()),
         BlocProvider(create: (context) => sl<HomeCubit>()),
         BlocProvider(create: (context) => sl<FavoritesCubit>()..loadFavorites()),
         BlocProvider.value(value: sl<AuthCubit>()),
@@ -140,6 +153,8 @@ class RentalApp extends StatelessWidget {
   }
 }
 
+final router = buildAppRouter();
+
 class RentalAppView extends StatelessWidget {
   const RentalAppView({super.key});
 
@@ -150,8 +165,6 @@ class RentalAppView extends StatelessWidget {
     });
     final themeState = context.watch<ThemeCubit>().state;
     final languageState = context.watch<LanguageCubit>().state;
-
-    final router = buildAppRouter();
 
     return MaterialApp.router(
       scaffoldMessengerKey: messengerKey,

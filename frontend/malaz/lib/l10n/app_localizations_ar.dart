@@ -689,4 +689,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorUnexpected => 'عذراً، حدث خطأ غير متوقع';
+
+  @override
+  String get notifications => 'الإشعارات';
+
+  @override
+  String get enable_notifications => 'تفعيل الإشعارات';
+
+  @override
+  String get notifications_description =>
+      'استلام تنبيهات عند تحديث حالة العقار أو وصول رسائل جديدة';
+
+  @override
+  String get notification_sound => 'نغمة الإشعارات';
+
+  @override
+  String get select_from_system => 'اختر من نغمات النظام';
+
+  @override
+  String get default_sound => 'النغمة الافتراضية';
+
+  @override
+  String get custom_tone_selected => 'تم اختيار نغمة مخصصة';
+
+  @override
+  String get app_preferences => 'تفضيلات التطبيق';
 }

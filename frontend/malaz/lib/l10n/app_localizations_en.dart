@@ -45,10 +45,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chats => 'chats';
 
   @override
-  String get select_theme => 'select theme';
+  String get select_theme => 'Select Theme';
 
   @override
-  String get select_language => 'select language';
+  String get select_language => 'Select Language';
 
   @override
   String get messages => 'Messages';
@@ -693,4 +693,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorUnexpected => 'Sorry, an unexpected error occurred';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get enable_notifications => 'Enable Notifications';
+
+  @override
+  String get notifications_description =>
+      'Receive alerts for property updates or new messages';
+
+  @override
+  String get notification_sound => 'Notification Sound';
+
+  @override
+  String get select_from_system => 'Select from system sounds';
+
+  @override
+  String get default_sound => 'Default Sound';
+
+  @override
+  String get custom_tone_selected => 'Custom tone selected';
+
+  @override
+  String get app_preferences => 'App Preferences';
 }

@@ -229,5 +229,15 @@
   "errorWrongPassword": "Mot de passe incorrect, veuillez réessayer",
   "errorInvalidCredentials": "Identifiants de connexion invalides",
   "errorNoNetwork": "Pas de connexion internet, veuillez vérifier votre réseau",
-  "errorUnexpected": "Désolé, une erreur inattendue s'est produite"
+  "errorUnexpected": "Désolé, une erreur inattendue s'est produite",
+  "notifications": "Notifications",
+  "enable_notifications": "Activer les notifications",
+  "notifications_description": "Recevoir des alertes pour les mises à jour des propriétés",
+  "notification_sound": "Son de notification",
+  "select_from_system": "Choisir parmi les sons du système",
+  "default_sound": "Son par défaut",
+  "custom_tone_selected": "Tonalité personnalisée sélectionnée",
+  "app_preferences": "Préférences de l'application",
+  "select_theme": "Choisir le thème",
+  "select_language": "Choisir la langue"
 }

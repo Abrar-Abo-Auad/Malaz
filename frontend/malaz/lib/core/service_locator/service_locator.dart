@@ -62,6 +62,7 @@ import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/location/location_cubit.dart';
 import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/review/review_cubit.dart';
+import '../../presentation/cubits/settings/settings_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
 import '../network/auth_interceptor.dart';
 import '../network/network_info.dart';
@@ -115,6 +116,8 @@ Future<void> setUpServices() async {
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
 
   sl.registerFactory(() => ThemeCubit(sl()));
+
+  sl.registerFactory(() => SettingsCubit(sl<SharedPreferences>()));
 
   sl.registerFactory(() => LanguageCubit(sl()));
 

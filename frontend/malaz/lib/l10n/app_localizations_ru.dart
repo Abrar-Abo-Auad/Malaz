@@ -45,10 +45,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chats => 'чаты';
 
   @override
-  String get select_theme => 'выберите тему';
+  String get select_theme => 'Выберите тему';
 
   @override
-  String get select_language => 'выберите язык';
+  String get select_language => 'Выберите язык';
 
   @override
   String get messages => 'Сообщения';
@@ -700,4 +700,29 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get errorUnexpected => 'К сожалению, произошла непредвиденная ошибка';
+
+  @override
+  String get notifications => 'Уведомления';
+
+  @override
+  String get enable_notifications => 'Включить уведомления';
+
+  @override
+  String get notifications_description =>
+      'Получать оповещения об обновлениях недвижимости';
+
+  @override
+  String get notification_sound => 'Звук уведомления';
+
+  @override
+  String get select_from_system => 'Выбрать из системных звуков';
+
+  @override
+  String get default_sound => 'Звук по умолчанию';
+
+  @override
+  String get custom_tone_selected => 'Выбрана своя мелодия';
+
+  @override
+  String get app_preferences => 'Настройки приложения';
 }

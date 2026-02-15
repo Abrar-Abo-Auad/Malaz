@@ -230,5 +230,15 @@
   "errorWrongPassword": "كلمة المرور غير صحيحة، حاول مرة أخرى",
   "errorInvalidCredentials": "بيانات الدخول غير صحيحة",
   "errorNoNetwork": "لا يوجد اتصال بالإنترنت، يرجى التحقق من الشبكة",
-  "errorUnexpected": "عذراً، حدث خطأ غير متوقع"
+  "errorUnexpected": "عذراً، حدث خطأ غير متوقع",
+  "notifications": "الإشعارات",
+  "enable_notifications": "تفعيل الإشعارات",
+  "notifications_description": "استلام تنبيهات عند تحديث حالة العقار أو وصول رسائل جديدة",
+  "notification_sound": "نغمة الإشعارات",
+  "select_from_system": "اختر من نغمات النظام",
+  "default_sound": "النغمة الافتراضية",
+  "custom_tone_selected": "تم اختيار نغمة مخصصة",
+  "app_preferences": "تفضيلات التطبيق",
+  "select_theme": "اختر المظهر",
+  "select_language": "اختر اللغة"
 }
