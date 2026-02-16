@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
 
 import '../../../core/errors/exceptions.dart';
+import '../../../domain/entities/apartment/apartment.dart';
 import '../../../domain/entities/apartment/apartments_list.dart';
 import '../../../domain/entities/filters/filters.dart';
 import '../../../domain/repositories/apartment/apartment_repository.dart';
@@ -77,6 +78,26 @@ class ApartmentRepositoryImpl implements ApartmentRepository {
       return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(GeneralFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Apartment>>> searchProperties({
+    String? title,
+    String? ownerFirstName,
+    String? ownerLastName,
+    int perPage = 20,
+  }) async {
+    try {
+      final remoteData = await remoteDataSource.searchProperties(
+        title: title,
+        ownerFirstName: ownerFirstName,
+        ownerLastName: ownerLastName,
+        perPage: perPage,
+      );
+      return Right(remoteData);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     }
   }
 }

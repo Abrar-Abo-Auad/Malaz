@@ -15,11 +15,13 @@ import 'package:malaz/presentation/cubits/language/language_cubit.dart';
 import 'package:malaz/presentation/cubits/location/location_cubit.dart';
 import 'package:malaz/presentation/cubits/property/property_cubit.dart';
 import 'package:malaz/presentation/cubits/review/review_cubit.dart';
+import 'package:malaz/presentation/cubits/search/search_cubit.dart';
 import 'package:malaz/presentation/cubits/settings/settings_cubit.dart';
 import 'package:malaz/presentation/cubits/theme/theme_cubit.dart';
 
 import 'package:malaz/presentation/screens/auth/login/login_screen.dart';
 import 'package:malaz/presentation/screens/auth/register/home_register_screen.dart';
+import 'package:malaz/presentation/screens/home/home_screen.dart';
 import 'package:malaz/presentation/screens/settings/settings_screen.dart';
 import 'package:malaz/presentation/screens/splash_screen/splash_screen.dart';
 import 'package:malaz/services/notification_service/notification_service.dart';
@@ -147,6 +149,10 @@ class RentalApp extends StatelessWidget {
         BlocProvider(create: (context) => sl<MyBookingCubit>()),
         BlocProvider(create: (context) => sl<ManageBookingCubit>()),
         BlocProvider(create: (context) => sl<ReviewsCubit>()),
+        BlocProvider(
+          create: (context) => sl<SearchCubit>(),
+          child: const HomeScreen(),
+        )
       ],
       child: const RentalAppView(),
     );

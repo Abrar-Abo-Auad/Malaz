@@ -143,8 +143,8 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 right: 20,
                 child: Text(
                   tr.malaz_chat,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     fontWeight: FontWeight.w900,
                     fontSize: 32,
                   ),
@@ -163,11 +163,17 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
   Widget _buildActionIcon(IconData icon) {
     return Container(
-      margin: const EdgeInsets.only(top: 10),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), shape: BoxShape.circle),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white, size: 22),
-        onPressed: () {},
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.09),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Theme.of(context).scaffoldBackgroundColor),
+      ),
+      child: GestureDetector(
+        onTap: (){
+
+        },
+        child: Icon(icon, color: Theme.of(context).scaffoldBackgroundColor, size: 22)
       ),
     );
   }

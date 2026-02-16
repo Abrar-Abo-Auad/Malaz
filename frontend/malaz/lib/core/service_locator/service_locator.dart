@@ -37,6 +37,7 @@ import '../../domain/repositories/favorites/favorites_repository.dart';
 import '../../domain/repositories/location/location_repository.dart';
 import '../../domain/usecases/apartment/add_apartment_use_case.dart';
 import '../../domain/usecases/apartment/my_apartment_use_case.dart';
+import '../../domain/usecases/apartment/search_properties_usecase.dart';
 import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/register_usecase.dart';
@@ -62,6 +63,7 @@ import '../../presentation/cubits/language/language_cubit.dart';
 import '../../presentation/cubits/location/location_cubit.dart';
 import '../../presentation/cubits/property/property_cubit.dart';
 import '../../presentation/cubits/review/review_cubit.dart';
+import '../../presentation/cubits/search/search_cubit.dart';
 import '../../presentation/cubits/settings/settings_cubit.dart';
 import '../../presentation/cubits/theme/theme_cubit.dart';
 import '../network/auth_interceptor.dart';
@@ -221,4 +223,7 @@ Future<void> setUpServices() async {
     loadSavedLocationUseCase: sl(),
     updateManualLocationUseCase: sl(),
   ));
+
+  sl.registerFactory(() => SearchCubit(sl()));
+  sl.registerLazySingleton(() => SearchPropertiesUseCase(sl()));
 }

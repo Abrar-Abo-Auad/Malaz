@@ -7,7 +7,6 @@ import 'package:malaz/l10n/app_localizations.dart';
 import 'package:malaz/presentation/cubits/settings/settings_cubit.dart';
 import '../../cubits/auth/auth_cubit.dart';
 import '../../cubits/language/language_cubit.dart';
-import '../../cubits/theme/theme_cubit.dart';
 import '../../global_widgets/brand/build_branding.dart';
 import '../../global_widgets/glowing_key/build_glowing_key.dart';
 import '../../global_widgets/user_profile_image/user_profile_image.dart';
@@ -33,10 +32,9 @@ class SettingsScreen extends StatelessWidget {
         body: BlocBuilder<SettingsCubit, SettingsState>(
           builder: (context, state) {
             return ListView(
-              physics: const BouncingScrollPhysics(), // حركة تمرير ناعمة (iOS style)
+              physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               children: [
-                // 1. إضافة ملخص الحساب (اختياري لكنه يعطي رقي عالي)
                 _buildAccountSummary(context, isDark),
                 const SizedBox(height: 30),
 
@@ -137,14 +135,12 @@ class SettingsScreen extends StatelessWidget {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // التدرج الذهبي مع انحناء سفلي
             Container(
               decoration: const BoxDecoration(
                 gradient: AppColors.premiumGoldGradient2,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
               ),
             ),
-            // المفاتيح المتوهجة (بروح ملاذ)
             const PositionedDirectional(
               top: -20,
               start: -40,

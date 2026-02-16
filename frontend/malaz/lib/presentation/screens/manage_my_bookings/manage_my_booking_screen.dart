@@ -148,11 +148,11 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.09),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Theme.of(context).scaffoldBackgroundColor),
               ),
-              child: const Icon(Icons.tune_rounded, color: Colors.white, size: 22),
+              child: Icon(Icons.tune_rounded, color: Theme.of(context).scaffoldBackgroundColor, size: 22),
             ),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             itemBuilder: (context) => [
@@ -189,8 +189,8 @@ class _ManageBookingsScreenState extends State<ManageMyBookingsScreen> {
                 right: 20,
                 child: Text(
                   tr.my_bookings,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     fontWeight: FontWeight.w900,
                     fontSize: 30,
                   ),

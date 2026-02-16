@@ -29,6 +29,13 @@ abstract class ApartmentRemoteDataSource {
     required double longitude,
   });
   Future<ApartmentsList> getMyApartments({String? cursor});
+
+  Future<List<ApartmentModel>> searchProperties({
+    String? title,
+    String? ownerFirstName,
+    String? ownerLastName,
+    int perPage,
+  });
 }
 class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
   final NetworkService networkService;
@@ -194,6 +201,31 @@ class ApartmentRemoteDataSourceImpl implements ApartmentRemoteDataSource {
       print('ADD PROPERTY ERROR: $e');
       print(stack);
       rethrow;
+    }
+  }
+
+  @override
+  Future<List<ApartmentModel>> searchProperties({
+    String? title,
+    String? ownerFirstName,
+    String? ownerLastName,
+    int perPage = 20,
+  }) async {
+    final response = await networkService.get(
+      '/properties/find/search',
+      queryParameters: {
+        'per_page': perPage,
+        if (title != null) 'title': title,
+        if (ownerFirstName != null) 'owner_first_name': ownerFirstName,
+        if (ownerLastName != null) 'owner_last_name': ownerLastName,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List data = response.data['data'];
+      return data.map((json) => ApartmentModel.fromJson(json)).toList();
+    } else {
+      throw ServerException(message: response.data['message']);
     }
   }
 }

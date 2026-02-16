@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-const Color _placeholderColor = Colors.white;
+const Color _silverBase = Color(0xFFE0E0E0);
+const Color _silverHighlight = Color(0xFFF5F5F5);
 
 class BuildBookingShimmer extends StatelessWidget {
   const BuildBookingShimmer({super.key});
@@ -10,30 +11,41 @@ class BuildBookingShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final Color baseColor = isDark ? Colors.grey[850]! : _silverBase;
+    final Color highlightColor = isDark ? Colors.grey[700]! : _silverHighlight;
+
     return Container(
-      margin: const EdgeInsets.symmetric( vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: isDark ? Colors.grey[900]!.withOpacity(0.5) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Shimmer.fromColors(
-        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
-        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
-        child: const Column(
+        baseColor: baseColor,
+        highlightColor: highlightColor,
+        period: const Duration(milliseconds: 1500),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _BuildShimmerUserHeader(),
-            Divider(height: 32, color: _placeholderColor, thickness: 0.8),
-            _BuildShimmerApartmentRow(),
-            SizedBox(height: 20),
-            _BuildShimmerActionButtons(),
+            const _BuildShimmerUserHeader(),
+            const SizedBox(height: 16),
+            Container(
+                height: 1,
+                width: double.infinity,
+                color: baseColor.withOpacity(0.5)
+            ),
+            const SizedBox(height: 16),
+            const _BuildShimmerApartmentRow(),
+            const SizedBox(height: 24),
+            const _BuildShimmerActionButtons(),
           ],
         ),
       ),
@@ -49,21 +61,25 @@ class _BuildShimmerUserHeader extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 55, height: 55,
-          decoration: const BoxDecoration(color: _placeholderColor, shape: BoxShape.circle),
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(width: 100, height: 16, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+              Container(width: 110, height: 12, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
               const SizedBox(height: 8),
-              Container(width: 140, height: 12, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+              Container(width: 70, height: 8, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
             ],
           ),
         ),
-        Container(width: 40, height: 40, decoration: const BoxDecoration(color: _placeholderColor, shape: BoxShape.circle)),
+        Container(width: 24, height: 24, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6))),
       ],
     );
   }
@@ -77,22 +93,24 @@ class _BuildShimmerApartmentRow extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 50, height: 50,
-          decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(12)),
+          width: 54,
+          height: 54,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(width: 120, height: 14, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+              Container(width: 160, height: 10, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
               const SizedBox(height: 8),
-              Container(width: 60, height: 14, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(4))),
+              Container(width: 90, height: 8, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
             ],
           ),
         ),
-        Container(width: 65, height: 24, decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(10))),
       ],
     );
   }
@@ -107,18 +125,22 @@ class _BuildShimmerActionButtons extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            height: 45,
+            height: 38,
             decoration: BoxDecoration(
-              border: Border.all(color: _placeholderColor, width: 2),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.white, width: 1.5),
             ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Container(
-            height: 45,
-            decoration: BoxDecoration(color: _placeholderColor, borderRadius: BorderRadius.circular(12)),
+            height: 38,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         ),
       ],

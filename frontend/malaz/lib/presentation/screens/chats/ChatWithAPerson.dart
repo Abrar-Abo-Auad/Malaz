@@ -311,7 +311,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                   children: [
                     IconButton(
                       onPressed: () => context.pop(),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).scaffoldBackgroundColor, size: 20),
                     ),
                     UserProfileImage(
                       userId: widget.otherUserId,
@@ -328,10 +328,10 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                         children: [
                           Text(
                             '${widget.firstName} ${widget.lastName}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
-                              color: Colors.white,
+                              color: Theme.of(context).scaffoldBackgroundColor,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -361,7 +361,7 @@ class _ChatWithAPersonState extends State<ChatWithAPerson> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
+                      icon: Icon(Icons.more_vert_rounded, color: Theme.of(context).scaffoldBackgroundColor,),
                       onPressed: () {},
                     ),
                   ],

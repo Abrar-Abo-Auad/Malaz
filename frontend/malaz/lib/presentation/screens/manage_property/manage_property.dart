@@ -89,10 +89,10 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryLight.withOpacity(0.4),
-                blurRadius: 15,
+                color: AppColors.primaryLight.withOpacity(0.3),
+                blurRadius: 20,
                 spreadRadius: 2,
-                offset: const Offset(0, 8),
+                offset: const Offset(0, 10),
               ),
             ],
           ),
@@ -297,7 +297,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                 )
                     : ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {
                     return BookingCardWidget(
@@ -307,7 +307,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                       ownerId: authState.user.id,
                     );
                   },
-                ),
+                )
               );
             }
             return const SizedBox.shrink();
@@ -343,7 +343,7 @@ class _ManagePropertiesScreenState extends State<ManagePropertiesScreen> {
                 .fetchMyApartments(isRefresh: true),
             child: ListView.builder(
               controller: _myApartmentsScrollController,
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
+              padding: const EdgeInsets.fromLTRB(2, 10, 2, 100),
               itemCount: state.myApartments.length + (state.hasReachedMax ? 0 : 1),
               itemBuilder: (context, index) {
                 if (index < state.myApartments.length) {

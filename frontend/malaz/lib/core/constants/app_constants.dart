@@ -1,3 +1,5 @@
+import 'package:malaz/services/notification_service/notification_service.dart';
+
 class AppConstants {
   static const baseurl = 'http://192.168.1.101:8000/api';
   static const baseurlForPusher = 'http://192.168.1.101:8000/broadcasting/auth';
@@ -29,6 +31,11 @@ class AppConstants {
   /// [Pusher] keys
   static const String apiKeyForPusher = 'c85e12264ff96015fc05';
   static const String clusterForPusher = 'ap2';
+
+  /// [Notifications] keys
+  static const String notificationsEnabled = 'notifications_enabled';
+  static const String customSoundPath = 'custom_sound_path';
+  static const String ChannelId = 'malaz_notifications_channel';
 
   /// [Logo] key
   static const String LogoPath = 'assets/icons/key_logo.png';

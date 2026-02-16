@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:malaz/core/errors/failures.dart';
 import 'package:malaz/domain/entities/apartment/apartments_list.dart';
 
+import '../../entities/apartment/apartment.dart';
 import '../../entities/filters/filters.dart';
 
 abstract class ApartmentRepository {
@@ -26,5 +27,10 @@ abstract class ApartmentRepository {
   });
   Future<ApartmentsList> getMyApartments({required String? cursor});
 
-
+  Future<Either<Failure, List<Apartment>>> searchProperties({
+    String? title,
+    String? ownerFirstName,
+    String? ownerLastName,
+    int perPage = 20,
+  });
 }

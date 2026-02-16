@@ -1,16 +1,17 @@
+import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
 import 'package:malaz/core/config/color/app_color.dart';
-import 'package:malaz/core/constants/app_constants.dart';
-import 'package:malaz/presentation/global_widgets/brand/build_branding.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/config/routes/route_info.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../cubits/home/home_cubit.dart';
+import '../../cubits/search/search_cubit.dart';
 import '../../global_widgets/cards/apartment/apartment_card.dart';
 import '../../global_widgets/cards/apartment/apartment_shimmer_card.dart';
+import '../property/build_no_results_view.dart';
 import '../side_drawer/app_drawer.dart';
 import 'filter_bottom_sheet.dart';
 
@@ -33,6 +34,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
+  Timer? _debounce;
 
   bool _showStickyHeader = false;
 
@@ -50,6 +52,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -66,6 +69,17 @@ class _HomeViewState extends State<HomeView> {
         });
       }
     }
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      if (query.isNotEmpty) {
+        context.read<SearchCubit>().search(query);
+      } else {
+        context.read<SearchCubit>().search("");
+      }
+    });
   }
 
   bool get _isBottom {
@@ -97,6 +111,7 @@ class _HomeViewState extends State<HomeView> {
             _BuildScrollableBody(
               scrollController: _scrollController,
               scaffoldKey: _scaffoldKey,
+              onSearchChanged: _onSearchChanged,
             ),
             _BuildStickyHeader(
               isVisible: _showStickyHeader,
@@ -117,10 +132,12 @@ class _HomeViewState extends State<HomeView> {
 class _BuildScrollableBody extends StatelessWidget {
   final ScrollController scrollController;
   final GlobalKey<ScaffoldState> scaffoldKey;
+  final Function(String) onSearchChanged;
 
   const _BuildScrollableBody({
     required this.scrollController,
     required this.scaffoldKey,
+    required this.onSearchChanged,
   });
 
   @override
@@ -136,58 +153,159 @@ class _BuildScrollableBody extends StatelessWidget {
             child: _BuildMainBrandingHeader(scaffoldKey: scaffoldKey),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 10)),
-          BlocBuilder<HomeCubit, HomeState>(
-            builder: (context, state) {
-              if (state is HomeLoading) {
+
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SearchAppBarDelegate(
+              minHeight: 90,
+              maxHeight: 90,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    color: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF1E1E1E)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8)
+                          )
+                        ],
+                        border: Border.all(color: AppColors.primaryLight.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          const Icon(Icons.search_rounded, color: AppColors.primaryLight, size: 22),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              onChanged: onSearchChanged,
+                              style: const TextStyle(fontSize: 16),
+                              decoration: const InputDecoration(
+                                hintText: "Search by title or owner...",
+                                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => const FilterBottomSheet(),
+                              );
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                gradient: AppColors.premiumGoldGradient2,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.tune_rounded, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
+
+          BlocBuilder<SearchCubit, SearchState>(
+            builder: (context, searchState) {
+              if (searchState is SearchLoading) {
                 return const SliverToBoxAdapter(child: _BuildShimmerLoading());
               }
 
-              if (state is HomeError) {
-                return SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: _BuildErrorView(message: state.message),
-                );
-              }
-
-              if (state is HomeLoaded) {
-                if (state.apartments.isEmpty) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _BuildErrorView(
-                        message: AppLocalizations.of(context)
-                            .unexpected_error_message),
-                  );
-                }
+              if (searchState is SearchSuccess) {
+                if (searchState.results.isEmpty) return const BuildNoResultsView();
 
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index >= state.apartments.length) {
-                        return state.hasReachedMax
-                            ? const SizedBox.shrink()
-                            : const _BuildBottomLoader();
-                      }
-                      final apartment = state.apartments[index];
-                      return ApartmentCard(
-                        apartment: apartment,
-                        onTap: () {
-                          context.pushNamed(RouteNames.details,
-                              extra: apartment);
-                        },
-                      );
-                    },
-                    childCount: state.hasReachedMax
-                        ? state.apartments.length
-                        : state.apartments.length + 1,
+                        (context, index) => ApartmentCard(
+                      apartment: searchState.results[index],
+                      onTap: () => context.pushNamed(RouteNames.details, extra: searchState.results[index]),
+                    ),
+                    childCount: searchState.results.length,
                   ),
                 );
               }
 
-              return const SliverToBoxAdapter(child: SizedBox.shrink());
+              return const _BuildHomeList();
             },
           ),
         ],
       ),
+    );
+  }
+}
+
+/// [_BuildHomeList]
+class _BuildHomeList extends StatelessWidget {
+  const _BuildHomeList();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: (context, state) {
+        if (state is HomeLoading) {
+          return const SliverToBoxAdapter(child: _BuildShimmerLoading());
+        }
+
+        if (state is HomeError) {
+          return SliverFillRemaining(
+            hasScrollBody: false,
+            child: _BuildErrorView(message: state.message),
+          );
+        }
+
+        if (state is HomeLoaded) {
+          if (state.apartments.isEmpty) {
+            return SliverFillRemaining(
+              hasScrollBody: false,
+              child: _BuildErrorView(message: AppLocalizations.of(context).unexpected_error_message),
+            );
+          }
+
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                if (index >= state.apartments.length) {
+                  return state.hasReachedMax
+                      ? const SizedBox.shrink()
+                      : const _BuildBottomLoader();
+                }
+                final apartment = state.apartments[index];
+                return ApartmentCard(
+                  apartment: apartment,
+                  onTap: () {
+                    context.pushNamed(RouteNames.details, extra: apartment);
+                  },
+                );
+              },
+              childCount: state.hasReachedMax
+                  ? state.apartments.length
+                  : state.apartments.length + 1,
+            ),
+          );
+        }
+        return const SliverToBoxAdapter(child: SizedBox.shrink());
+      },
     );
   }
 }
@@ -200,31 +318,45 @@ class _BuildMainBrandingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SizedBox(
+      height: 130,
+      child: Stack(
         children: [
-          _BuildIconButton(
-            icon: Icons.menu_rounded,
-            onTap: () => scaffoldKey.currentState?.openDrawer(),
+          Container(
+            height: 100,
+            decoration: const BoxDecoration(
+              gradient: AppColors.premiumGoldGradient2,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(25),
+                bottomRight: Radius.circular(25),
+              ),
+            ),
           ),
-          BuildBranding.nameLottie(
-              lottie: Lottie.asset('assets/lottie/shake_share_laptop.json'),
-              width: 80,
-              height: 80),
-          _BuildIconButton(
-            icon: Icons.tune_rounded,
-            color: AppColors.primaryDark.withOpacity(0.1),
-            iconColor: AppColors.primaryDark,
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => const FilterBottomSheet(),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 35, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _BuildIconButton(
+                  icon: Icons.notes_rounded,
+                  onTap: () => scaffoldKey.currentState?.openDrawer(),
+                ),
+                Text(
+                  AppLocalizations.of(context).malaz,
+                  style: TextStyle(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 28,
+                    letterSpacing: 5,
+                  ),
+                ),
+                _BuildIconButton(
+                  icon: Icons.notifications_none_rounded,
+                  onTap: () {},
+                  showBadge: true,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -237,10 +369,7 @@ class _BuildStickyHeader extends StatelessWidget {
   final bool isVisible;
   final VoidCallback onTapBack;
 
-  const _BuildStickyHeader({
-    required this.isVisible,
-    required this.onTapBack,
-  });
+  const _BuildStickyHeader({required this.isVisible, required this.onTapBack});
 
   @override
   Widget build(BuildContext context) {
@@ -249,7 +378,7 @@ class _BuildStickyHeader extends StatelessWidget {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOutBack,
-      top: isVisible ? 10 : -80,
+      top: isVisible ? 90 : -80,
       left: 0,
       right: 0,
       child: Center(
@@ -263,13 +392,11 @@ class _BuildStickyHeader extends StatelessWidget {
               height: 25,
               decoration: BoxDecoration(
                   color: theme.colorScheme.surface,
-                  shape: BoxShape.rectangle,
                   boxShadow: [
                     BoxShadow(
                       color: theme.colorScheme.primary.withOpacity(0.25),
                       blurRadius: 15,
                       offset: const Offset(0, 4),
-                      spreadRadius: 1,
                     ),
                   ],
                   border: Border.all(
@@ -296,39 +423,43 @@ class _BuildStickyHeader extends StatelessWidget {
 class _BuildIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  final Color? color;
-  final Color? iconColor;
+  final bool showBadge;
 
-  const _BuildIconButton({
-    required this.icon,
-    required this.onTap,
-    this.color,
-    this.iconColor,
-  });
+  const _BuildIconButton({required this.icon, required this.onTap, this.showBadge = false});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: color ?? (isDark ? Colors.grey[800] : Colors.white),
-            borderRadius: BorderRadius.circular(20 * 0.6),
-            boxShadow: [
-              BoxShadow(
-                color: theme.colorScheme.primary.withOpacity(0.25),
-                blurRadius: 15,
-                offset: const Offset(0, 4),
-              )
-            ],
-            border: Border.all(color: Colors.grey.withOpacity(0.1))),
-        child: Icon(icon,
-            color: iconColor ?? theme.colorScheme.onSurface.withOpacity(0.8),
-            size: 24),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).scaffoldBackgroundColor),
+            ),
+            child: Icon(icon, size: 22, color: Theme.of(context).scaffoldBackgroundColor,),
+          ),
+          if (showBadge)
+            Positioned(
+              top: -2,
+              right: -2,
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 1.5),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -336,123 +467,59 @@ class _BuildIconButton extends StatelessWidget {
 
 class _BuildBottomLoader extends StatelessWidget {
   const _BuildBottomLoader();
-
   @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(24.0),
-      child: Center(
-          child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2))),
-    );
-  }
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.all(24.0),
+    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+  );
 }
 
 class _BuildShimmerLoading extends StatelessWidget {
   const _BuildShimmerLoading();
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
-      children: List.generate(
-        3,
-        (index) => Shimmer.fromColors(
-          baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
-          highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
-          child: const BuildShimmerCard(),
-        ),
+      children: List.generate(3, (index) => Shimmer.fromColors(
+        baseColor: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+        highlightColor: isDark ? Colors.grey[700]! : Colors.grey[100]!,
+        child: const BuildShimmerCard(),
+      ),
       ),
     );
   }
 }
 
-/// [_BuildErrorView]
 class _BuildErrorView extends StatelessWidget {
   final String message;
-
   const _BuildErrorView({required this.message});
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    String displayMessage = message;
-
-    if (message == AppConstants.networkFailureKey) {
-      displayMessage = AppLocalizations.of(context).network_error_message;
-    } else if (message == AppConstants.cancelledFailureKey) {
-      displayMessage =
-          AppLocalizations.of(context).request_cancelled_error_message;
-    } else {
-      displayMessage = AppLocalizations.of(context).unexpected_error_message;
-    }
-
     return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.error.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.cloud_off_rounded,
-                size: 64,
-                color: theme.colorScheme.error,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              AppLocalizations.of(context).warring,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              displayMessage,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: 200,
-              height: 54,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.read<HomeCubit>().loadApartments(isRefresh: true);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  elevation: 4,
-                  shadowColor: theme.colorScheme.primary.withOpacity(0.4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                icon: const Icon(Icons.refresh_rounded),
-                label: Text(
-                  AppLocalizations.of(context).retry,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.cloud_off_rounded, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(message),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => context.read<HomeCubit>().loadApartments(isRefresh: true),
+            child: const Text("Retry"),
+          ),
+        ],
       ),
     );
   }
+}
+
+class _SearchAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+  _SearchAppBarDelegate({required this.minHeight, required this.maxHeight, required this.child});
+  @override double get minExtent => minHeight;
+  @override double get maxExtent => maxHeight;
+  @override Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) => SizedBox.expand(child: child);
+  @override bool shouldRebuild(_SearchAppBarDelegate oldDelegate) => true;
 }

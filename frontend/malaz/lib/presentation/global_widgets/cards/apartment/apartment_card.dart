@@ -4,6 +4,8 @@ import 'package:malaz/l10n/app_localizations.dart';
 import 'package:malaz/presentation/global_widgets/buttons/animated_heart_button.dart';
 import '../../../../domain/entities/apartment/apartment.dart';
 import '../../../cubits/favorites/favorites_cubit.dart';
+import '../../../cubits/search/search_cubit.dart';
+import '../../../screens/property/search_text_highlighter.dart';
 
 /// ============================================================================
 /// [ApartmentCard]
@@ -19,21 +21,16 @@ class ApartmentCard extends StatelessWidget {
   final Apartment apartment;
   final VoidCallback onTap;
 
-  const ApartmentCard({
-    super.key,
-    required this.apartment,
-    required this.onTap,
-  });
+  const ApartmentCard({super.key, required this.apartment, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 24),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -43,7 +40,7 @@ class ApartmentCard extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(16),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -52,7 +49,6 @@ class ApartmentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _BuildCardImageArea(apartment: apartment),
-
                   _BuildCardDetails(apartment: apartment),
                 ],
               ),
@@ -68,7 +64,6 @@ class ApartmentCard extends StatelessWidget {
 /// Handles the top part of the card: The Image Slider and the Overlay Badges.
 class _BuildCardImageArea extends StatefulWidget {
   final Apartment apartment;
-
   const _BuildCardImageArea({required this.apartment});
 
   @override
@@ -122,7 +117,6 @@ class _BuildCardImageAreaState extends State<_BuildCardImageArea> {
           right: 16,
           child: _BuildFavoriteIcon(apartment: widget.apartment),
         ),
-
         Positioned(
           bottom: 12,
           left: 0,
@@ -168,13 +162,13 @@ class _BuildCardDetails extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  apartment.title,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                child: SearchTextHighlighter(
+                  text: apartment.title,
+                  query: context.read<SearchCubit>().currentQuery,
+                  baseStyle: theme.textTheme.titleMedium!.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (apartment.status == 'approved')

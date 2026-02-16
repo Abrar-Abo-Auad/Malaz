@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:malaz/core/config/color/app_color.dart';
+import 'package:malaz/core/constants/app_constants.dart';
 
 import '../../main.dart';
 
@@ -32,25 +33,21 @@ class NotificationService {
   static Future<void> updateNotificationChannel(String? soundUri) async {
     final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    // اسم القناة الثابت
-    const String fixedChannelId = 'malaz_notifications_channel';
+    const String fixedChannelId = AppConstants.ChannelId;
 
-    // 1. حذف القناة القديمة
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.deleteNotificationChannel(channelId: fixedChannelId);
 
-    // 2. إنشاء القناة باستخدام الرموز المسماة (Named Parameters)
     final AndroidNotificationChannel channel = AndroidNotificationChannel(
-      fixedChannelId,      // الـ ID لا يزال positional في أغلب النسخ كأول باراميتر
-      'Malaz Notifications', // الاسم أيضاً positional كـ ثاني باراميتر
-      description: 'Main notifications for malaz app', // هنا نستخدم الأسماء
+      fixedChannelId,
+      'Malaz Notifications',
+      description: 'Main notifications for malaz app',
       importance: Importance.max,
       playSound: true,
       sound: soundUri != null ? UriAndroidNotificationSound(soundUri) : null,
     );
 
-    // 3. تسجيل القناة
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
