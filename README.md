@@ -1,6 +1,6 @@
 # Malaz App - Apartment Rental & Real Estate Platform 🏠
 
-**Malaz** is a high-performance cross-platform mobile application built with **Flutter**. It serves as a sophisticated bridge between landlords and tenants. This project was developed as a collaborative effort by a team of 5 at Damascus University (2025-2026), implementing modern software engineering standards and professional UI/UX features.
+**Malaz** is a high-performance cross-platform mobile application built with **Flutter** & **Laravel**. It serves as a sophisticated bridge between landlords and tenants. This project was developed as a collaborative effort by a team of 5 at Damascus University (2025-2026), implementing modern software engineering standards and professional UI/UX features.
 
 ## 🚀 Key Features
 * **Advanced Search Engine:** Dynamic searching by **Title** or **Landlord's Full Name**.
@@ -8,11 +8,11 @@
 * **Multi-Language Support:** Fully localized experience supporting **Arabic, English, French, Russian, and Turkish**.
 * **Dynamic Theming:** Seamless switching between **Dark Mode** and **Light Mode**.
 * **Smart Booking & Rating:** A complete booking lifecycle (Accept/Reject) with a **Post-Rental Rating System** for user feedback.
-* **Full Authentication & Profile:** Secure Sign-up/Login and a comprehensive Profile Management module (Image picking, bio updates, and password security).
+* **Full Authentication & Profile:** Secure Sign-up/Login and a comprehensive Profile Management module (Image picking, profile updates, and password security).
 * **Real-time Communication:** Instant messaging powered by **Pusher Channels**.
 * **Instant Notifications:** Real-time alerts for bookings and messages via **Firebase (FCM)**.
 
-## 🛠️ Tech Stack (The Engine)
+## 🛠️ Front-end Tools and Technologies
 * **Framework:** Flutter (Dart) using **Clean Architecture**.
 * **State Management:** **Bloc/Cubit** (`flutter_bloc`) for reactive an  d predictable state handling.
 * **Localization:** Internationalization support for 5 languages.
